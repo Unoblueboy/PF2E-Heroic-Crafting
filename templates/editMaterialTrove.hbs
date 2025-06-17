@@ -1,0 +1,10 @@
+<section class="tab {{tab.cssClass}}"
+         data-group="primary"
+         data-tab="edit">
+    <div></div>
+    {{formGroup fields.editPP label=(localize 'PF2E.CurrencyPP') value=craftingMaterials.coins.pp rootId=partId}}
+    {{formGroup fields.editGP label=(localize 'PF2E.CurrencyGP') value=craftingMaterials.coins.gp rootId=partId}}
+    {{formGroup fields.editSP label=(localize 'PF2E.CurrencySP') value=craftingMaterials.coins.sp rootId=partId}}
+    {{formGroup fields.editCP label=(localize 'PF2E.CurrencyCP') value=craftingMaterials.coins.cp rootId=partId}}
+    <div></div>
+</section>

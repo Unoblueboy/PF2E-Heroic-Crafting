@@ -1,0 +1,124 @@
+{
+	"id": "pf2e-heroic-crafting",
+	"title": "PF2E Heroic Crafting",
+	"version": "1.0.0",
+	"compatibility": {
+		"minimum": "13",
+		"verified": "13"
+	},
+	"esmodules": ["scripts/heroicCrafting.mjs"],
+	"styles": ["styles/style.css"],
+	"description": "<p>Heroic Crafting, new and improved</p>",
+	"authors": [
+		{
+			"name": "Nathan Douglas",
+			"flags": {}
+		}
+	],
+	"relationships": {
+		"systems": [
+			{
+				"id": "pf2e",
+				"type": "system",
+				"manifest": "https://github.com/foundryvtt/pf2e/releases/latest/download/system.json",
+				"compatibility": {
+					"minimum": "7.1.1"
+				}
+			}
+		]
+	},
+	"packs": [
+		{
+			"label": "Heroic Crafting Actions",
+			"type": "Item",
+			"name": "heroic-crafting-actions",
+			"path": "./packs/heroic-crafting-actions",
+			"system": "pf2e",
+			"package": "pf2e-heroic-crafting",
+			"banner": "systems/pf2e/assets/compendium-banner/green.webp",
+			"ownership": {
+				"PLAYER": "LIMITED",
+				"ASSISTANT": "OWNER"
+			}
+		},
+		{
+			"label": "Heroic Crafting Feats",
+			"type": "Item",
+			"name": "heroic-crafting-feats",
+			"path": "./packs/heroic-crafting-feats",
+			"system": "pf2e",
+			"package": "pf2e-heroic-crafting",
+			"banner": "systems/pf2e/assets/compendium-banner/green.webp",
+			"ownership": {
+				"PLAYER": "LIMITED",
+				"ASSISTANT": "OWNER"
+			}
+		},
+		{
+			"label": "Heroic Crafting Items",
+			"type": "Item",
+			"name": "heroic-crafting-items",
+			"path": "./packs/heroic-crafting-items",
+			"system": "pf2e",
+			"package": "pf2e-heroic-crafting",
+			"banner": "systems/pf2e/assets/compendium-banner/blue.webp",
+			"ownership": {
+				"PLAYER": "LIMITED",
+				"ASSISTANT": "OWNER"
+			}
+		},
+		{
+			"label": "Heroic Crafting Effects",
+			"type": "Item",
+			"name": "heroic-crafting-effects",
+			"path": "./packs/heroic-crafting-effects",
+			"system": "pf2e",
+			"package": "pf2e-heroic-crafting",
+			"banner": "systems/pf2e/assets/compendium-banner/blue.webp",
+			"ownership": {
+				"PLAYER": "LIMITED",
+				"ASSISTANT": "OWNER"
+			}
+		},
+		{
+			"label": "Heroic Crafting Vehicles",
+			"type": "Actor",
+			"name": "heroic-crafting-vehicles",
+			"path": "./packs/heroic-crafting-vehicles",
+			"system": "pf2e",
+			"package": "pf2e-heroic-crafting",
+			"banner": "systems/pf2e/assets/compendium-banner/red.webp",
+			"ownership": {
+				"PLAYER": "LIMITED",
+				"ASSISTANT": "OWNER"
+			}
+		},
+		{
+			"label": "Heroic Crafting Journals",
+			"type": "JournalEntry",
+			"name": "heroic-crafting-journals",
+			"path": "./packs/heroic-crafting-journals",
+			"system": "pf2e",
+			"package": "pf2e-heroic-crafting",
+			"banner": "systems/pf2e/assets/compendium-banner/orange.webp",
+			"ownership": {
+				"PLAYER": "LIMITED",
+				"ASSISTANT": "OWNER"
+			}
+		}
+	],
+	"packFolders": [
+		{
+			"name": "Heroic Crafting",
+			"sorting": "m",
+			"packs": [
+				"heroic-crafting-actions",
+				"heroic-crafting-feats",
+				"heroic-crafting-items",
+				"heroic-crafting-effects",
+				"heroic-crafting-vehicles",
+				"heroic-crafting-journals"
+			]
+		}
+	]
+}

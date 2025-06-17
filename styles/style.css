@@ -1,0 +1,11 @@
+.add-sub-form {
+	gap: 0.5rem;
+
+	h4 {
+		margin: 0.5rem 0 0;
+	}
+
+	label {
+		line-height: normal;
+	}
+}
