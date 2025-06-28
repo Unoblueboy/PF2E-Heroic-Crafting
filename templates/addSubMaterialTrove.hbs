@@ -1,7 +1,7 @@
 <section class="tab {{tab.cssClass}}"
          data-group="primary"
          data-tab="add-sub">
-    <div class="standard-form add-sub-form">
+    <div class="standard-form material-form">
         <h4>Materials</h4>
         <div class="form-group">
             <label for="edit-material-trove-add-sub-current-materials">Current:</label>
@@ -20,6 +20,25 @@
         {{formGroup fields.addSubGP label=(localize 'PF2E.CurrencyGP') value=0 rootId=partId}}
         {{formGroup fields.addSubSP label=(localize 'PF2E.CurrencySP') value=0 rootId=partId}}
         {{formGroup fields.addSubCP label=(localize 'PF2E.CurrencyCP') value=0 rootId=partId}}
+        <div class="form-group">
+            <ul id="edit-material-trove-add-sub-addSubChoice">
+                <li>
+                    <label for="add"
+                           data-action="check-radio-box">+</label>
+                    <input type="radio"
+                           value="add"
+                           name="addSubChoice"
+                           checked />
+                </li>
+                <li>
+                    <label for="sub"
+                           data-action="check-radio-box">-</label>
+                    <input type="radio"
+                           value="sub"
+                           name="addSubChoice" />
+                </li>
+            </ul>
+        </div>
     </div>
     <hr style="margin:0.5rem 0;">
     <div class="standard-form">
