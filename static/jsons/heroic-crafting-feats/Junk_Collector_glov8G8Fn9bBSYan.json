@@ -1,0 +1,77 @@
+{
+  "folder": null,
+  "name": "Junk Collector",
+  "type": "feat",
+  "effects": [],
+  "system": {
+    "_migration": {
+      "version": 0.939,
+      "previous": null
+    },
+    "description": {
+      "value": "<p>Your bag is full of odds and ends others would call “junk.” When you use a non-temporary consumable, it leaves behind scraps that can be salvaged using the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.DfvGFDHV7pYIT7ct]{Salvage Item} activity. The total salvagable value of the scraps is equal to 25% of the item’s Price.</p>",
+      "gm": ""
+    },
+    "publication": {
+      "title": "Heroic Crafting",
+      "authors": "",
+      "license": "OGL",
+      "remaster": false
+    },
+    "rules": [],
+    "slug": null,
+    "traits": {
+      "otherTags": [],
+      "value": [
+        "manipulate",
+        "skill"
+      ],
+      "rarity": "common"
+    },
+    "level": {
+      "value": 15
+    },
+    "category": "skill",
+    "onlyLevel1": false,
+    "maxTakable": 1,
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "prerequisites": {
+      "value": [
+        {
+          "value": "legendary in Crafting"
+        }
+      ]
+    },
+    "subfeatures": {
+      "proficiencies": {},
+      "senses": {},
+      "suppressedFeatures": []
+    },
+    "location": null,
+    "frequency": null
+  },
+  "img": "icons/sundries/books/book-red-exclamation.webp",
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "pf2e",
+    "systemVersion": "7.1.1",
+    "modifiedTime": 1749874952660,
+    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
+  },
+  "_id": "glov8G8Fn9bBSYan",
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "xtF1DuSWhBdA8aGR": 3
+  },
+  "_key": "!items!glov8G8Fn9bBSYan"
+}

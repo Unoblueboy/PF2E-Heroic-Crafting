@@ -1,0 +1,105 @@
+{
+  "folder": null,
+  "name": "Crafter's Fulu",
+  "type": "consumable",
+  "effects": [],
+  "system": {
+    "description": {
+      "gm": "",
+      "value": "<p><strong>Usage</strong> Affixed to artisan’s tools</p><p><strong>Duration</strong> See text</p><p><strong>Activate</strong> <span style=\"font-family:Pathfinder2eActions, sans-serif\">F</span> (envision)</p><p><strong>Requirements</strong> Master in Crafting</p><hr /><p>This charm — traditionally decorated with Dwarven runes penned in a deep burgundy ink — is a mainstay of many serious artisans. You recieve a +1 status bonus on your next check to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project}. This bonus lasts for the duration of your check, even if it takes place over a long period of downtime. If that check is an exploration activity, you can roll twice and take the better result; this is a fortune effect.</p><p>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-effects.Item.NMFQCuwei5L5ERAE]{Effect: Crafter's Fulu}</p>"
+    },
+    "rules": [],
+    "slug": null,
+    "_migration": {
+      "version": 0.939,
+      "lastMigration": null
+    },
+    "traits": {
+      "otherTags": [],
+      "value": [
+        "consumable",
+        "fulu",
+        "magical"
+      ],
+      "rarity": "common"
+    },
+    "publication": {
+      "title": "Heroic Crafting",
+      "authors": "",
+      "license": "OGL",
+      "remaster": false
+    },
+    "level": {
+      "value": 8
+    },
+    "quantity": 1,
+    "baseItem": null,
+    "bulk": {
+      "value": 0
+    },
+    "hp": {
+      "value": 0,
+      "max": 0
+    },
+    "hardness": 0,
+    "price": {
+      "value": {
+        "gp": 100
+      }
+    },
+    "equipped": {
+      "carryType": "worn",
+      "handsHeld": 0
+    },
+    "containerId": null,
+    "size": "med",
+    "material": {
+      "type": null,
+      "grade": null
+    },
+    "identification": {
+      "status": "identified",
+      "unidentified": {
+        "name": "Unusual Object",
+        "img": "systems/pf2e/icons/unidentified_item_icons/other-consumables.webp",
+        "data": {
+          "description": {
+            "value": ""
+          }
+        }
+      },
+      "misidentified": {}
+    },
+    "category": "other",
+    "uses": {
+      "value": 1,
+      "max": 1,
+      "autoDestroy": true
+    },
+    "damage": null,
+    "usage": {
+      "value": "other"
+    },
+    "stackGroup": null,
+    "spell": null
+  },
+  "_id": "foKrw4V35MXu9P2N",
+  "img": "systems/pf2e/icons/equipment/consumables/fulus/fulu-modest.webp",
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "pf2e",
+    "systemVersion": "7.1.1",
+    "modifiedTime": 1749874946134,
+    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
+  },
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "xtF1DuSWhBdA8aGR": 3
+  },
+  "_key": "!items!foKrw4V35MXu9P2N"
+}

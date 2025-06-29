@@ -1,0 +1,75 @@
+{
+  "folder": null,
+  "name": "Natural-Born Tinker",
+  "type": "feat",
+  "effects": [],
+  "system": {
+    "_migration": {
+      "version": 0.939,
+      "previous": null
+    },
+    "description": {
+      "value": "<p>Your time living off the land has taught you that with enough care, many useful items can be created from naturally-occurring materials. You can use your Survival modifier instead of your Crafting modifier on checks to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project}. Additionally, you can use Survival in place of Crafting for the purposes of meeting the requirements to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.LkGmdi4CzHghHhjA]{Begin a Project} or Craft a Project and to qualify for feats that fulfill crafting requirements, such as @UUID[Compendium.pf2e.feats-srd.is3Oz9wt11lNq62K]{Alchemical Crafting} and @UUID[Compendium.pf2e.feats-srd.xWY5omyIcILNR7y1]{Magical Crafting}.</p>",
+      "gm": ""
+    },
+    "publication": {
+      "title": "Heroic Crafting",
+      "authors": "",
+      "license": "OGL",
+      "remaster": false
+    },
+    "rules": [],
+    "slug": null,
+    "traits": {
+      "otherTags": [],
+      "value": [
+        "skill"
+      ],
+      "rarity": "common"
+    },
+    "level": {
+      "value": 2
+    },
+    "category": "skill",
+    "onlyLevel1": false,
+    "maxTakable": 1,
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "prerequisites": {
+      "value": [
+        {
+          "value": "expert in Survival"
+        }
+      ]
+    },
+    "subfeatures": {
+      "proficiencies": {},
+      "senses": {},
+      "suppressedFeatures": []
+    },
+    "location": null
+  },
+  "img": "icons/sundries/books/book-red-exclamation.webp",
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "pf2e",
+    "systemVersion": "7.1.1",
+    "modifiedTime": 1749874952660,
+    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
+  },
+  "_id": "cuE6DuhWW1MR5tHe",
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "xtF1DuSWhBdA8aGR": 3
+  },
+  "_key": "!items!cuE6DuhWW1MR5tHe"
+}

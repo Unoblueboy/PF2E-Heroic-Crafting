@@ -1,0 +1,22 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Generic Items",
+  "color": null,
+  "sorting": "a",
+  "_id": "3HtP1mRfaE6OSy6c",
+  "description": "",
+  "sort": 0,
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "pf2e",
+    "systemVersion": "7.1.1",
+    "modifiedTime": 1749874946113,
+    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
+  },
+  "_key": "!folders!3HtP1mRfaE6OSy6c"
+}

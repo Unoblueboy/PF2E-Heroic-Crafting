@@ -1,0 +1,57 @@
+{
+  "folder": null,
+  "name": "Forage Crafting Resources",
+  "type": "action",
+  "effects": [],
+  "system": {
+    "_migration": {
+      "version": 0.939,
+      "previous": null
+    },
+    "description": {
+      "value": "<p><strong>Requirements</strong> Trained in Survival.</p><hr /><p>You try to find crafting materials for your trove in your environment. The GM assigns a task level representing the most promising foraging location nearby. You can search for lower-level locations, with the GM determining whether you find any. When you begin to forage for resources, the GM secretly sets the DC. After your first day of foraging, you roll a @Check[survival|traits:action:forage-crafting-resources] check to determine your findings.</p><p><strong>Success</strong> Add the amount listed on Table 2: Gathered Income for the location’s level to your Material Trove each day. If you are a master in Survival, instead add twice as much.</p><p><strong>Failure</strong> You find no materials.</p><p>You can continue foraging in a location on subsequent days without rolling again until the GM determines that there are no more resources available, typically after a week or two.</p><h2>Table 2: Gathered Income</h2><table class=\"pf2e\"><thead><tr><th><p>Level</p></th><th><p>Income</p></th></tr></thead><tbody><tr><td>0</td><td>1 sp</td></tr><tr><td>1</td><td>4 sp</td></tr><tr><td>2</td><td>6 sp</td></tr><tr><td>3</td><td>1 gp</td></tr><tr><td>4</td><td>1 gp, 6 sp</td></tr><tr><td>5</td><td>2 gp</td></tr><tr><td>6</td><td>4 gp</td></tr><tr><td>7</td><td>5 gp</td></tr><tr><td>8</td><td>6 gp</td></tr><tr><td>9</td><td>8 gp</td></tr><tr><td>10</td><td>10 gp</td></tr><tr><td>11</td><td>12 gp</td></tr><tr><td>12</td><td>16 gp</td></tr><tr><td>13</td><td>24 gp</td></tr><tr><td>14</td><td>30 gp</td></tr><tr><td>15</td><td>40 gp</td></tr><tr><td>16</td><td>60 gp</td></tr><tr><td>17</td><td>80 gp</td></tr><tr><td>18</td><td>140 gp</td></tr><tr><td>19</td><td>200 gp</td></tr><tr><td>20</td><td>300 gp</td></tr></tbody></table>",
+      "gm": ""
+    },
+    "publication": {
+      "title": "Heroic Crafting",
+      "authors": "",
+      "license": "OGL",
+      "remaster": false
+    },
+    "rules": [],
+    "slug": "forage-crafting-resources",
+    "traits": {
+      "otherTags": [],
+      "value": [
+        "downtime"
+      ]
+    },
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "interaction",
+    "deathNote": false
+  },
+  "img": "systems/pf2e/icons/actions/Passive.webp",
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "pf2e",
+    "systemVersion": "7.1.1",
+    "modifiedTime": 1749874968991,
+    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
+  },
+  "_id": "KNJAA6peNXZoP7ap",
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "xtF1DuSWhBdA8aGR": 3
+  },
+  "_key": "!items!KNJAA6peNXZoP7ap"
+}

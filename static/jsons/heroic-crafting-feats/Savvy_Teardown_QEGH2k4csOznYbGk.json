@@ -1,0 +1,107 @@
+{
+  "folder": null,
+  "name": "Savvy Teardown",
+  "type": "feat",
+  "effects": [],
+  "system": {
+    "_migration": {
+      "version": 0.939,
+      "previous": null
+    },
+    "description": {
+      "value": "<p>You know how to quickly break down an item, saving only the most useful components. When you @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.DfvGFDHV7pYIT7ct]{Salvage an Item} of the type you chose with @UUID[Compendium.pf2e.feats-srd.QLeMH5mQgh28sa5o]{Specialty Crafting}, you can choose to spend only ten minutes. If you do so, attempt a single Crafting check against a Very Hard DC for the item’s level.</p><p>On a success, add half of the item’s Salvage Maximum value or your Day value on Table 1: Spending Limit, whichever is less. On a failure, you gain no materials. Either way, the item is destroyed.</p>",
+      "gm": ""
+    },
+    "publication": {
+      "title": "Heroic Crafting",
+      "authors": "",
+      "license": "OGL",
+      "remaster": false
+    },
+    "rules": [
+      {
+        "key": "Note",
+        "selector": "crafting",
+        "text": "On a success, add half of the item’s Salvage Maximum value or your Day value on Table 1: Spending Limit ({actor|flags.pf2e.craftAProject.limits.day.value} {actor|flags.pf2e.craftAProject.limits.day.coin}), whichever is less. The item is destroyed.",
+        "outcome": [
+          "success"
+        ],
+        "title": "{item|name}",
+        "predicate": [
+          "action:salvage-item",
+          "savvy-teardown",
+          "speciality"
+        ]
+      },
+      {
+        "key": "Note",
+        "selector": "crafting",
+        "text": "On a failure, You gain no materials.The item is destroyed.",
+        "outcome": [
+          "failure"
+        ],
+        "title": "{item|name}",
+        "predicate": [
+          "action:salvage-item",
+          "savvy-teardown",
+          "speciality"
+        ]
+      }
+    ],
+    "slug": null,
+    "traits": {
+      "otherTags": [],
+      "value": [
+        "skill"
+      ],
+      "rarity": "common"
+    },
+    "level": {
+      "value": 2
+    },
+    "category": "skill",
+    "onlyLevel1": false,
+    "maxTakable": 1,
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "prerequisites": {
+      "value": [
+        {
+          "value": "expert in Crafting"
+        },
+        {
+          "value": "Specialty Crafting or\r\nSeasoned"
+        }
+      ]
+    },
+    "subfeatures": {
+      "proficiencies": {},
+      "senses": {},
+      "suppressedFeatures": []
+    },
+    "location": null
+  },
+  "img": "icons/sundries/books/book-red-exclamation.webp",
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "pf2e",
+    "systemVersion": "7.1.1",
+    "modifiedTime": 1749874952660,
+    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
+  },
+  "_id": "QEGH2k4csOznYbGk",
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "xtF1DuSWhBdA8aGR": 3
+  },
+  "_key": "!items!QEGH2k4csOznYbGk"
+}

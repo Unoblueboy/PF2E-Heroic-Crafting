@@ -1,0 +1,102 @@
+{
+  "folder": null,
+  "name": "Hyperfocus",
+  "type": "feat",
+  "effects": [],
+  "system": {
+    "_migration": {
+      "version": 0.939,
+      "previous": null
+    },
+    "description": {
+      "value": "<p>When inspiration strikes, you can progress further than should really be possible. When you roll a critical success on a check to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} for at least a day, your expertise in crafting allows you to make more progress than normal with the materials available.</p><p>In addition to the progress you would make on a success, if you spent 1 day crafting, add the value listed in Table 1: Spending Limit for 1 hour to your Current Value. If you spent 1 week crafting, add the value listed in Table 1: Spending Limit for 1 day to your Current Value. This feat cannot add more than the Cost of the Craft a Project activity to the item’s Current Value.</p>",
+      "gm": ""
+    },
+    "publication": {
+      "title": "Heroic Crafting",
+      "authors": "",
+      "license": "OGL",
+      "remaster": false
+    },
+    "rules": [
+      {
+        "key": "Note",
+        "selector": "crafting",
+        "text": "Whenever you roll a critical success on a Crafting check to Craft a Project for 1 day, add the value listed in Table 1: Spending Limit for 1 hour ({actor|flags.pf2e.craftAProject.limits.hour.value} {actor|flags.pf2e.craftAProject.limits.hour.coin}) to your Current Value. This feat cannot add more than the Cost of the Craft a Project activity to the item’s Current Value.",
+        "outcome": [
+          "criticalSuccess"
+        ],
+        "title": "{item|name}",
+        "predicate": [
+          "action:craft-a-project",
+          "length:day"
+        ]
+      },
+      {
+        "key": "Note",
+        "selector": "crafting",
+        "text": "Whenever you roll a critical success on a Crafting check to Craft a Project for 1 week, add the value listed in Table 1: Spending Limit for 1 day ({actor|flags.pf2e.craftAProject.limits.day.value} {actor|flags.pf2e.craftAProject.limits.day.coin}) to your Current Value. This feat cannot add more than the Cost of the Craft a Project activity to the item’s Current Value.",
+        "outcome": [
+          "criticalSuccess"
+        ],
+        "title": "{item|name}",
+        "predicate": [
+          "action:craft-a-project",
+          "length:week"
+        ]
+      }
+    ],
+    "slug": null,
+    "traits": {
+      "otherTags": [],
+      "value": [
+        "skill"
+      ],
+      "rarity": "common"
+    },
+    "level": {
+      "value": 2
+    },
+    "category": "skill",
+    "onlyLevel1": false,
+    "maxTakable": 1,
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "prerequisites": {
+      "value": [
+        {
+          "value": "expert in Crafting"
+        }
+      ]
+    },
+    "subfeatures": {
+      "proficiencies": {},
+      "senses": {},
+      "suppressedFeatures": []
+    },
+    "location": null
+  },
+  "img": "icons/sundries/books/book-red-exclamation.webp",
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "pf2e",
+    "systemVersion": "7.1.1",
+    "modifiedTime": 1749874952660,
+    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
+  },
+  "_id": "HPEH0DrLLLU9w7rv",
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "xtF1DuSWhBdA8aGR": 3
+  },
+  "_key": "!items!HPEH0DrLLLU9w7rv"
+}

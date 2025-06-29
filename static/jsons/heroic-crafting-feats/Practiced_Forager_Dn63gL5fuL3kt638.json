@@ -1,0 +1,112 @@
+{
+  "folder": null,
+  "name": "Practiced Forager",
+  "type": "feat",
+  "effects": [],
+  "system": {
+    "_migration": {
+      "version": 0.939,
+      "previous": null
+    },
+    "description": {
+      "value": "<p>Your knowledge of materials found in the wilderness includes some rare, but very valuable resources. When you use the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.KNJAA6peNXZoP7ap]{Forage Crafting Resources} activity, a critical success adds double the amount listed in Table 2: Gathered Income for the location’s level to your material trove each day. If you are a master in Survival, instead add triple the listed amount.</p>",
+      "gm": ""
+    },
+    "publication": {
+      "title": "Heroic Crafting",
+      "authors": "",
+      "license": "OGL",
+      "remaster": false
+    },
+    "rules": [
+      {
+        "key": "Note",
+        "selector": "survival",
+        "text": "Whenever you roll a critical success on a Survival check to Forage Crafting Resources, add double the amount listed in Table 2: Gathered Income for the location’s level to your material trove each day.",
+        "outcome": [
+          "criticalSuccess"
+        ],
+        "title": "{item|name}",
+        "predicate": [
+          {
+            "or": [
+              "skill:survival:rank:1",
+              "skill:survival:rank:2"
+            ]
+          },
+          "action:forage-crafting-resources"
+        ]
+      },
+      {
+        "key": "Note",
+        "selector": "survival",
+        "text": "Whenever you roll a critical success on a Survival check to Forage Crafting Resources, add triple the amount listed in Table 2: Gathered Income for the location’s level to your material trove each day.",
+        "outcome": [
+          "criticalSuccess"
+        ],
+        "predicate": [
+          {
+            "gte": [
+              "skill:survival:rank",
+              3
+            ]
+          },
+          "action:forage-crafting-resources"
+        ],
+        "title": "{item|name}"
+      }
+    ],
+    "slug": null,
+    "traits": {
+      "otherTags": [],
+      "value": [
+        "skill"
+      ],
+      "rarity": "common"
+    },
+    "level": {
+      "value": 1
+    },
+    "category": "skill",
+    "onlyLevel1": false,
+    "maxTakable": 1,
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "prerequisites": {
+      "value": [
+        {
+          "value": "trained in Survival"
+        }
+      ]
+    },
+    "subfeatures": {
+      "proficiencies": {},
+      "senses": {},
+      "suppressedFeatures": []
+    },
+    "location": null
+  },
+  "img": "icons/sundries/books/book-red-exclamation.webp",
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "pf2e",
+    "systemVersion": "7.1.1",
+    "modifiedTime": 1749874952660,
+    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
+  },
+  "_id": "Dn63gL5fuL3kt638",
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "xtF1DuSWhBdA8aGR": 3
+  },
+  "_key": "!items!Dn63gL5fuL3kt638"
+}

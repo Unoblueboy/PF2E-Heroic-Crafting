@@ -1,0 +1,93 @@
+{
+  "_id": "ae1PWuyZWYdNft3K",
+  "folder": null,
+  "img": "icons/sundries/books/book-red-exclamation.webp",
+  "name": "Impeccable Crafting",
+  "system": {
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "skill",
+    "description": {
+      "value": "<p>You craft flawless creations with great efficiency. Whenever you roll a success at a Crafting check to make an item of the type you chose with @UUID[Compendium.pf2e.feats-srd.Item.QLeMH5mQgh28sa5o]{Specialty Crafting}, you get a critical success instead.</p>",
+      "gm": ""
+    },
+    "level": {
+      "value": 7
+    },
+    "prerequisites": {
+      "value": [
+        {
+          "value": "master in Crafting"
+        },
+        {
+          "value": "Specialty Crafting"
+        },
+        {
+          "value": "Hyperfocus"
+        }
+      ]
+    },
+    "publication": {
+      "license": "OGL",
+      "remaster": false,
+      "title": "Heroic Crafting",
+      "authors": ""
+    },
+    "rules": [
+      {
+        "key": "Note",
+        "predicate": [
+          "action:craft",
+          "speciality"
+        ],
+        "selector": "crafting",
+        "text": "Whenever you roll a success at a Crafting check to make an item of the type you chose with Specialty Crafting, you get a critical success instead.",
+        "title": "{item|name}"
+      }
+    ],
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "general",
+        "skill"
+      ],
+      "otherTags": []
+    },
+    "slug": "impeccable-crafting",
+    "_migration": {
+      "version": 0.939,
+      "previous": null
+    },
+    "onlyLevel1": false,
+    "maxTakable": 1,
+    "subfeatures": {
+      "proficiencies": {},
+      "senses": {},
+      "suppressedFeatures": []
+    },
+    "location": null
+  },
+  "type": "feat",
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "pf2e",
+    "systemVersion": "7.1.1",
+    "modifiedTime": 1749874952660,
+    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
+  },
+  "effects": [],
+  "flags": {},
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "xtF1DuSWhBdA8aGR": 3
+  },
+  "_key": "!items!ae1PWuyZWYdNft3K"
+}

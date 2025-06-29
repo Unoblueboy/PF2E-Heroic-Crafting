@@ -1,0 +1,89 @@
+{
+  "folder": null,
+  "name": "Midnight Crafting",
+  "type": "feat",
+  "effects": [],
+  "system": {
+    "_migration": {
+      "version": 0.939,
+      "previous": null
+    },
+    "description": {
+      "value": "<p>You can burn additional resources to craft on a tight deadline. You can @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} with a duration of only 10 minutes. When you do so, use the same rules as the Hour duration, but you must expend double the amount of crafting materials. The additional materials spent this way are called the “rush cost” and don’t add to the check’s Cost or Progress.</p><p>If you critically fail a Crafting check using this feat, you deduct twice as much progress as normal from your progress.</p><p>Just like Hourly checks, crafting this way is an exploration activity and requires you to have all your materials on hand. Crafting this way also counts as one Hourly check for the purposes of determining how many checks you can make in a day without Working Overtime.</p>",
+      "gm": ""
+    },
+    "publication": {
+      "title": "Heroic Crafting",
+      "authors": "",
+      "license": "OGL",
+      "remaster": false
+    },
+    "rules": [
+      {
+        "key": "Note",
+        "selector": "crafting",
+        "text": "If you critically fail a Crafting check using this feat, you deduct twice as much progress as normal from your progress.",
+        "outcome": [
+          "criticalSuccess"
+        ],
+        "title": "{item|name}",
+        "predicate": [
+          "action:craft-a-project",
+          "midnight-crafting"
+        ]
+      }
+    ],
+    "slug": null,
+    "traits": {
+      "otherTags": [],
+      "value": [
+        "skill"
+      ],
+      "rarity": "common"
+    },
+    "level": {
+      "value": 2
+    },
+    "category": "skill",
+    "onlyLevel1": false,
+    "maxTakable": 1,
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "prerequisites": {
+      "value": [
+        {
+          "value": "expert in Crafting"
+        }
+      ]
+    },
+    "subfeatures": {
+      "proficiencies": {},
+      "senses": {},
+      "suppressedFeatures": []
+    },
+    "location": null
+  },
+  "img": "icons/sundries/books/book-red-exclamation.webp",
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "pf2e",
+    "systemVersion": "7.1.1",
+    "modifiedTime": 1749874952660,
+    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
+  },
+  "_id": "lRROJh4C2TlJSwn8",
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "xtF1DuSWhBdA8aGR": 3
+  },
+  "_key": "!items!lRROJh4C2TlJSwn8"
+}

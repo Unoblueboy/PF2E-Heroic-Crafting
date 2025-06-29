@@ -1,0 +1,57 @@
+{
+  "folder": null,
+  "name": "Begin a Project",
+  "type": "action",
+  "effects": [],
+  "system": {
+    "_migration": {
+      "version": 0.939,
+      "previous": null
+    },
+    "description": {
+      "value": "<p><strong>Requirements</strong> Trained in Crafting; you have the formula and the prerequisite feats for the item; you have the appropriate proficiency to craft the item.</p><hr /><p>To begin a crafting project, write down the name of the item you’re crafting and its total Price. Spend crafting materials worth up to half the item’s Price, and write down that value. This is the project’s Current Value, and it will increase as you complete Crafting checks. When the Current Value equals the item’s Price, the project is complete.</p>",
+      "gm": ""
+    },
+    "publication": {
+      "title": "Heroic Crafting",
+      "authors": "",
+      "license": "OGL",
+      "remaster": false
+    },
+    "rules": [],
+    "slug": "begin-a-project",
+    "traits": {
+      "otherTags": [],
+      "value": [
+        "exploration"
+      ]
+    },
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "interaction",
+    "deathNote": false
+  },
+  "_id": "LkGmdi4CzHghHhjA",
+  "img": "systems/pf2e/icons/actions/Passive.webp",
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "pf2e",
+    "systemVersion": "7.1.1",
+    "modifiedTime": 1749874968991,
+    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
+  },
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "xtF1DuSWhBdA8aGR": 3
+  },
+  "_key": "!items!LkGmdi4CzHghHhjA"
+}

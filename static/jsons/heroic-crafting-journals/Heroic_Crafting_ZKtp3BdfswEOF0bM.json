@@ -1,0 +1,386 @@
+{
+  "folder": null,
+  "name": "Heroic Crafting",
+  "_id": "ZKtp3BdfswEOF0bM",
+  "pages": [
+    {
+      "sort": 100000,
+      "name": "Heroic Crafting",
+      "type": "text",
+      "_id": "vhprUK9sviQXrwzK",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p><em>In some stories, heroes rely on tools, weapons, and armor smithed by mythic creatures and gods, or looted from the lairs of legendary beasts. However, some heroes forge their own gear. This book describes an alternative crafting system, written to allow heroes to benefit significantly from crafting their own items, whether trying to do so in a hurry or because they are more capable than any artisan in the land.</em></p><hr /><p>Heroic Crafting is a variant rule designed to replace the default crafting rules — where all items can be crafted in four days regardless of complexity or type — with a system more flexible and powerful.</p><p>With this variant, the time a project takes varies based on the level of the item and the expertise of the crafter. Characters can craft certain consumables and lower-level items very quickly, sometimes in a single hour. GMs can use uncertainty about when an item will be completed to set up “race against the clock” moments, like racing to the villain’s castle before they can finish their doomsday device, or rushing to build a raft before the tide comes in.</p><p>This book also presents formalized rules for gathering crafting materials from the natural world or from damaged or destroyed items, such as picking through a ruined castle for trinkets or delving through shallow caves for alchemically useful fungi.</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.345",
+        "systemId": "pf2e",
+        "systemVersion": "7.1.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!ZKtp3BdfswEOF0bM.vhprUK9sviQXrwzK"
+    },
+    {
+      "sort": 200000,
+      "name": "Heroic Crafting Impacts",
+      "type": "text",
+      "_id": "LFmIW0TveyD2mrLW",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 2
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>With Heroic Crafting, characters can:</p><ul><li><p>Craft lower-level items and consumable items of their level quickly — in only a day or even a few hours.</p></li><li><p>Push their luck to craft items more quickly, at risk of fatigue.</p></li><li><p>Attempt to craft items above their level. These projects can take weeks, or more.</p></li><li><p>Save money by crafting, rather than purchasing items they know the formula for. Items still can’t be sold for more than half their Price, so profiting is generally impossible.</p></li><li><p>Forage materials from their environment and use them in projects.</p></li><li><p>Receive rewards in the form of crafting materials, which are more useful in projects than for sale.</p></li><li><p>Craft an item gradually, with the ability to track their progress over time.</p></li></ul><h3>Crafting In Brief</h3><p>In order to craft an item, you must satisfy the following requirements:</p><ul><li><p>You have the prerequisite feats (ie. Alchemical Crafting, Magical Crafting, Snare Crafting).</p></li><li><p>If the item is 9th level or higher, you must be a master in Crafting. If the item is 16th level or higher, you must be legendary.</p></li><li><p>You have the item’s formula (but see Reverse-Engineering on page 13).</p></li><li><p>You have an appropriate set of tools. You may also need a workspace.</p></li><li><p>You have any rare or precious materials the item consists of. Most items don’t require any special materials.</p></li></ul><p>If all requirements are satisfied, you can @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.LkGmdi4CzHghHhjA]{Begin a Project}, then use the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} activity multiple times until the project is completed. You can Craft a Project as a downtime or exploration mode activity.</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.345",
+        "systemId": "pf2e",
+        "systemVersion": "7.1.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!ZKtp3BdfswEOF0bM.LFmIW0TveyD2mrLW"
+    },
+    {
+      "sort": 300000,
+      "name": "Crafting Actions",
+      "type": "text",
+      "_id": "R48fK2wYMNxI0nzk",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 2
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>No matter what you’re crafting, follow this sequence: First, @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.LkGmdi4CzHghHhjA]{Begin a Project}, then @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} one or more times until finished. Beginning a Project consists of making plans, setting up a workspace, and gathering initial materials and tools.</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.LkGmdi4CzHghHhjA]{Begin a Project}</h3><section class=\"traits\"><p>Exploration</p></section><p><strong>Requirements</strong> Trained in Crafting; you have the formula and the prerequisite feats for the item; you have the appropriate proficiency to craft the item.</p><hr /><p>To begin a crafting project, write down the name of the item you’re crafting and its total Price. Spend crafting materials worth up to half the item’s Price, and write down that value. This is the project’s Current Value, and it will increase as you complete Crafting checks. When the Current Value equals the item’s Price, the project is complete.</p><h3>Table 1: Spending Limit</h3><table class=\"pf2e\"><thead><tr><th>Level</th><th>Hour</th><th>Day</th><th>Week</th></tr></thead><tbody><tr><td>1</td><td>3 sp</td><td>1 gp, 2 sp</td><td>6 gp</td></tr><tr><td>2</td><td>5 sp</td><td>2 gp</td><td>10 gp</td></tr><tr><td>3</td><td>8 sp</td><td>3 gp, 2 sp</td><td>16 gp</td></tr><tr><td>4</td><td>1 gp, 5 sp</td><td>6 gp</td><td>30 gp</td></tr><tr><td>5</td><td>2 gp</td><td>8 gp</td><td>40 gp</td></tr><tr><td>6</td><td>3 gp</td><td>12 gp</td><td>60 gp</td></tr><tr><td>7</td><td>5 gp</td><td>20 gp</td><td>100 gp</td></tr><tr><td>8</td><td>7 gp</td><td>28 gp</td><td>140 gp</td></tr><tr><td>9</td><td>10 gp</td><td>40 gp</td><td>200 gp</td></tr><tr><td>10</td><td>15 gp</td><td>60 gp</td><td>300 gp</td></tr><tr><td>11</td><td>21 gp</td><td>84 gp</td><td>420 gp</td></tr><tr><td>12</td><td>30 gp</td><td>120 gp</td><td>600 gp</td></tr><tr><td>13</td><td>40 gp</td><td>160 gp</td><td>800 gp</td></tr><tr><td>14</td><td>70 gp</td><td>280 gp</td><td>1400 gp</td></tr><tr><td>15</td><td>100 gp</td><td>400 gp</td><td>2000 gp</td></tr><tr><td>16</td><td>125 gp</td><td>500 gp</td><td>2500 gp</td></tr><tr><td>17</td><td>200 gp</td><td>800 gp</td><td>4000 gp</td></tr><tr><td>18</td><td>300 gp</td><td>1200 gp</td><td>6000 gp</td></tr><tr><td>19</td><td>500 gp</td><td>2000 gp</td><td>10000 gp</td></tr><tr><td>20</td><td>800 gp</td><td>3200 gp</td><td>16000 gp</td></tr></tbody></table><p>Once you’ve begun at least one project, you can use the Craft a Project activity to work on any of your incomplete projects. To do this, you must spend a specified amount of time and materials to bring your project closer to completion. This represents the labor and resources you devote as you smith, carve, fletch, or otherwise craft the project.</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.LkGmdi4CzHghHhjA]{Craft a Project}</h3><section class=\"traits\"><p>Downtime</p><p>Manipulate</p></section><p><strong>Requirements</strong> trained in Crafting; you have @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.LkGmdi4CzHghHhjA]{Begun a Project} and have not yet finished it; you are not fatigued; you have appropriate tools and in many cases a work space.</p><p><strong>Cost</strong> crafting materials worth up to the amount listed in Table 1: Spending Limit</p><hr /><p>Choose the amount of time to spend crafting: 1 hour, 1 day, or 1 week. The time spent, along with your level, determines the maximum Cost of this activity.</p><p>At the end of the duration, decide the Cost of this activity, then make a @Check[crafting|traits:action:craft-a-project] check. The GM determines the DC based on the item’s level, rarity, and any other circumstances.</p><p><strong>Success</strong> You work productively during this period. Add double this activity’s Cost to the project’s Current Value.</p><p><strong>Failure</strong> You work unproductively during this period. Add half this activity’s Cost to the project’s Current Value.</p><p><strong>Critical Failure</strong> You ruin your materials and suffer a setback while crafting. Deduct this activity’s Cost from the project’s Current Value. If this reduces the project’s Current Value below 0, the project is ruined and must be started again.</p><p>If the difference between your project’s Current Value and its Price is less than this activity’s maximum Cost, you can forgo the Crafting check.</p><p>Instead, at the end of the duration you may simply pay the remaining value to complete the project.</p><section class=\"info\"><p><strong>Watching Your Budget</strong></p><p>The maximum Spending Limit will often quickly deplete your funds. Spend this much only when speed is imperative.</p></section><h3>Crafting Duration</h3><p>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} may be carried out over any length of time. This duration is always broken up into multiples of 1 hour, 1 day, or 1 week.</p><h4><strong>Working Overtime</strong></h4><p>Sometimes, crafters will risk exhaustion to work longer hours in an effort to complete a project sooner. In a process called Working Overtime, characters can make additional checks to Craft a Project, but take increasing penalties. If you fail a check to Craft a Project while Working Overtime, you must stop crafting. When you stop Working Overtime for any reason, you become @UUID[Compendium.pf2e.conditionitems.HL2l2VRSaQHu9lUw]{Fatigued} and cannot remove this condition for 24 hours.</p><h4><strong>Hour</strong></h4><p>Use an Hour (or Hourly) check whenever you are crafting as part of a normal adventuring day. Crafting this way requires you to have all your materials on hand. You can craft Hourly up to 4 times in a day without Working Overtime. When you Work Overtime, you can make a 5th and 6th check at a -5 penalty, and a 7th and 8th check at a -10 penalty.</p><p><strong>Special</strong> This activity gains the Exploration trait and loses the Downtime trait.</p><h4><strong>Day</strong></h4><p>Use a Day (or Daily) check whenever you are crafting during downtime for less than a week.</p><p>If you are crafting for multiple days, you can craft Daily up to 5 times in a week without Working Overtime. When you Work Overtime this way, you can make a 6th check at a -5 penalty and a 7th check at a -10 penalty.</p><p>If you are crafting for only one day, you can instead Work Overtime using Hour checks as if you had just made 4 Hour checks.</p><h4><strong>Week</strong></h4><p>Use a Week (or Weekly) check whenever you are crafting during downtime for a week or more. After making a Weekly check, you can Work Overtime using Day checks as if you had just made 5 Day checks, or you can make additional Weekly checks without Working Overtime.</p><h3>Multiple People Crafting</h3><p>Some parties have multiple heroic crafters, who may choose to collaborate on large or complex projects. In this case, multiple characters may @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} on the same project simultaneously (typically 2, but possibly more, dependent on the project). All characters must meet the crafting requirements individually. Each character needs their own set of tools, but they can share a workspace. Certain projects, like a lich’s soul cage, may require that only one crafter work on them.</p><p>Members of the party who do not meet the crafting requirements may also assist by contributing labor or relevant expertise to the project. This is a version of the @UUID[Compendium.pf2e.actionspf2e.HCl3pzVefiv9ZKQW]{Aid} action which can be used as a downtime activity (or as an exploration activity if the aided Craft a Project activity has the Exploration trait). A single use of Aid only assists <strong>one crafter</strong> with <strong>one project</strong>.</p><section class=\"info\"><p><strong>Crafting With Spells</strong></p><p>In some cases, you may use a spell (such as shape wood) to assist with crafting. In this case, either treat the spell as a successful Aid check, or as a Daily check to Craft a Project. The caster may be required to make a Crafting check (typically at a lower DC). The value added to a project by a spell generally should not exceed the value of a day of crafting.</p></section><h3>Crafting Batches</h3><p>When you craft consumables and ammunition, you can craft them in a batch of up to a certain number (default 4 for consumables, the listed amount in the item entry for nonmagical ammunition). All items in a batch must be identical; when crafting in a batch, the Spending Limit is multiplied by the size of the batch.</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.345",
+        "systemId": "pf2e",
+        "systemVersion": "7.1.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!ZKtp3BdfswEOF0bM.R48fK2wYMNxI0nzk"
+    },
+    {
+      "sort": 400000,
+      "name": "Providing Materials",
+      "type": "text",
+      "_id": "orkSTcrCK3NalGvH",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 2
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>You can provide the materials used to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.LkGmdi4CzHghHhjA]{Begin a Project} or @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} in a few different ways. If you are using the Craft a Project activity with the Downtime trait (such as to craft for 1 day or more) in a location with ready access to the necessary materials, you can purchase materials as part of the Craft a Project activity.</p><p>However, if you are using the Craft a Project activity with the Exploration trait (such as to craft for 1 hour), you must provide materials for the check directly, rather than by spending currency. (See Material Trove below for how generic materials can be tracked).</p><p>Some materials are too rare to be provided through these generic means and instead must be supplied directly while crafting (See Crafting with Treasure below).</p><h3>Crafting with Treasure</h3><p>Adventurers with a focus on crafting can often be quite creative about sourcing materials, such as a flawless emerald “borrowed” from a wealthy merchant guild or the hide of a freshly-killed basilisk. You can use specific pieces of treasure to pay the material Cost of the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} activity. When you do so with an appropriate material, some or all of the Cost is covered by the value of the item. Some formulas even require specific items to be provided this way. For example, weapons and armor made from special materials such as silver and cold iron require you to provide a portion of their value in those materials. Magic items such as scrolls and staves also require you to cast spells at some point during their creation.</p><p>The value provided this way is limited by the degree to which the item could practically be used. For example, the hide of a dragon worth 5000 gp could be used to build a shield, but the useful pieces may only contribute 500 gp in raw materials.</p><h3>Material Trove</h3><p>If you frequently use the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} activity as an exploration activity - or on the road where materials can’t easily be bought - it can be tedious to track your available materials and their values. The Material Trove provides a streamlined way to track common crafting materials.</p><p>A Material Trove stores general-purpose crafting materials. The amount and quality of these materials are represented by a value in gp. This value can be increased by purchasing generic crafting materials with currency or by any of the methods specified in the Gathering Materials section opposite. The contents of a Material Trove can only be used to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.LkGmdi4CzHghHhjA]{Begin a Project} or Craft a Project.</p><h4><strong>Trove Bulk</strong></h4><p>An alchemist that stays in town with a dedicated workspace always has convenient access to materials and space to store them. However, an adventurer on the road may be forced to travel light, with the space for their materials confined to a wagon or backpack.</p><p>If you need to determine the Bulk of your Material Trove, consult @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-journals.JournalEntry.ZKtp3BdfswEOF0bM.JournalEntryPage.R48fK2wYMNxI0nzk#table-1:-spending-limit]{Table 1: Spending Limit}. Materials worth the listed Week limit for your current level take up 2 Bulk. Since crafters of a higher level create higher-level items, and higher-level items require more expensive and high-quality materials, higher-level characters store more value in the same amount of space.</p><p>This rule can be used to determine the value of a trove with any given bulk or the bulk of a trove worth any amount.</p><section class=\"info\"><p><strong>Example Trove</strong></p><p>A 4th-level crafter can fill a chest with a 2 Bulk artisan’s tools and a 6 Bulk trove. This trove would be worth 90 gp and could be used for 3 weeks of crafting. If this same chest was filled by an 8th-level crafter, their 6 Bulk trove would be worth 420gp, but it would still be sufficient for 3 weeks of crafting.</p></section>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.345",
+        "systemId": "pf2e",
+        "systemVersion": "7.1.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!ZKtp3BdfswEOF0bM.orkSTcrCK3NalGvH"
+    },
+    {
+      "sort": 500000,
+      "name": "Gathering Materials",
+      "type": "text",
+      "_id": "Li1uYskLeAQFNwA7",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 2
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Spending currency in a town isn’t the only way to obtain crafting materials for your Material Trove. If you can’t or don’t want to simply purchase supplies, try the following options. Anytime you want to spend downtime searching for crafting materials, use the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.KNJAA6peNXZoP7ap]{Forage Crafting Resources} activity. If you have a specific item you want to break down into useful materials, use the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.DfvGFDHV7pYIT7ct]{Salvage Item} activity instead.</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.KNJAA6peNXZoP7ap]{Forage Crafting Resources}</h3><section class=\"traits\"><p>Downtime</p></section><p><strong>Requirements</strong> Trained in Survival.</p><hr /><p>You try to find crafting materials for your trove in your environment. The GM assigns a task level representing the most promising foraging location nearby. You can search for lower-level locations, with the GM determining whether you find any. When you begin to forage for resources, the GM secretly sets the DC. After your first day of foraging, you roll a Survival check to determine your findings.</p><p><strong>Success</strong> Add the amount listed on @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-journals.JournalEntry.ZKtp3BdfswEOF0bM.JournalEntryPage.Li1uYskLeAQFNwA7#table-2:-gathered-income]{Table 2: Gathered Income} for the location’s level to your Material Trove each day. If you are a master in Survival, instead add twice as much.</p><p><strong>Failure</strong> You find no materials.</p><p>You can continue foraging in a location on subsequent days without rolling again until the GM determines that there are no more resources available, typically after a week or two.</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.DfvGFDHV7pYIT7ct]{Salvage Item}</h3><section class=\"traits\"><p>Exploration</p></section><p><strong>Requirements</strong> Trained in Crafting.</p><p><strong>Cost</strong> The item to be salvaged</p><hr /><p>You tear down an item for parts. The GM decides if the item can be salvaged this way. Roll a Crafting check against the item’s Craft DC.</p><p><strong>Success</strong> Add the amount listed on @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-journals.JournalEntry.ZKtp3BdfswEOF0bM.JournalEntryPage.Li1uYskLeAQFNwA7#table-2:-gathered-income]{Table 2: Gathered Income} for the item’s level to your Material Trove each hour. If you are a master in Crafting, instead add twice as much. The item becomes unusable.</p><p><strong>Failure</strong> Add half the amount listed on Table 2: Gathered Income for the item’s level to your Material Trove each hour. If you are a master in Crafting, instead add the listed amount. The item becomes unusable.</p><p>You can continue salvaging an item for multiple hours without rolling again until you have recovered the item’s Salvage Maximum, after which the item is destroyed. The GM detemines the item’s Salvage Maximum, but it is never greater than 75% of the item’s Price, and is typically 50% or lower based on the item’s condition.</p><p>At the GM’s discretion, you may sometimes be able to salvage special materials or treasure worth the same amount instead.</p><h3>Table 2: Gathered Income</h3><table class=\"pf2e\"><thead><tr><th><p>Level</p></th><th><p>Income</p></th></tr></thead><tbody><tr><td>0</td><td>1 sp</td></tr><tr><td>1</td><td>4 sp</td></tr><tr><td>2</td><td>6 sp</td></tr><tr><td>3</td><td>1 gp</td></tr><tr><td>4</td><td>1 gp, 6 sp</td></tr><tr><td>5</td><td>2 gp</td></tr><tr><td>6</td><td>4 gp</td></tr><tr><td>7</td><td>5 gp</td></tr><tr><td>8</td><td>6 gp</td></tr><tr><td>9</td><td>8 gp</td></tr><tr><td>10</td><td>10 gp</td></tr><tr><td>11</td><td>12 gp</td></tr><tr><td>12</td><td>16 gp</td></tr><tr><td>13</td><td>24 gp</td></tr><tr><td>14</td><td>30 gp</td></tr><tr><td>15</td><td>40 gp</td></tr><tr><td>16</td><td>60 gp</td></tr><tr><td>17</td><td>80 gp</td></tr><tr><td>18</td><td>140 gp</td></tr><tr><td>19</td><td>200 gp</td></tr><tr><td>20</td><td>300 gp</td></tr></tbody></table>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.345",
+        "systemId": "pf2e",
+        "systemVersion": "7.1.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!ZKtp3BdfswEOF0bM.Li1uYskLeAQFNwA7"
+    },
+    {
+      "sort": 600000,
+      "name": "New Skill Feats",
+      "type": "text",
+      "_id": "bPYJdGBWY53uPuNJ",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 2
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Existing Crafting feats will still work with these variant rules; simply replace their references to the Craft activity with references to the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} activity. Addtionally, you can use the following new skill feats with these rules.</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.voUVbeXtwpVNDElJ]{Dismantler} <span style=\"float:right\">Feat 1</span></h3><section class=\"traits\"><p>General</p><p>Skill</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.voUVbeXtwpVNDElJ inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.Dn63gL5fuL3kt638]{Practiced Forager} <span style=\"float:right\">Feat 1</span></h3><section class=\"traits\"><p>General</p><p>Skill</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.Dn63gL5fuL3kt638 inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.HPEH0DrLLLU9w7rv]{Hyperfocus} <span style=\"float:right\">Feat 2</span></h3><section class=\"traits\"><p>General</p><p>Skill</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.HPEH0DrLLLU9w7rv inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.lRROJh4C2TlJSwn8]{Midnight Crafting} <span style=\"float:right\">Feat 2</span></h3><section class=\"traits\"><p>General</p><p>Skill</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.lRROJh4C2TlJSwn8 inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.cuE6DuhWW1MR5tHe]{Natural-Born Tinker} <span style=\"float:right\">Feat 2</span></h3><section class=\"traits\"><p>General</p><p>Skill</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.cuE6DuhWW1MR5tHe inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.hi58jfDkGvxqL6Dl]{Quartermaster} <span style=\"float:right\">Feat 2</span></h3><section class=\"traits\"><p>General</p><p>Skill</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.hi58jfDkGvxqL6Dl inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.QEGH2k4csOznYbGk]{Savvy Teardown} <span style=\"float:right\">Feat 2</span></h3><section class=\"traits\"><p>General</p><p>Skill</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.QEGH2k4csOznYbGk inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.jxdu5L2NI8QSPZmS]{Vigilant Forager} <span style=\"float:right\">Feat 2</span></h3><section class=\"traits\"><p>General</p><p>Skill</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.jxdu5L2NI8QSPZmS inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.4yMKnd7xOXfujdA8]{Efficient Crafting} <span style=\"float:right\">Feat 7</span></h3><section class=\"traits\"><p>General</p><p>Skill</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.4yMKnd7xOXfujdA8 inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.mChmlK5ndlzRJZzq]{Multitasker} <span style=\"float:right\">Feat 7</span></h3><section class=\"traits\"><p>General</p><p>Skill</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.mChmlK5ndlzRJZzq inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.nGRwEYzFB17BkBjl]{Quick Crafting} <span style=\"float:right\">Feat 7</span></h3><section class=\"traits\"><p>General</p><p>Skill</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.nGRwEYzFB17BkBjl inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.E9wwEU1oLLbZioFP]{Instant Crafting} <span style=\"font-family:Pathfinder2eActions, sans-serif\">3 </span><span style=\"float:right\">Feat 2</span></h3><section class=\"traits\"><p>General</p><p>Skill</p><p>Manipulate</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.E9wwEU1oLLbZioFP inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.glov8G8Fn9bBSYan]{Junk Collector} <span style=\"float:right\">Feat 2</span></h3><section class=\"traits\"><p>General</p><p>Skill</p></section><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.glov8G8Fn9bBSYan inline]</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.345",
+        "systemId": "pf2e",
+        "systemVersion": "7.1.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!ZKtp3BdfswEOF0bM.bPYJdGBWY53uPuNJ"
+    },
+    {
+      "sort": 700000,
+      "name": "Archetypes",
+      "type": "text",
+      "_id": "03AVWmjQtzugN96H",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 2
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>The Pathfinder Second Edition Advanced Player’s Guide introduced an archetype devoted to quickly improvising cheap items when a situation requires them. The following feat, taken in place of @UUID[Compendium.pf2e.feats-srd.CaeCSWFWytWv8Fgu]{Scrounger Dedication}, preserves the basic functionality of the archetype while updating its rules to match the Heroic Crafting variant rule.</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.jk6cFbBVLJnVxGiw]{Heroic Scrounger Dedication} <span style=\"float:right\">Feat 2</span></h3><section class=\"traits tags\" style=\"gap:0px\"><p class=\"tag rarity uncommon\">Uncommon</p><p>Archetype</p><p>Dedication</p></section><p><strong>Archetype</strong> @UUID[Compendium.pf2e.journals.JournalEntry.vx5FGEG34AxI2dow.JournalEntryPage.rlKxNuq1obXe3m5J]{Scrounger}</p><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.jk6cFbBVLJnVxGiw inline]</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.345",
+        "systemId": "pf2e",
+        "systemVersion": "7.1.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!ZKtp3BdfswEOF0bM.03AVWmjQtzugN96H"
+    },
+    {
+      "sort": 800000,
+      "name": "Items",
+      "type": "text",
+      "_id": "DxjZmmC9DzaRP1Dt",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 2
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Many of the following items are useful as tools to assist with crafting, or afford new options to adventurers seeking to expand their horizons. Heroic crafters may find the following items interesting or useful:</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.lNpKHlp43BrqZHSq]{Dowsing Rods} <span style=\"float:right\">Item 3</span></h3><section class=\"traits\"><p>Magical</p><p>Divination</p></section><p><strong>Price</strong> 65 gp</p><p><strong>Usage</strong> held in 2 hands</p><p><strong>Bulk</strong> 1</p><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.lNpKHlp43BrqZHSq inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.2HE8QwxmjECGlfQm]{Runic Anvil} <span style=\"float:right\">Item 6</span></h3><section class=\"traits\"><p>Magical</p><p>Evocation</p></section><p><strong>Price</strong> 245 gp</p><p><strong>Bulk</strong> 4</p><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.2HE8QwxmjECGlfQm inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.foKrw4V35MXu9P2N]{Crafter's Fulu} <span style=\"float:right\">Item 8</span></h3><section class=\"traits\"><p>Consumable</p><p>Fului</p><p>Magical</p></section><p><strong>Price</strong> 100 gp</p><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.foKrw4V35MXu9P2N inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-vehicles.Actor.ky2xq5VeQmscIk7a]{Mobile Workshop} <span style=\"float:right\">Vehicle 8</span></h3><section class=\"tags paizo-style\"><p class=\"tag size\">Large</p></section><p><strong>Price</strong> 1020 gp</p><p>This specialized wagon contains everything you need to ply your trade on the road. It counts as a suitable workshop and provides artisan’s tools for one type of crafting, even while moving. Additionally, you don’t take the penalty for making a downtime check to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} while engaging in 4 hours or less of exploration activities. It also has space for up to 50 Bulk of crafting materials. Uses the same Vehicle statistics as a @UUID[Compendium.pf2e.vehicles.UNOwkQq5lc4cYdZP]{Wagon}.</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.B7TqaTPurTz9DROj]{Transmuter's Vial} <span style=\"float:right\">Item 11+</span></h3><section class=\"traits\"><p>Alchemical</p><p>Consumable</p></section><p><strong>Usage</strong> held in 1 hand</p><p><strong>Bulk</strong> L</p><p><strong>Activate</strong> <span style=\"font-family:Pathfinder2eActions, sans-serif\">A</span> (Interact)</p><hr /><p>The exact makeup of this substance is somewhat unclear, but it seems to consist partially of a tiny amount of adamantine powder suspended in a powerful acid. When poured over an unattended object, this unstable liquid increases or decreases the object’s Hardness by the listed value, to a maximum of the listed value. You choose whether to increase or decrease when you use the vial. This change lasts for 1 hour.</p><h4 style=\"background-color:var(--alt);color:var(--text-light);border-radius:3px;padding:2px 3px\">Transmuter's Vial (Greater) <span style=\"float:right\">Item 11</span></h4><p><strong>Price</strong> 275 gp</p><p><strong>Bulk</strong> L</p><p>The increase or decrease is 5, to a maximum of 15.</p><h4 style=\"background-color:var(--alt);color:var(--text-light);border-radius:3px;padding:2px 3px\">Transmuter's Vial (Major) <span style=\"float:right\">Item 17</span></h4><p><strong>Price</strong> 2850 gp</p><p><strong>Bulk</strong> L</p><p>The increase or decrease is 10, to a maximum of 20.</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.70I8hZ6Dizz1f9JP]{Gloves of Fluid Form} <span style=\"float:right\">Item 14</span></h3><section class=\"traits\"><p>Invested</p><p>Transmutation</p></section><p><strong>Price</strong> 4050 gp</p><p><strong>Usage</strong> worn gloves</p><p><strong>Bulk</strong> L</p><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.70I8hZ6Dizz1f9JP inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.h6PcsIW5Mzch1Fxi]{Vulcan's Hammer} <span style=\"float:right\">Item 14</span></h3><section class=\"traits tags\" style=\"gap:0px\"><p class=\"tag rarity uncommon\">Uncommon</p><p>Evocation</p><p>Fire</p><p>Force</p><p>Magical</p></section><p><strong>Price</strong> 4050 gp</p><p><strong>Usage</strong> held in 2 hands</p><p><strong>Bulk</strong> 2</p><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.h6PcsIW5Mzch1Fxi inline]</p><h3>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.La8LhXBMRUpfWWaD]{Relic Maker's Fulu} <span style=\"float:right\">Item 14</span></h3><section class=\"traits tags\" style=\"gap:0px\"><p class=\"tag rarity uncommon\">Uncommon</p><p>Consumable</p><p>Fulu</p><p>Magical</p></section><p><strong>Price</strong> 2850 gp</p><p>@Embed[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.La8LhXBMRUpfWWaD inline]</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.345",
+        "systemId": "pf2e",
+        "systemVersion": "7.1.1",
+        "lastModifiedBy": "xtF1DuSWhBdA8aGR",
+        "modifiedTime": 1749875492067
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!ZKtp3BdfswEOF0bM.DxjZmmC9DzaRP1Dt"
+    },
+    {
+      "sort": 900000,
+      "name": "Advice for GMs",
+      "type": "text",
+      "_id": "QNiLgfmCuu4WUnNL",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 2
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>The following sections help answer questions you might have about implementing Heroic Crafting in your game.</p><h3>Selling Crafted Items</h3><p>The Heroic Crafting system assumes that a significant portion of the value of an item comes from the labor used to craft it. Because of this assumption, characters using Heroic Crafting always save at least 25% of an item’s cost (unless they are unable to reliably succeed at the Crafting checks). The resulting cost savings are roughly on par with allowing players to haggle prices up or down by 25-50%, but unlike haggling, only apply to items the player meets the requirements to craft.</p><p>While Heroic Crafting allows characters to save money producing their own items, they typically can’t benefit financially from crafting and selling items. Items can be sold for no more than half their Price, which makes it very difficult to craft items for less than they can be sold for. However, if characters are extensively using Foraging or other cost-saving methods, we recommend further lowering the price these items can be sold for.</p><p>Alternatively, if you want to allow characters to sell their crafted items for a profit, setting the sell price to 55-60% of the item’s Price will put this system on par with Earn Income.</p><h3>Downtime Requirements</h3><p>Where the basic Craft rules provided by the Pathfinder Second Edition Core Rulebook make all items craftable in 4 days, Heroic Crafting makes the time to craft an item highly variable. In general, characters will need about a day to craft a consumable item of their level, and will need about a week to craft a permanent item of their level. This time is affected by the intitial investment, the degree of success of the Crafting checks, and the item’s Cost and Rarity.</p><h3>Custom Items</h3><p>Players that engage strongly with the Heroic Crafting system are likely to see the flexibility of the system as an opportunity to try to create new custom items. You may require the player to have the Inventor feat before they attempt this, or not. Either way, they will need to know the Price and Craft DC of the item to begin the process of crafting it.</p><p>The easiest way to determine the Price and Craft DC of a custom item is usually to refer to the Building Items section of the Pathfinder Second Edition Gamemastery Guide. Most custom items should also be at least Uncommon in rarity, which increases the Craft DC.</p><p>In some cases, you may waive the formula requirement to craft a custom item. Otherwise, refer to Table 6-13: Formulas in the Pathfinder Second Edition Core Rulebook to determine the Price of the formula.</p><h3>Monster Parts</h3><p>Certain monsters, when slain, can have valuable materials harvested from their bodies. The entries for those monsters sometimes list what the materials are and how they can be harvested, but in cases where you’d like to add materials not specified in the creature’s entry or where the rules aren’t clear, you can use the following guidelines:</p><p>Harvesting materials from a monster’s body requires a Medicine check with the same DC as the check to Recall Knowledge. It takes 10 minutes and requires healer’s tools. The value of the harvested materials generally should not exceed the value of a consumable item of the monster’s level.</p><p>The harvested materials can be awarded to characters in the form of generic crafting materials added to their Trove, or as treasure to be used in crafting (see the Crafting with Treasure section on page 6). Crafting materials as treasure may have effects on the properties of the crafted item or the Craft DC of the item.</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.345",
+        "systemId": "pf2e",
+        "systemVersion": "7.1.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!ZKtp3BdfswEOF0bM.QNiLgfmCuu4WUnNL"
+    },
+    {
+      "sort": 1000000,
+      "name": "Rules Adjustments",
+      "type": "text",
+      "_id": "qKp6k30fxR4eiauj",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 2
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>The following additional adjustments to the core rules will help smooth the gap between existing Craft rules and Heroic Crafting rules.</p><h3>Existing Craft Rules</h3><p>Most of the existing Crafting-related items, feats, and rules work exactly the same way as in the base rules. The following modifications cover other cases.</p><h4><strong>Consumable Batches</strong></h4><p>Crafting consumables in batches allows a character to increase their effective Spending Limit. More information on page 5.</p><h4><strong>Crafting Level Requirements</strong></h4><p>The rules presented in this system make one notable change to crafting requirements: Characters can craft items above their level. This change helps crafting characters by allowing them to attempt to craft an item they discover the formula for, even if the item is very high-level and the project will take months or even years. For this reason, it’s important to ensure characters only have access to formulas for items they should be able to craft.</p><h4><strong>Expanded Specialty Crafting</strong></h4><p>The @UUID[Compendium.pf2e.feats-srd.1Eceqc6zbMj2x0q9]{Seasoned} skill feat grants effects identical to @UUID[Compendium.pf2e.feats-srd.QLeMH5mQgh28sa5o]{Specialty Crafting}, and therefore should count as Specialty Crafting for the purposes of meeting prerequisites. Any other feat which provides the same effect should also count as Specialty Crafting.</p><h4><strong>Impeccable Crafting</strong></h4><p>Critical successes to Craft a Project don’t do anything extra unless the character has the Hyperfocus feat, so add Hyperfocus as a prerequisite for Impeccable Crafting.</p><h4><strong>Items Altering Craft Time</strong></h4><p>Items which decrease the minimum time to craft an item, such as the inexplicable apparatus, instead double the Spending Limit of the character using them whenever they Craft a Project.</p><h4><strong>Reverse-Engineering</strong></h4><p>If a character doesn’t have an item’s formula but does have the item, they can Begin a Project to reverse-engineer the item’s formula. This destroys the item, but leaves behind fragments which can be Salvaged for 50% of the item’s value. To do this, a character must be trained in Crafting.</p><h4><strong>@UUID[Compendium.pf2e.feats-srd.CaeCSWFWytWv8Fgu]{Scrounger Dedication}</strong></h4><p>Replace Scrounger Dedication with the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.jk6cFbBVLJnVxGiw]{Heroic Scrounger Dedication} feat presented in this book.</p><h3>Other Craft Durations</h3><p>If your game requires you to run downtime on the scale of months or years, or if the setting’s days or weeks differ significantly from the duration of Earth days or weeks, you can easily produce rules for other intervals. To derive the Spending Limit for a given duration, multiply the Spending Limit for that level by the number of days, not counting days in which the character must rest in order to avoid incurring penalties (typically around 25% of the duration must be spent resting). For durations which consist of multiple weeks, it is typically easier to instead multiply the number of weeks, since the Week time and Spending Limit already include the required time spent resting.</p><section class=\"info\"><p><strong>Example Duration: Month</strong></p><p>A month consists of 30 days, and 25% of that time must be spent resting in order to avoid incurring penalties. This means that there are 22 working days and 8 resting days. The Spending Limit for a month is equal to the Day Spending Limit multiplied by 22.</p></section>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.345",
+        "systemId": "pf2e",
+        "systemVersion": "7.1.1",
+        "lastModifiedBy": null
+      },
+      "ownership": {
+        "default": -1
+      },
+      "_key": "!journal.pages!ZKtp3BdfswEOF0bM.qKp6k30fxR4eiauj"
+    }
+  ],
+  "categories": [],
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.345",
+    "systemId": "pf2e",
+    "systemVersion": "7.1.1",
+    "modifiedTime": 1749874931496,
+    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
+  },
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "xtF1DuSWhBdA8aGR": 3
+  },
+  "_key": "!journal!ZKtp3BdfswEOF0bM"
+}
