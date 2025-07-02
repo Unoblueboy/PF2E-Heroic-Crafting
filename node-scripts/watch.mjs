@@ -1,6 +1,12 @@
 import fs from "fs";
 import path from "path";
 
+import { buildStaticFiles, buildSourceFiles } from "./build-helper.mjs";
+
+console.log(`Running initial build`);
+buildStaticFiles();
+buildSourceFiles();
+
 const BUILD_PATH = path.join(".", "build");
 const STATIC_PATH = path.join(".", "static");
 const SOURCE_PATH = path.join(".", "src");
