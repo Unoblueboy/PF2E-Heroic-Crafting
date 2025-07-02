@@ -5,7 +5,8 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"unpack-compendium": "node ./node-scripts/unpack-compendium.mjs",
 		"pack-compendium": "node ./node-scripts/pack-compendium.mjs",
-		"build": "node ./node-scripts/build.mjs & node ./node-scripts/pack-compendium.mjs true"
+		"build": "node ./node-scripts/build.mjs & node ./node-scripts/pack-compendium.mjs true",
+		"build-dev": "node ./node-scripts/build.mjs dev"
 	},
 	"author": "",
 	"license": "ISC",

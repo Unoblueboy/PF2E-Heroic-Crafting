@@ -1,19 +1,23 @@
 import fs from "fs";
 import path from "path";
 
-const BUILD_PATH = "./build";
-const STATIC_PATH = "./static";
-const SOURCE_PATH = "./src";
+const BUILD_PATH = path.join(".", "build");
+const STATIC_PATH = path.join(".", "static");
+const SOURCE_PATH = path.join(".", "src");
 const STATIC_IGNORE = ["jsons"];
 
-if (fs.existsSync(BUILD_PATH)) {
-	console.log("Existing build folder found. Deleting...");
-	fs.rmSync(BUILD_PATH, { recursive: true });
-	console.log("Build folder deleted.");
-}
+const DEV_BUILD = process.argv.length > 2 ? ["true", "dev"].includes(process.argv[2].toLowerCase()) : false;
 
-console.log("Creating Build folder");
-fs.mkdirSync(BUILD_PATH);
+if (!DEV_BUILD) {
+	if (fs.existsSync(BUILD_PATH)) {
+		console.log("Existing build folder found. Deleting...");
+		fs.rmSync(BUILD_PATH, { recursive: true });
+		console.log("Build folder deleted.");
+	}
+
+	console.log("Creating Build folder");
+	fs.mkdirSync(BUILD_PATH);
+}
 
 console.log("Copying static folders/files");
 fs.readdirSync(STATIC_PATH, { withFileTypes: true }).forEach((dirent) => {

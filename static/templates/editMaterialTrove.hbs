@@ -16,10 +16,15 @@
     </div>
     <hr style="margin:0.5rem 0;">
     <div class="standard-form">
-        {{formGroup fields.editPP label=(localize 'PF2E.CurrencyPP') value=craftingMaterials.coins.pp rootId=partId}}
-        {{formGroup fields.editGP label=(localize 'PF2E.CurrencyGP') value=craftingMaterials.coins.gp rootId=partId}}
-        {{formGroup fields.editSP label=(localize 'PF2E.CurrencySP') value=craftingMaterials.coins.sp rootId=partId}}
-        {{formGroup fields.editCP label=(localize 'PF2E.CurrencyCP') value=craftingMaterials.coins.cp rootId=partId}}
+        {{formGroup fields.editPP dataset=fields.editPP.dataset label=(localize 'PF2E.CurrencyPP') value=craftingMaterials.coins.pp rootId=partId}}
+        {{formGroup fields.editGP dataset=fields.editGP.dataset label=(localize 'PF2E.CurrencyGP') value=craftingMaterials.coins.gp rootId=partId}}
+        {{formGroup fields.editSP dataset=fields.editSP.dataset label=(localize 'PF2E.CurrencySP') value=craftingMaterials.coins.sp rootId=partId}}
+        {{formGroup fields.editCP dataset=fields.editCP.dataset label=(localize 'PF2E.CurrencyCP') value=craftingMaterials.coins.cp rootId=partId}}
+        <div></div>
+    </div>
+    <hr style="margin:0.5rem 0;">
+    <div class="standard-form">
+        {{formGroup fields.editUseCoins rootId=partId}}
         <div></div>
     </div>
 </section>

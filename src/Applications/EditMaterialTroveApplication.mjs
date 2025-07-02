@@ -1,10 +1,16 @@
+import { coinsToCopperValue, copperValueToCoins } from "../helper/currency.mjs";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(ApplicationV2) {
-	constructor(...args) {
-		super(...args);
-		this.CraftingMaterialsCopperValue = args[0];
+class EditMaterialTroveApplication extends HandlebarsApplicationMixin(ApplicationV2) {
+	constructor(CraftingMaterialsCopperValue, callback) {
+		super();
+		this.CraftingMaterialsCopperValue = CraftingMaterialsCopperValue;
 		this.addSubChosen = "add";
+		this.curEditValue = {};
+		this.curAddSubValue = {};
+		this.result = null;
+		this.callback = callback ? callback : null;
 	}
 
 	/** @override */
@@ -69,6 +75,11 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 			min: 0,
 			positive: true,
 		}),
+		editUseCoins: new foundry.data.fields.BooleanField({
+			initial: false,
+			label: "Use Coins",
+			hint: "Move coins from/to the actors inventory",
+		}),
 		addSubCP: new foundry.data.fields.NumberField({
 			required: true,
 			integer: true,
@@ -96,35 +107,127 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		addSubUseCoins: new foundry.data.fields.BooleanField({
 			initial: false,
 			label: "Use Coins",
-			hint: "Takes coins from the actors inventory",
+			hint: "Move coins from/to the actors inventory",
 		}),
 	});
 
-	// async changeTab(tab, group, { event, force, navElement, updatePosition }) {
-	// 	console.log(tab, group, event, force, navElement, updatePosition);
-	// 	await super.changeTab(tab, group, { event, force, navElement, updatePosition });
-	// 	console.log("Tab Groups", this.tabGroups);
-	// }
+	static async handler(event, form, formData) {
+		console.log(formData);
+		console.log(this);
+		switch (this.tabGroups.primary) {
+			case "add-sub":
+				this.result = {
+					newMaterialCopperValue:
+						this.addSubChosen == "add"
+							? this.CraftingMaterialsCopperValue + coinsToCopperValue(this.curAddSubValue.coins)
+							: this.CraftingMaterialsCopperValue - coinsToCopperValue(this.curAddSubValue.coins),
+					useActorCoins: formData.object.addSubUseCoins,
+				};
+				break;
+			case "edit":
+				this.result = {
+					newMaterialCopperValue: coinsToCopperValue(this.curEditValue.coins),
+					useActorCoins: formData.object.editUseCoins,
+				};
+				break;
+			default:
+				break;
+		}
+	}
+
+	static checkRadioBox(event, target) {
+		if (event.type != "click") return;
+		const inputElement = target.parentElement.getElementsByTagName("input")[0];
+		inputElement.checked = true;
+		this.addSubChosen = inputElement.value;
+		EditMaterialTroveApplication.AddSubCurValue.bind(this)();
+	}
+
+	static UpdateAddSubCurValue(event) {
+		event.preventDefault();
+		event.stopImmediatePropagation();
+
+		const target = event.target;
+		switch (target.dataset.tab) {
+			case "edit": {
+				EditMaterialTroveApplication.EditCurValue.bind(this)(target.dataset.currency, target.value);
+				break;
+			}
+			case "addSub": {
+				EditMaterialTroveApplication.AddSubCurValue.bind(this)(target.dataset.currency, target.value);
+				break;
+			}
+			default:
+				break;
+		}
+	}
+
+	static EditCurValue(currency, value) {
+		this.curEditValue.coins[currency] = Number.parseInt(value);
+		const curValue = (coinsToCopperValue(this.curEditValue.coins) / 100).toFixed(2);
+		this.element.querySelector("#edit-material-trove-edit-new-materials").textContent = `${curValue} GP`;
+	}
+
+	static AddSubCurValue(currency, value) {
+		if (currency && value) this.curAddSubValue.coins[currency] = Number.parseInt(value);
+		const copperValue =
+			this.addSubChosen == "add"
+				? this.CraftingMaterialsCopperValue + coinsToCopperValue(this.curAddSubValue.coins)
+				: this.CraftingMaterialsCopperValue - coinsToCopperValue(this.curAddSubValue.coins);
+		const curValue = (copperValue / 100).toFixed(2);
+		this.element.querySelector("#edit-material-trove-add-sub-new-materials").textContent = `${curValue} GP`;
+	}
+
+	/** @override */
+	_onClose(options) {
+		super._onClose(options);
+		if (this.callback) this.callback(this.result);
+	}
+
+	/** @override */
+	async _onRender(context, options) {
+		const numberFields = this.element.querySelectorAll('[data-action="update-cur-value"]');
+		for (const input of numberFields) {
+			input.addEventListener("change", EditMaterialTroveApplication.UpdateAddSubCurValue.bind(this));
+		}
+	}
+
 	/** @override */
 	async _prepareContext() {
 		const data = await super._prepareContext();
-		console.log(data);
-		const buttons = [{ type: "submit", icon: "fa-solid fa-floppy-disk", label: "SETTINGS.Save" }];
+
+		const fields = EditMaterialTroveApplication.SCHEMA.fields;
+		for (const key of Object.keys(fields)) {
+			if (key == "addSubUseCoins") continue;
+
+			const currency = key.slice(key.length - 2).toLowerCase();
+			const tab = key.slice(0, key.length - 2);
+			fields[key].dataset = {
+				action: "update-cur-value",
+				currency,
+				tab,
+			};
+		}
+
+		const buttons = [{ type: "submit", icon: "fa-solid fa-treasure-chest", label: "Update Material Trove" }];
 		const craftingMaterials = {
 			goldValue: (this.CraftingMaterialsCopperValue / 100).toFixed(2),
+			coins: copperValueToCoins(this.CraftingMaterialsCopperValue),
+		};
+		this.curEditValue = { coins: { ...craftingMaterials.coins } };
+		this.curAddSubValue = {
 			coins: {
-				cp: this.CraftingMaterialsCopperValue % 10,
-				sp: Math.floor((this.CraftingMaterialsCopperValue % 100) / 10),
-				gp: Math.floor(this.CraftingMaterialsCopperValue / 100),
+				cp: 0,
+				sp: 0,
+				gp: 0,
 				pp: 0,
 			},
 		};
 		return Object.assign(data, {
 			buttons,
 			rootId: this.id,
-			fields: EditMaterialTroveApplication.SCHEMA.fields,
+			fields,
 			craftingMaterials,
-			addSubChosen: this.addSubChosen,
 		});
 	}
 
@@ -132,25 +235,13 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 	async _preparePartContext(partId, context) {
 		context.partId = `${this.id}-${partId}`;
 		context.tab = context.tabs[partId];
-		console.log(context, partId);
 		return context;
 	}
+}
 
-	static async handler(event, form, formData) {
-		console.log(formData);
-		console.log(this);
-	}
-
-	static checkRadioBox(event, target) {
-		console.log(event, target);
-		if (event.type != "click") return;
-		target.parentElement.getElementsByTagName("input")[0].checked = true;
-		// this.addSubChosen = target.parentElement.getElementsByTagName("input")[0].value;
-		// this.render();
-	}
-
-	/** @override */
-	async _onRender(context, options) {
-		console.log(context, options);
-	}
+export async function EditMaterialTrove(curValue) {
+	return new Promise((resolve, reject) => {
+		const app = new EditMaterialTroveApplication(curValue, resolve);
+		app.render(true);
+	});
 }
