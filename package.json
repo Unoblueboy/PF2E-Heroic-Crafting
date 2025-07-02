@@ -7,7 +7,7 @@
 		"pack-compendium": "node ./node-scripts/pack-compendium.mjs",
 		"build": "node ./node-scripts/build.mjs & node ./node-scripts/pack-compendium.mjs true",
 		"build-dev": "node ./node-scripts/build.mjs dev",
-		"watch": "node ./node-scripts/watch,mjs"
+		"watch": "node ./node-scripts/watch.mjs"
 	},
 	"author": "",
 	"license": "ISC",
