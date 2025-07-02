@@ -1,5 +1,6 @@
 import { copperValueToCoins } from "./helper/currency.mjs";
 import { EditMaterialTrove } from "./Applications/EditMaterialTroveApplication.mjs";
+import { salvage } from "./salvage/salvage.mjs";
 
 const HEROIC_CRAFTING_PREFIX = "Compendium.pf2e-heroic-crafting.heroic-crafting";
 const HEROIC_CRAFTING_ITEMS_PREFIX = `${HEROIC_CRAFTING_PREFIX}-items.Item`;
@@ -36,6 +37,7 @@ const HEROIC_CRAFTING_GATHERED_INCOME = [
 Hooks.on("init", () => {
 	game.pf2eHeroicCrafting = {
 		editMaterialTrove,
+		salvage,
 	};
 });
 
