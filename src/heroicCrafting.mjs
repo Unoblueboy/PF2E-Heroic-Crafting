@@ -2,10 +2,10 @@ import { copperValueToCoins } from "./helper/currency.mjs";
 import { EditMaterialTrove } from "./Applications/EditMaterialTroveApplication.mjs";
 import { salvage } from "./salvage/salvage.mjs";
 
-const HEROIC_CRAFTING_PREFIX = "Compendium.pf2e-heroic-crafting.heroic-crafting";
-const HEROIC_CRAFTING_ITEMS_PREFIX = `${HEROIC_CRAFTING_PREFIX}-items.Item`;
-const MATERIAL_TROVE_UUID = `${HEROIC_CRAFTING_ITEMS_PREFIX}.wtpSAjQwSyPOglzU`;
-const CRAFTING_MATERIAL_UUID = `${HEROIC_CRAFTING_ITEMS_PREFIX}.UFqgBzSfC8XfuKVg`;
+const CRAFTING_MATERIAL_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.UFqgBzSfC8XfuKVg`;
+
+const MATERIAL_TROVE_SLUG = "material-trove";
+const CRAFTING_MATERIAL_SLUG = "generic-crafting-material";
 
 const HEROIC_CRAFTING_SPENDING_LIMIT = {
 	1: { hour: 30, day: 120, week: 600 },
@@ -30,10 +30,6 @@ const HEROIC_CRAFTING_SPENDING_LIMIT = {
 	20: { hour: 80000, day: 320000, week: 1600000 },
 }; // prices are in CP
 
-const HEROIC_CRAFTING_GATHERED_INCOME = [
-	10, 40, 60, 100, 160, 200, 400, 500, 600, 800, 1000, 1200, 1600, 2400, 3000, 4000, 6000, 8000, 14000, 20000, 30000,
-]; // prices are in CP
-
 Hooks.on("init", () => {
 	game.pf2eHeroicCrafting = {
 		editMaterialTrove,
@@ -43,7 +39,7 @@ Hooks.on("init", () => {
 
 function getMaterialTrove(actor) {
 	// Get Material Trove
-	const materialTroves = actor.items.filter((x) => x?.sourceId == MATERIAL_TROVE_UUID);
+	const materialTroves = actor.items.filter((x) => x?.slug == MATERIAL_TROVE_SLUG);
 
 	if (materialTroves.length == 0) {
 		ui.notifications.error(
@@ -61,7 +57,7 @@ function getMaterialTrove(actor) {
 
 function getGenericCraftingMaterials(actor) {
 	// Get Generic Crafting Materials
-	return actor.items.filter((x) => x?.sourceId == CRAFTING_MATERIAL_UUID);
+	return actor.items.filter((x) => x?.slug == CRAFTING_MATERIAL_SLUG);
 }
 
 async function useActorCoins(result, CraftingMaterialsCopperValue, actor) {

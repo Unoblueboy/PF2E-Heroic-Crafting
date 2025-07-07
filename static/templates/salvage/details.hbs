@@ -1,0 +1,43 @@
+<div class="details">
+    <hr style="margin:0.5rem 0;">
+    <div class="savvy-teardown standard-form">
+        <h4>Savvy Teardown</h4>
+        {{formGroup fields.useSavvyTeardown dataset=fields.useSavvyTeardown.dataset rootId=partId}}
+    </div>
+    <hr style="margin:0.5rem 0;">
+    <div class="maximum standard-form">
+        <h4>Salvage Maximum</h4>
+        {{formGroup fields.salvageMaximumPP label=(localize 'PF2E.CurrencyPP') value=0 rootId=partId}}
+        {{formGroup fields.salvageMaximumGP label=(localize 'PF2E.CurrencyGP') value=0 rootId=partId}}
+        {{formGroup fields.salvageMaximumSP label=(localize 'PF2E.CurrencySP') value=0 rootId=partId}}
+        {{formGroup fields.salvageMaximumCP label=(localize 'PF2E.CurrencyCP') value=0 rootId=partId}}
+    </div>
+    <hr style="margin:0.5rem 0;">
+    <div class="income">
+        <h4>Salvage Income</h4>
+        <div class="result-details"
+             data-tooltip-direction="UP">
+            <div class="result-group">
+                <span>Success</span>
+                <div class="tooltip"
+                     data-tooltip
+                     id="salvage-success-income"
+                     disabled>
+                </div>
+            </div>
+            <div class="result-group">
+                <span>Failure</span>
+                <div class="tooltip"
+                     data-tooltip
+                     id="salvage-failure-income"
+                     disabled>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr style="margin:0.5rem 0;">
+    <div class="duration standard-form">
+        <h4>Salvage Duration</h4>
+        {{formGroup fields.salvageDuration label="Hours Worked" value=1 rootId=partId}}
+    </div>
+</div>
