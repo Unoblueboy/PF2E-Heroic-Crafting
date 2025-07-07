@@ -1,168 +1,151 @@
 {
-  "folder": null,
-  "name": "Vulcan's Hammer",
-  "type": "weapon",
-  "effects": [],
-  "system": {
-    "description": {
-      "gm": "",
-      "value": "<p>The striking end of this <em>+2 greater striking @UUID[Compendium.pf2e.equipment-srd.H9qYN48voa2ZDy3i]{Impactful} @UUID[Compendium.pf2e.equipment-srd.XszNvxnymWYRaoTp]{Flaming} maul</em> is worked into the shape of a dragon’s head. This weapon counts as sterling artisan’s tools, providing a +1 item bonus on Crafting checks to smith or work with metal.</p><hr /><p><strong>Activate</strong> <span style=\"font-family:Pathfinder2eActions, sans-serif\">3</span> Cast a Spell</p><p><strong>Frequency</strong> once per day;</p><hr /><p><strong>Effect</strong> you cast a 5th-rank @UUID[Compendium.pf2e.spells-srd.kOa055FIrO9Smnya]{Wall of Stone} spell. When cast this way, the wall is instead made of iron, and each section has 17 Hardness instead of 14.</p><hr /><p><strong>Activate</strong> <span style=\"font-family:Pathfinder2eActions, sans-serif\">2</span> (command)</p><p><strong>Frequency</strong> once per day;</p><hr /><p><strong>Effect</strong> for the next 1 minute, the maul is wreathed in crimson flames that strip away an enemy’s resitances. It ignores Hardness, resistances, and immunities during this time.</p>"
-    },
-    "rules": [
-      {
-        "key": "FlatModifier",
-        "label": "Vulcan's Hammer",
-        "selector": "crafting",
-        "value": 1,
-        "type": "item",
-        "predicate": [
-          "blacksmithing"
-        ]
-      },
-      {
-        "key": "AdjustStrike",
-        "mode": "add",
-        "property": "property-runes",
-        "value": "impactful",
-        "definition": [
-          "item:id:{item|id}"
-        ]
-      },
-      {
-        "key": "AdjustStrike",
-        "mode": "add",
-        "property": "property-runes",
-        "value": "flaming",
-        "definition": [
-          "item:id:{item|id}"
-        ]
-      }
-    ],
-    "slug": null,
-    "_migration": {
-      "version": 0.939,
-      "lastMigration": null
-    },
-    "traits": {
-      "otherTags": [],
-      "value": [
-        "fire",
-        "force",
-        "magical",
-        "shove"
-      ],
-      "rarity": "uncommon"
-    },
-    "publication": {
-      "title": "Heroic Crafting",
-      "authors": "",
-      "license": "OGL",
-      "remaster": false
-    },
-    "level": {
-      "value": 14
-    },
-    "quantity": 1,
-    "baseItem": "maul",
-    "bulk": {
-      "value": 2
-    },
-    "hp": {
-      "value": 0,
-      "max": 0
-    },
-    "hardness": 0,
-    "price": {
-      "value": {
-        "gp": 4300
-      }
-    },
-    "equipped": {
-      "carryType": "worn",
-      "invested": null,
-      "handsHeld": 0
-    },
-    "containerId": null,
-    "size": "med",
-    "material": {
-      "type": null,
-      "grade": null
-    },
-    "identification": {
-      "status": "identified",
-      "unidentified": {
-        "name": "Unusual Weapon",
-        "img": "systems/pf2e/icons/unidentified_item_icons/weapon.webp",
-        "data": {
-          "description": {
-            "value": ""
-          }
-        }
-      },
-      "misidentified": {}
-    },
-    "usage": {
-      "value": "held-in-two-hands"
-    },
-    "category": "martial",
-    "group": "hammer",
-    "bonus": {
-      "value": 0
-    },
-    "damage": {
-      "dice": 1,
-      "die": "d6",
-      "damageType": "slashing",
-      "persistent": null
-    },
-    "splashDamage": {
-      "value": 0
-    },
-    "range": null,
-    "reload": {
-      "value": null
-    },
-    "runes": {
-      "potency": 2,
-      "striking": 2,
-      "property": [
-        "impactful",
-        "flaming"
-      ]
-    },
-    "specific": {
-      "material": {
-        "type": null,
-        "grade": null
-      },
-      "runes": {
-        "potency": 2,
-        "striking": 2,
-        "property": [
-          "impactful",
-          "flaming"
-        ]
-      }
-    },
-    "subitems": []
-  },
-  "_id": "h6PcsIW5Mzch1Fxi",
-  "img": "icons/weapons/hammers/hammer-double-steel-embossed.webp",
-  "flags": {},
-  "_stats": {
-    "compendiumSource": null,
-    "duplicateSource": null,
-    "exportSource": null,
-    "coreVersion": "13.345",
-    "systemId": "pf2e",
-    "systemVersion": "7.1.1",
-    "modifiedTime": 1749874946134,
-    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
-  },
-  "sort": 0,
-  "ownership": {
-    "default": 0,
-    "xtF1DuSWhBdA8aGR": 3
-  },
-  "_key": "!items!h6PcsIW5Mzch1Fxi"
+	"folder": null,
+	"name": "Vulcan's Hammer",
+	"type": "weapon",
+	"effects": [],
+	"system": {
+		"description": {
+			"gm": "",
+			"value": "<p>The striking end of this <em>+2 greater striking @UUID[Compendium.pf2e.equipment-srd.H9qYN48voa2ZDy3i]{Impactful} @UUID[Compendium.pf2e.equipment-srd.XszNvxnymWYRaoTp]{Flaming} maul</em> is worked into the shape of a dragon’s head. This weapon counts as sterling artisan’s tools, providing a +1 item bonus on Crafting checks to smith or work with metal.</p><hr /><p><strong>Activate</strong> <span style=\"font-family:Pathfinder2eActions, sans-serif\">3</span> Cast a Spell</p><p><strong>Frequency</strong> once per day;</p><hr /><p><strong>Effect</strong> you cast a 5th-rank @UUID[Compendium.pf2e.spells-srd.kOa055FIrO9Smnya]{Wall of Stone} spell. When cast this way, the wall is instead made of iron, and each section has 17 Hardness instead of 14.</p><hr /><p><strong>Activate</strong> <span style=\"font-family:Pathfinder2eActions, sans-serif\">2</span> (command)</p><p><strong>Frequency</strong> once per day;</p><hr /><p><strong>Effect</strong> for the next 1 minute, the maul is wreathed in crimson flames that strip away an enemy’s resitances. It ignores Hardness, resistances, and immunities during this time.</p>"
+		},
+		"rules": [
+			{
+				"key": "FlatModifier",
+				"label": "Vulcan's Hammer",
+				"selector": "crafting",
+				"value": 1,
+				"type": "item",
+				"predicate": ["blacksmithing"]
+			},
+			{
+				"key": "AdjustStrike",
+				"mode": "add",
+				"property": "property-runes",
+				"value": "impactful",
+				"definition": ["item:id:{item|id}"]
+			},
+			{
+				"key": "AdjustStrike",
+				"mode": "add",
+				"property": "property-runes",
+				"value": "flaming",
+				"definition": ["item:id:{item|id}"]
+			}
+		],
+		"slug": "vulcans-hammer",
+		"_migration": {
+			"version": 0.939,
+			"lastMigration": null
+		},
+		"traits": {
+			"otherTags": [],
+			"value": ["fire", "force", "magical", "shove"],
+			"rarity": "uncommon"
+		},
+		"publication": {
+			"title": "Heroic Crafting",
+			"authors": "",
+			"license": "OGL",
+			"remaster": false
+		},
+		"level": {
+			"value": 14
+		},
+		"quantity": 1,
+		"baseItem": "maul",
+		"bulk": {
+			"value": 2
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"hardness": 0,
+		"price": {
+			"value": {
+				"gp": 4300
+			}
+		},
+		"equipped": {
+			"carryType": "worn",
+			"invested": null,
+			"handsHeld": 0
+		},
+		"containerId": null,
+		"size": "med",
+		"material": {
+			"type": null,
+			"grade": null
+		},
+		"identification": {
+			"status": "identified",
+			"unidentified": {
+				"name": "Unusual Weapon",
+				"img": "systems/pf2e/icons/unidentified_item_icons/weapon.webp",
+				"data": {
+					"description": {
+						"value": ""
+					}
+				}
+			},
+			"misidentified": {}
+		},
+		"usage": {
+			"value": "held-in-two-hands"
+		},
+		"category": "martial",
+		"group": "hammer",
+		"bonus": {
+			"value": 0
+		},
+		"damage": {
+			"dice": 1,
+			"die": "d6",
+			"damageType": "slashing",
+			"persistent": null
+		},
+		"splashDamage": {
+			"value": 0
+		},
+		"range": null,
+		"reload": {
+			"value": null
+		},
+		"runes": {
+			"potency": 2,
+			"striking": 2,
+			"property": ["impactful", "flaming"]
+		},
+		"specific": {
+			"material": {
+				"type": null,
+				"grade": null
+			},
+			"runes": {
+				"potency": 2,
+				"striking": 2,
+				"property": ["impactful", "flaming"]
+			}
+		},
+		"subitems": []
+	},
+	"_id": "h6PcsIW5Mzch1Fxi",
+	"img": "icons/weapons/hammers/hammer-double-steel-embossed.webp",
+	"flags": {},
+	"_stats": {
+		"compendiumSource": null,
+		"duplicateSource": null,
+		"exportSource": null,
+		"coreVersion": "13.345",
+		"systemId": "pf2e",
+		"systemVersion": "7.1.1",
+		"modifiedTime": 1749874946134,
+		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
+	},
+	"sort": 0,
+	"ownership": {
+		"default": 0,
+		"xtF1DuSWhBdA8aGR": 3
+	},
+	"_key": "!items!h6PcsIW5Mzch1Fxi"
 }

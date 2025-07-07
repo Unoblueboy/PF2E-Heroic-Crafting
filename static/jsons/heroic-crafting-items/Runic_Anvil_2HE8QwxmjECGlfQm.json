@@ -1,108 +1,103 @@
 {
-  "folder": null,
-  "name": "Runic Anvil",
-  "type": "equipment",
-  "effects": [],
-  "system": {
-    "description": {
-      "gm": "",
-      "value": "<p>This anvil is used by traveling smiths to be able to craft swords, armor, and other gear on the road. The anvil counts as sterling artisan’s tools for any type of smithing, providing a +1 item bonus on that type of Crafting checks. This anvil is also capable of heating the metal to be worked, removing the need for a forge.</p><p>Additionally, the anvil can store up to 4 weapon or armor runes, as if by a runestone. Runes can be added and removed without damaging the anvil.</p>"
-    },
-    "rules": [
-      {
-        "key": "FlatModifier",
-        "label": "Runic Anvil",
-        "selector": "crafting",
-        "value": 1,
-        "type": "item",
-        "predicate": [
-          "action:craft",
-          "blacksmithing"
-        ]
-      }
-    ],
-    "slug": "runic-anvil",
-    "_migration": {
-      "version": 0.939,
-      "lastMigration": null
-    },
-    "traits": {
-      "otherTags": [],
-      "value": [
-        "magical"
-      ],
-      "rarity": "common"
-    },
-    "publication": {
-      "title": "Heroic Crafting",
-      "authors": "",
-      "license": "OGL",
-      "remaster": false
-    },
-    "level": {
-      "value": 6
-    },
-    "quantity": 1,
-    "baseItem": null,
-    "bulk": {
-      "value": 4
-    },
-    "hp": {
-      "value": 0,
-      "max": 0
-    },
-    "hardness": 0,
-    "price": {
-      "value": {
-        "gp": 245
-      }
-    },
-    "equipped": {
-      "carryType": "worn",
-      "invested": null,
-      "handsHeld": 0
-    },
-    "containerId": null,
-    "size": "med",
-    "material": {
-      "type": null,
-      "grade": null
-    },
-    "identification": {
-      "status": "identified",
-      "unidentified": {
-        "name": "Unusual Object",
-        "img": "systems/pf2e/icons/unidentified_item_icons/adventuring_gear.webp",
-        "data": {
-          "description": {
-            "value": ""
-          }
-        }
-      },
-      "misidentified": {}
-    },
-    "usage": {
-      "value": "other"
-    },
-    "subitems": []
-  },
-  "_id": "2HE8QwxmjECGlfQm",
-  "img": "icons/tools/smithing/anvil.webp",
-  "flags": {},
-  "_stats": {
-    "compendiumSource": null,
-    "duplicateSource": null,
-    "exportSource": null,
-    "coreVersion": "13.345",
-    "systemId": "pf2e",
-    "systemVersion": "7.1.1",
-    "modifiedTime": 1749874946134,
-    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
-  },
-  "sort": 0,
-  "ownership": {
-    "default": 0,
-    "xtF1DuSWhBdA8aGR": 3
-  },
-  "_key": "!items!2HE8QwxmjECGlfQm"
+	"folder": null,
+	"name": "Runic Anvil",
+	"type": "equipment",
+	"effects": [],
+	"system": {
+		"description": {
+			"gm": "",
+			"value": "<p>This anvil is used by traveling smiths to be able to craft swords, armor, and other gear on the road. The anvil counts as sterling artisan’s tools for any type of smithing, providing a +1 item bonus on that type of Crafting checks. This anvil is also capable of heating the metal to be worked, removing the need for a forge.</p><p>Additionally, the anvil can store up to 4 weapon or armor runes, as if by a runestone. Runes can be added and removed without damaging the anvil.</p>"
+		},
+		"rules": [
+			{
+				"key": "FlatModifier",
+				"label": "Runic Anvil",
+				"selector": "crafting",
+				"value": 1,
+				"type": "item",
+				"predicate": ["action:craft", "blacksmithing"]
+			}
+		],
+		"slug": "runic-anvil",
+		"_migration": {
+			"version": 0.939,
+			"lastMigration": null
+		},
+		"traits": {
+			"otherTags": [],
+			"value": ["magical"],
+			"rarity": "common"
+		},
+		"publication": {
+			"title": "Heroic Crafting",
+			"authors": "",
+			"license": "OGL",
+			"remaster": false
+		},
+		"level": {
+			"value": 6
+		},
+		"quantity": 1,
+		"baseItem": null,
+		"bulk": {
+			"value": 4
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"hardness": 0,
+		"price": {
+			"value": {
+				"gp": 245
+			}
+		},
+		"equipped": {
+			"carryType": "worn",
+			"invested": null,
+			"handsHeld": 0
+		},
+		"containerId": null,
+		"size": "med",
+		"material": {
+			"type": null,
+			"grade": null
+		},
+		"identification": {
+			"status": "identified",
+			"unidentified": {
+				"name": "Unusual Object",
+				"img": "systems/pf2e/icons/unidentified_item_icons/adventuring_gear.webp",
+				"data": {
+					"description": {
+						"value": ""
+					}
+				}
+			},
+			"misidentified": {}
+		},
+		"usage": {
+			"value": "other"
+		},
+		"subitems": []
+	},
+	"_id": "2HE8QwxmjECGlfQm",
+	"img": "icons/tools/smithing/anvil.webp",
+	"flags": {},
+	"_stats": {
+		"compendiumSource": null,
+		"duplicateSource": null,
+		"exportSource": null,
+		"coreVersion": "13.345",
+		"systemId": "pf2e",
+		"systemVersion": "7.1.1",
+		"modifiedTime": 1749874946134,
+		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
+	},
+	"sort": 0,
+	"ownership": {
+		"default": 0,
+		"xtF1DuSWhBdA8aGR": 3
+	},
+	"_key": "!items!2HE8QwxmjECGlfQm"
 }

@@ -1,86 +1,81 @@
 {
-  "folder": null,
-  "name": "Vigilant Forager",
-  "type": "feat",
-  "effects": [],
-  "system": {
-    "_migration": {
-      "version": 0.939,
-      "previous": null
-    },
-    "description": {
-      "value": "<p>Even while adventuring, you never stop looking for useful supplies. You can use the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.KNJAA6peNXZoP7ap]{Forage Crafting Resources} activity after 8 hours or less of exploration, but if you do, you take a –5 penalty.</p>",
-      "gm": ""
-    },
-    "publication": {
-      "title": "Heroic Crafting",
-      "authors": "",
-      "license": "OGL",
-      "remaster": false
-    },
-    "rules": [
-      {
-        "key": "FlatModifier",
-        "label": "{item|name}",
-        "selector": "survival",
-        "value": -5,
-        "predicate": [
-          "action:forage-crafting-resources",
-          "vigilant-forager"
-        ]
-      }
-    ],
-    "slug": null,
-    "traits": {
-      "otherTags": [],
-      "value": [
-        "skill"
-      ],
-      "rarity": "common"
-    },
-    "level": {
-      "value": 2
-    },
-    "category": "skill",
-    "onlyLevel1": false,
-    "maxTakable": 1,
-    "actionType": {
-      "value": "passive"
-    },
-    "actions": {
-      "value": null
-    },
-    "prerequisites": {
-      "value": [
-        {
-          "value": "expert in Survival"
-        }
-      ]
-    },
-    "subfeatures": {
-      "proficiencies": {},
-      "senses": {},
-      "suppressedFeatures": []
-    },
-    "location": null
-  },
-  "img": "icons/sundries/books/book-red-exclamation.webp",
-  "flags": {},
-  "_stats": {
-    "compendiumSource": null,
-    "duplicateSource": null,
-    "exportSource": null,
-    "coreVersion": "13.345",
-    "systemId": "pf2e",
-    "systemVersion": "7.1.1",
-    "modifiedTime": 1749874952660,
-    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
-  },
-  "_id": "jxdu5L2NI8QSPZmS",
-  "sort": 0,
-  "ownership": {
-    "default": 0,
-    "xtF1DuSWhBdA8aGR": 3
-  },
-  "_key": "!items!jxdu5L2NI8QSPZmS"
+	"folder": null,
+	"name": "Vigilant Forager",
+	"type": "feat",
+	"effects": [],
+	"system": {
+		"_migration": {
+			"version": 0.939,
+			"previous": null
+		},
+		"description": {
+			"value": "<p>Even while adventuring, you never stop looking for useful supplies. You can use the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.KNJAA6peNXZoP7ap]{Forage Crafting Resources} activity after 8 hours or less of exploration, but if you do, you take a –5 penalty.</p>",
+			"gm": ""
+		},
+		"publication": {
+			"title": "Heroic Crafting",
+			"authors": "",
+			"license": "OGL",
+			"remaster": false
+		},
+		"rules": [
+			{
+				"key": "FlatModifier",
+				"label": "{item|name}",
+				"selector": "survival",
+				"value": -5,
+				"predicate": ["action:forage-crafting-resources", "vigilant-forager"]
+			}
+		],
+		"slug": "vigilant-forager",
+		"traits": {
+			"otherTags": [],
+			"value": ["skill"],
+			"rarity": "common"
+		},
+		"level": {
+			"value": 2
+		},
+		"category": "skill",
+		"onlyLevel1": false,
+		"maxTakable": 1,
+		"actionType": {
+			"value": "passive"
+		},
+		"actions": {
+			"value": null
+		},
+		"prerequisites": {
+			"value": [
+				{
+					"value": "expert in Survival"
+				}
+			]
+		},
+		"subfeatures": {
+			"proficiencies": {},
+			"senses": {},
+			"suppressedFeatures": []
+		},
+		"location": null
+	},
+	"img": "icons/sundries/books/book-red-exclamation.webp",
+	"flags": {},
+	"_stats": {
+		"compendiumSource": null,
+		"duplicateSource": null,
+		"exportSource": null,
+		"coreVersion": "13.345",
+		"systemId": "pf2e",
+		"systemVersion": "7.1.1",
+		"modifiedTime": 1749874952660,
+		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
+	},
+	"_id": "jxdu5L2NI8QSPZmS",
+	"sort": 0,
+	"ownership": {
+		"default": 0,
+		"xtF1DuSWhBdA8aGR": 3
+	},
+	"_key": "!items!jxdu5L2NI8QSPZmS"
 }

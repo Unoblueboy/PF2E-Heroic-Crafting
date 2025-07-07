@@ -1,74 +1,74 @@
 {
-  "folder": null,
-  "name": "Effect: Overworked",
-  "type": "effect",
-  "effects": [],
-  "system": {
-    "_migration": {
-      "version": 0.939,
-      "previous": null
-    },
-    "description": {
-      "value": "<p>When you stop Working Overtime for any reason, you become @UUID[Compendium.pf2e.conditionitems.HL2l2VRSaQHu9lUw]{Fatigued} and cannot remove this condition for 24 hours.</p>",
-      "gm": ""
-    },
-    "publication": {
-      "title": "",
-      "authors": "",
-      "license": "OGL",
-      "remaster": false
-    },
-    "rules": [
-      {
-        "key": "GrantItem",
-        "uuid": "Compendium.pf2e.conditionitems.Item.HL2l2VRSaQHu9lUw",
-        "inMemoryOnly": true
-      }
-    ],
-    "slug": null,
-    "traits": {
-      "otherTags": [],
-      "value": []
-    },
-    "level": {
-      "value": 1
-    },
-    "duration": {
-      "value": 24,
-      "unit": "hours",
-      "expiry": "turn-start",
-      "sustained": false
-    },
-    "tokenIcon": {
-      "show": true
-    },
-    "unidentified": false,
-    "start": {
-      "value": 0,
-      "initiative": null
-    },
-    "badge": null,
-    "fromSpell": false,
-    "context": null
-  },
-  "_id": "m00SSabBqGKcc3pg",
-  "img": "icons/svg/unconscious.svg",
-  "flags": {},
-  "_stats": {
-    "compendiumSource": null,
-    "duplicateSource": null,
-    "exportSource": null,
-    "coreVersion": "13.345",
-    "systemId": "pf2e",
-    "systemVersion": "7.1.1",
-    "createdTime": 1749874963507,
-    "modifiedTime": 1749874963507,
-    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
-  },
-  "sort": 0,
-  "ownership": {
-    "default": 0,
-    "xtF1DuSWhBdA8aGR": 3
-  },
-  "_key": "!items!m00SSabBqGKcc3pg"
+	"folder": null,
+	"name": "Effect: Overworked",
+	"type": "effect",
+	"effects": [],
+	"system": {
+		"_migration": {
+			"version": 0.939,
+			"previous": null
+		},
+		"description": {
+			"value": "<p>When you stop Working Overtime for any reason, you become @UUID[Compendium.pf2e.conditionitems.HL2l2VRSaQHu9lUw]{Fatigued} and cannot remove this condition for 24 hours.</p>",
+			"gm": ""
+		},
+		"publication": {
+			"title": "",
+			"authors": "",
+			"license": "OGL",
+			"remaster": false
+		},
+		"rules": [
+			{
+				"key": "GrantItem",
+				"uuid": "Compendium.pf2e.conditionitems.Item.HL2l2VRSaQHu9lUw",
+				"inMemoryOnly": true
+			}
+		],
+		"slug": "effect-overworked",
+		"traits": {
+			"otherTags": [],
+			"value": []
+		},
+		"level": {
+			"value": 1
+		},
+		"duration": {
+			"value": 24,
+			"unit": "hours",
+			"expiry": "turn-start",
+			"sustained": false
+		},
+		"tokenIcon": {
+			"show": true
+		},
+		"unidentified": false,
+		"start": {
+			"value": 0,
+			"initiative": null
+		},
+		"badge": null,
+		"fromSpell": false,
+		"context": null
+	},
+	"_id": "m00SSabBqGKcc3pg",
+	"img": "icons/svg/unconscious.svg",
+	"flags": {},
+	"_stats": {
+		"compendiumSource": null,
+		"duplicateSource": null,
+		"exportSource": null,
+		"coreVersion": "13.345",
+		"systemId": "pf2e",
+		"systemVersion": "7.1.1",
+		"createdTime": 1749874963507,
+		"modifiedTime": 1749874963507,
+		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
+	},
+	"sort": 0,
+	"ownership": {
+		"default": 0,
+		"xtF1DuSWhBdA8aGR": 3
+	},
+	"_key": "!items!m00SSabBqGKcc3pg"
 }

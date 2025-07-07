@@ -1,57 +1,55 @@
 {
-  "folder": null,
-  "name": "Salvage Item",
-  "type": "action",
-  "effects": [],
-  "system": {
-    "_migration": {
-      "version": 0.939,
-      "previous": null
-    },
-    "description": {
-      "value": "<p><strong>Requirements</strong> Trained in Crafting.</p><p><strong>Cost</strong> The item to be salvaged</p><hr /><p>You tear down an item for parts. The GM decides if the item can be salvaged this way. Roll a @Check[crafting|traits:action:salvage-item] check against the item’s Craft DC.</p><p><strong>Success</strong> Add the amount listed on Table 2: Gathered Income for the item’s level to your Material Trove each hour. If you are a master in Crafting, instead add twice as much. The item becomes unusable.</p><p><strong>Failure</strong> Add half the amount listed on Table 2: Gathered Income for the item’s level to your Material Trove each hour. If you are a master in Crafting, instead add the listed amount. The item becomes unusable.</p><p>You can continue salvaging an item for multiple hours without rolling again until you have recovered the item’s Salvage Maximum, after which the item is destroyed. The GM detemines the item’s Salvage Maximum, but it is never greater than 75% of the item’s Price, and is typically 50% or lower based on the item’s condition.</p><p>At the GM’s discretion, you may sometimes be able to salvage special materials or treasure worth the same amount instead.</p><h2>Table 2: Gathered Income</h2><table class=\"pf2e\"><thead><tr><th><p>Level</p></th><th><p>Income</p></th></tr></thead><tbody><tr><td>0</td><td>1 sp</td></tr><tr><td>1</td><td>4 sp</td></tr><tr><td>2</td><td>6 sp</td></tr><tr><td>3</td><td>1 gp</td></tr><tr><td>4</td><td>1 gp, 6 sp</td></tr><tr><td>5</td><td>2 gp</td></tr><tr><td>6</td><td>4 gp</td></tr><tr><td>7</td><td>5 gp</td></tr><tr><td>8</td><td>6 gp</td></tr><tr><td>9</td><td>8 gp</td></tr><tr><td>10</td><td>10 gp</td></tr><tr><td>11</td><td>12 gp</td></tr><tr><td>12</td><td>16 gp</td></tr><tr><td>13</td><td>24 gp</td></tr><tr><td>14</td><td>30 gp</td></tr><tr><td>15</td><td>40 gp</td></tr><tr><td>16</td><td>60 gp</td></tr><tr><td>17</td><td>80 gp</td></tr><tr><td>18</td><td>140 gp</td></tr><tr><td>19</td><td>200 gp</td></tr><tr><td>20</td><td>300 gp</td></tr></tbody></table>",
-      "gm": ""
-    },
-    "publication": {
-      "title": "Heroic Crafting",
-      "authors": "",
-      "license": "OGL",
-      "remaster": false
-    },
-    "rules": [],
-    "slug": "salvage-item",
-    "traits": {
-      "otherTags": [],
-      "value": [
-        "exploration"
-      ]
-    },
-    "actionType": {
-      "value": "passive"
-    },
-    "actions": {
-      "value": null
-    },
-    "category": "interaction",
-    "deathNote": false
-  },
-  "img": "systems/pf2e/icons/actions/Passive.webp",
-  "flags": {},
-  "_stats": {
-    "compendiumSource": null,
-    "duplicateSource": null,
-    "exportSource": null,
-    "coreVersion": "13.345",
-    "systemId": "pf2e",
-    "systemVersion": "7.1.1",
-    "modifiedTime": 1749874968991,
-    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
-  },
-  "_id": "DfvGFDHV7pYIT7ct",
-  "sort": 0,
-  "ownership": {
-    "default": 0,
-    "xtF1DuSWhBdA8aGR": 3
-  },
-  "_key": "!items!DfvGFDHV7pYIT7ct"
+	"folder": null,
+	"name": "Salvage Item",
+	"type": "action",
+	"effects": [],
+	"system": {
+		"_migration": {
+			"version": 0.939,
+			"previous": null
+		},
+		"description": {
+			"value": "<p><strong>Requirements</strong> Trained in Crafting.</p><p><strong>Cost</strong> The item to be salvaged</p><hr /><p>You tear down an item for parts. The GM decides if the item can be salvaged this way. Roll a @Check[crafting|traits:action:salvage-item] check against the item’s Craft DC.</p><p><strong>Success</strong> Add the amount listed on Table 2: Gathered Income for the item’s level to your Material Trove each hour. If you are a master in Crafting, instead add twice as much. The item becomes unusable.</p><p><strong>Failure</strong> Add half the amount listed on Table 2: Gathered Income for the item’s level to your Material Trove each hour. If you are a master in Crafting, instead add the listed amount. The item becomes unusable.</p><p>You can continue salvaging an item for multiple hours without rolling again until you have recovered the item’s Salvage Maximum, after which the item is destroyed. The GM detemines the item’s Salvage Maximum, but it is never greater than 75% of the item’s Price, and is typically 50% or lower based on the item’s condition.</p><p>At the GM’s discretion, you may sometimes be able to salvage special materials or treasure worth the same amount instead.</p><h2>Table 2: Gathered Income</h2><table class=\"pf2e\"><thead><tr><th><p>Level</p></th><th><p>Income</p></th></tr></thead><tbody><tr><td>0</td><td>1 sp</td></tr><tr><td>1</td><td>4 sp</td></tr><tr><td>2</td><td>6 sp</td></tr><tr><td>3</td><td>1 gp</td></tr><tr><td>4</td><td>1 gp, 6 sp</td></tr><tr><td>5</td><td>2 gp</td></tr><tr><td>6</td><td>4 gp</td></tr><tr><td>7</td><td>5 gp</td></tr><tr><td>8</td><td>6 gp</td></tr><tr><td>9</td><td>8 gp</td></tr><tr><td>10</td><td>10 gp</td></tr><tr><td>11</td><td>12 gp</td></tr><tr><td>12</td><td>16 gp</td></tr><tr><td>13</td><td>24 gp</td></tr><tr><td>14</td><td>30 gp</td></tr><tr><td>15</td><td>40 gp</td></tr><tr><td>16</td><td>60 gp</td></tr><tr><td>17</td><td>80 gp</td></tr><tr><td>18</td><td>140 gp</td></tr><tr><td>19</td><td>200 gp</td></tr><tr><td>20</td><td>300 gp</td></tr></tbody></table>",
+			"gm": ""
+		},
+		"publication": {
+			"title": "Heroic Crafting",
+			"authors": "",
+			"license": "OGL",
+			"remaster": false
+		},
+		"rules": [],
+		"slug": "salvage-item",
+		"traits": {
+			"otherTags": [],
+			"value": ["exploration"]
+		},
+		"actionType": {
+			"value": "passive"
+		},
+		"actions": {
+			"value": null
+		},
+		"category": "interaction",
+		"deathNote": false
+	},
+	"img": "systems/pf2e/icons/actions/Passive.webp",
+	"flags": {},
+	"_stats": {
+		"compendiumSource": null,
+		"duplicateSource": null,
+		"exportSource": null,
+		"coreVersion": "13.345",
+		"systemId": "pf2e",
+		"systemVersion": "7.1.1",
+		"modifiedTime": 1749874968991,
+		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
+	},
+	"_id": "DfvGFDHV7pYIT7ct",
+	"sort": 0,
+	"ownership": {
+		"default": 0,
+		"xtF1DuSWhBdA8aGR": 3
+	},
+	"_key": "!items!DfvGFDHV7pYIT7ct"
 }

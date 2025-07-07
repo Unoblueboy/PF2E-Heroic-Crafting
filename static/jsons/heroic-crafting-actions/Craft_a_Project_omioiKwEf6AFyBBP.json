@@ -1,428 +1,425 @@
 {
-  "folder": null,
-  "name": "Craft a Project",
-  "type": "action",
-  "effects": [],
-  "system": {
-    "_migration": {
-      "version": 0.939,
-      "previous": null
-    },
-    "description": {
-      "value": "<p><strong>Requirements</strong> trained in Crafting; you have @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.LkGmdi4CzHghHhjA]{Begun a Project} and have not yet finished it; you are not fatigued; you have appropriate tools and in many cases a work space.</p><p><strong>Cost</strong> crafting materials worth up to the amount listed in Table 1: Spending Limit</p><hr /><p>Choose the amount of time to spend crafting: 1 hour, 1 day, or 1 week. The time spent, along with your level, determines the maximum Cost of this activity.</p><p>At the end of the duration, decide the Cost of this activity, then make a @Check[crafting|traits:action:craft-a-project] check. The GM determines the DC based on the item’s level, rarity, and any other circumstances.</p><p><strong>Success</strong> You work productively during this period. Add double this activity’s Cost to the project’s Current Value.</p><p><strong>Failure</strong> You work unproductively during this period. Add half this activity’s Cost to the project’s Current Value.</p><p><strong>Critical Failure</strong> You ruin your materials and suffer a setback while crafting. Deduct this activity’s Cost from the project’s Current Value. If this reduces the project’s Current Value below 0, the project is ruined and must be started again.</p><p>If the difference between your project’s Current Value and its Price is less than this activity’s maximum Cost, you can forgo the Crafting check.</p><p>Instead, at the end of the duration you may simply pay the remaining value to complete the project.</p><h2>Table 1: Spending Limit</h2><table class=\"pf2e\"><thead><tr><th>Level</th><th>Hour</th><th>Day</th><th>Week</th></tr></thead><tbody><tr><td>1</td><td>3 sp</td><td>1 gp, 2 sp</td><td>6 gp</td></tr><tr><td>2</td><td>5 sp</td><td>2 gp</td><td>10 gp</td></tr><tr><td>3</td><td>8 sp</td><td>3 gp, 2 sp</td><td>16 gp</td></tr><tr><td>4</td><td>1 gp, 5 sp</td><td>6 gp</td><td>30 gp</td></tr><tr><td>5</td><td>2 gp</td><td>8 gp</td><td>40 gp</td></tr><tr><td>6</td><td>3 gp</td><td>12 gp</td><td>60 gp</td></tr><tr><td>7</td><td>5 gp</td><td>20 gp</td><td>100 gp</td></tr><tr><td>8</td><td>7 gp</td><td>28 gp</td><td>140 gp</td></tr><tr><td>9</td><td>10 gp</td><td>40 gp</td><td>200 gp</td></tr><tr><td>10</td><td>15 gp</td><td>60 gp</td><td>300 gp</td></tr><tr><td>11</td><td>21 gp</td><td>84 gp</td><td>420 gp</td></tr><tr><td>12</td><td>30 gp</td><td>120 gp</td><td>600 gp</td></tr><tr><td>13</td><td>40 gp</td><td>160 gp</td><td>800 gp</td></tr><tr><td>14</td><td>70 gp</td><td>280 gp</td><td>1400 gp</td></tr><tr><td>15</td><td>100 gp</td><td>400 gp</td><td>2000 gp</td></tr><tr><td>16</td><td>125 gp</td><td>500 gp</td><td>2500 gp</td></tr><tr><td>17</td><td>200 gp</td><td>800 gp</td><td>4000 gp</td></tr><tr><td>18</td><td>300 gp</td><td>1200 gp</td><td>6000 gp</td></tr><tr><td>19</td><td>500 gp</td><td>2000 gp</td><td>10000 gp</td></tr><tr><td>20</td><td>800 gp</td><td>3200 gp</td><td>16000 gp</td></tr></tbody></table>",
-      "gm": ""
-    },
-    "publication": {
-      "title": "Heroic Crafting",
-      "authors": "",
-      "license": "OGL",
-      "remaster": false
-    },
-    "rules": [
-      {
-        "key": "ActiveEffectLike",
-        "mode": "override",
-        "path": "flags.pf2e.craftAProject.limits",
-        "value": {
-          "brackets": [
-            {
-              "start": 1,
-              "end": 1,
-              "value": {
-                "hour": {
-                  "value": 3,
-                  "coin": "sp"
-                },
-                "day": {
-                  "value": 12,
-                  "coin": "sp"
-                },
-                "week": {
-                  "value": 6,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 2,
-              "end": 2,
-              "value": {
-                "hour": {
-                  "value": 5,
-                  "coin": "sp"
-                },
-                "day": {
-                  "value": 2,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 10,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 3,
-              "end": 3,
-              "value": {
-                "hour": {
-                  "value": 8,
-                  "coin": "sp"
-                },
-                "day": {
-                  "value": 32,
-                  "coin": "sp"
-                },
-                "week": {
-                  "value": 16,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 4,
-              "end": 4,
-              "value": {
-                "hour": {
-                  "value": 15,
-                  "coin": "sp"
-                },
-                "day": {
-                  "value": 6,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 30,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 5,
-              "end": 5,
-              "value": {
-                "hour": {
-                  "value": 2,
-                  "coin": "sp"
-                },
-                "day": {
-                  "value": 8,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 40,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 6,
-              "end": 6,
-              "value": {
-                "hour": {
-                  "value": 3,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 12,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 60,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 7,
-              "end": 7,
-              "value": {
-                "hour": {
-                  "value": 5,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 20,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 100,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 8,
-              "end": 8,
-              "value": {
-                "hour": {
-                  "value": 7,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 28,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 140,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 9,
-              "end": 9,
-              "value": {
-                "hour": {
-                  "value": 10,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 40,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 200,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 10,
-              "end": 10,
-              "value": {
-                "hour": {
-                  "value": 15,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 60,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 300,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 11,
-              "end": 11,
-              "value": {
-                "hour": {
-                  "value": 21,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 84,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 420,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 12,
-              "end": 12,
-              "value": {
-                "hour": {
-                  "value": 30,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 120,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 600,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 13,
-              "end": 13,
-              "value": {
-                "hour": {
-                  "value": 40,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 160,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 800,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 14,
-              "end": 14,
-              "value": {
-                "hour": {
-                  "value": 70,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 280,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 1400,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 15,
-              "end": 15,
-              "value": {
-                "hour": {
-                  "value": 100,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 400,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 2000,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 16,
-              "end": 16,
-              "value": {
-                "hour": {
-                  "value": 125,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 500,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 2500,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 17,
-              "end": 17,
-              "value": {
-                "hour": {
-                  "value": 200,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 800,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 4000,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 18,
-              "end": 18,
-              "value": {
-                "hour": {
-                  "value": 300,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 1200,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 6000,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 19,
-              "end": 19,
-              "value": {
-                "hour": {
-                  "value": 500,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 2000,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 10000,
-                  "coin": "gp"
-                }
-              }
-            },
-            {
-              "start": 20,
-              "end": 20,
-              "value": {
-                "hour": {
-                  "value": 800,
-                  "coin": "gp"
-                },
-                "day": {
-                  "value": 3200,
-                  "coin": "gp"
-                },
-                "week": {
-                  "value": 16000,
-                  "coin": "gp"
-                }
-              }
-            }
-          ]
-        }
-      }
-    ],
-    "slug": "craft-a-project",
-    "traits": {
-      "otherTags": [],
-      "value": [
-        "downtime",
-        "manipulate"
-      ]
-    },
-    "actionType": {
-      "value": "passive"
-    },
-    "actions": {
-      "value": null
-    },
-    "category": "interaction",
-    "deathNote": false
-  },
-  "img": "systems/pf2e/icons/actions/Passive.webp",
-  "flags": {},
-  "_stats": {
-    "compendiumSource": null,
-    "duplicateSource": null,
-    "exportSource": null,
-    "coreVersion": "13.345",
-    "systemId": "pf2e",
-    "systemVersion": "7.1.1",
-    "modifiedTime": 1749874968991,
-    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
-  },
-  "_id": "omioiKwEf6AFyBBP",
-  "sort": 0,
-  "ownership": {
-    "default": 0,
-    "xtF1DuSWhBdA8aGR": 3
-  },
-  "_key": "!items!omioiKwEf6AFyBBP"
+	"folder": null,
+	"name": "Craft a Project",
+	"type": "action",
+	"effects": [],
+	"system": {
+		"_migration": {
+			"version": 0.939,
+			"previous": null
+		},
+		"description": {
+			"value": "<p><strong>Requirements</strong> trained in Crafting; you have @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.LkGmdi4CzHghHhjA]{Begun a Project} and have not yet finished it; you are not fatigued; you have appropriate tools and in many cases a work space.</p><p><strong>Cost</strong> crafting materials worth up to the amount listed in Table 1: Spending Limit</p><hr /><p>Choose the amount of time to spend crafting: 1 hour, 1 day, or 1 week. The time spent, along with your level, determines the maximum Cost of this activity.</p><p>At the end of the duration, decide the Cost of this activity, then make a @Check[crafting|traits:action:craft-a-project] check. The GM determines the DC based on the item’s level, rarity, and any other circumstances.</p><p><strong>Success</strong> You work productively during this period. Add double this activity’s Cost to the project’s Current Value.</p><p><strong>Failure</strong> You work unproductively during this period. Add half this activity’s Cost to the project’s Current Value.</p><p><strong>Critical Failure</strong> You ruin your materials and suffer a setback while crafting. Deduct this activity’s Cost from the project’s Current Value. If this reduces the project’s Current Value below 0, the project is ruined and must be started again.</p><p>If the difference between your project’s Current Value and its Price is less than this activity’s maximum Cost, you can forgo the Crafting check.</p><p>Instead, at the end of the duration you may simply pay the remaining value to complete the project.</p><h2>Table 1: Spending Limit</h2><table class=\"pf2e\"><thead><tr><th>Level</th><th>Hour</th><th>Day</th><th>Week</th></tr></thead><tbody><tr><td>1</td><td>3 sp</td><td>1 gp, 2 sp</td><td>6 gp</td></tr><tr><td>2</td><td>5 sp</td><td>2 gp</td><td>10 gp</td></tr><tr><td>3</td><td>8 sp</td><td>3 gp, 2 sp</td><td>16 gp</td></tr><tr><td>4</td><td>1 gp, 5 sp</td><td>6 gp</td><td>30 gp</td></tr><tr><td>5</td><td>2 gp</td><td>8 gp</td><td>40 gp</td></tr><tr><td>6</td><td>3 gp</td><td>12 gp</td><td>60 gp</td></tr><tr><td>7</td><td>5 gp</td><td>20 gp</td><td>100 gp</td></tr><tr><td>8</td><td>7 gp</td><td>28 gp</td><td>140 gp</td></tr><tr><td>9</td><td>10 gp</td><td>40 gp</td><td>200 gp</td></tr><tr><td>10</td><td>15 gp</td><td>60 gp</td><td>300 gp</td></tr><tr><td>11</td><td>21 gp</td><td>84 gp</td><td>420 gp</td></tr><tr><td>12</td><td>30 gp</td><td>120 gp</td><td>600 gp</td></tr><tr><td>13</td><td>40 gp</td><td>160 gp</td><td>800 gp</td></tr><tr><td>14</td><td>70 gp</td><td>280 gp</td><td>1400 gp</td></tr><tr><td>15</td><td>100 gp</td><td>400 gp</td><td>2000 gp</td></tr><tr><td>16</td><td>125 gp</td><td>500 gp</td><td>2500 gp</td></tr><tr><td>17</td><td>200 gp</td><td>800 gp</td><td>4000 gp</td></tr><tr><td>18</td><td>300 gp</td><td>1200 gp</td><td>6000 gp</td></tr><tr><td>19</td><td>500 gp</td><td>2000 gp</td><td>10000 gp</td></tr><tr><td>20</td><td>800 gp</td><td>3200 gp</td><td>16000 gp</td></tr></tbody></table>",
+			"gm": ""
+		},
+		"publication": {
+			"title": "Heroic Crafting",
+			"authors": "",
+			"license": "OGL",
+			"remaster": false
+		},
+		"rules": [
+			{
+				"key": "ActiveEffectLike",
+				"mode": "override",
+				"path": "flags.pf2e.craftAProject.limits",
+				"value": {
+					"brackets": [
+						{
+							"start": 1,
+							"end": 1,
+							"value": {
+								"hour": {
+									"value": 3,
+									"coin": "sp"
+								},
+								"day": {
+									"value": 12,
+									"coin": "sp"
+								},
+								"week": {
+									"value": 6,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 2,
+							"end": 2,
+							"value": {
+								"hour": {
+									"value": 5,
+									"coin": "sp"
+								},
+								"day": {
+									"value": 2,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 10,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 3,
+							"end": 3,
+							"value": {
+								"hour": {
+									"value": 8,
+									"coin": "sp"
+								},
+								"day": {
+									"value": 32,
+									"coin": "sp"
+								},
+								"week": {
+									"value": 16,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 4,
+							"end": 4,
+							"value": {
+								"hour": {
+									"value": 15,
+									"coin": "sp"
+								},
+								"day": {
+									"value": 6,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 30,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 5,
+							"end": 5,
+							"value": {
+								"hour": {
+									"value": 2,
+									"coin": "sp"
+								},
+								"day": {
+									"value": 8,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 40,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 6,
+							"end": 6,
+							"value": {
+								"hour": {
+									"value": 3,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 12,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 60,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 7,
+							"end": 7,
+							"value": {
+								"hour": {
+									"value": 5,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 20,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 100,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 8,
+							"end": 8,
+							"value": {
+								"hour": {
+									"value": 7,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 28,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 140,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 9,
+							"end": 9,
+							"value": {
+								"hour": {
+									"value": 10,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 40,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 200,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 10,
+							"end": 10,
+							"value": {
+								"hour": {
+									"value": 15,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 60,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 300,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 11,
+							"end": 11,
+							"value": {
+								"hour": {
+									"value": 21,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 84,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 420,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 12,
+							"end": 12,
+							"value": {
+								"hour": {
+									"value": 30,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 120,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 600,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 13,
+							"end": 13,
+							"value": {
+								"hour": {
+									"value": 40,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 160,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 800,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 14,
+							"end": 14,
+							"value": {
+								"hour": {
+									"value": 70,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 280,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 1400,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 15,
+							"end": 15,
+							"value": {
+								"hour": {
+									"value": 100,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 400,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 2000,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 16,
+							"end": 16,
+							"value": {
+								"hour": {
+									"value": 125,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 500,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 2500,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 17,
+							"end": 17,
+							"value": {
+								"hour": {
+									"value": 200,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 800,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 4000,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 18,
+							"end": 18,
+							"value": {
+								"hour": {
+									"value": 300,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 1200,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 6000,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 19,
+							"end": 19,
+							"value": {
+								"hour": {
+									"value": 500,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 2000,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 10000,
+									"coin": "gp"
+								}
+							}
+						},
+						{
+							"start": 20,
+							"end": 20,
+							"value": {
+								"hour": {
+									"value": 800,
+									"coin": "gp"
+								},
+								"day": {
+									"value": 3200,
+									"coin": "gp"
+								},
+								"week": {
+									"value": 16000,
+									"coin": "gp"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"slug": "craft-a-project",
+		"traits": {
+			"otherTags": [],
+			"value": ["downtime", "manipulate"]
+		},
+		"actionType": {
+			"value": "passive"
+		},
+		"actions": {
+			"value": null
+		},
+		"category": "interaction",
+		"deathNote": false
+	},
+	"img": "systems/pf2e/icons/actions/Passive.webp",
+	"flags": {},
+	"_stats": {
+		"compendiumSource": null,
+		"duplicateSource": null,
+		"exportSource": null,
+		"coreVersion": "13.345",
+		"systemId": "pf2e",
+		"systemVersion": "7.1.1",
+		"modifiedTime": 1749874968991,
+		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
+	},
+	"_id": "omioiKwEf6AFyBBP",
+	"sort": 0,
+	"ownership": {
+		"default": 0,
+		"xtF1DuSWhBdA8aGR": 3
+	},
+	"_key": "!items!omioiKwEf6AFyBBP"
 }

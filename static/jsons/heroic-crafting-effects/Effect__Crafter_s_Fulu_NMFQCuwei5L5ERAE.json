@@ -1,106 +1,100 @@
 {
-  "folder": null,
-  "name": "Effect: Crafter's Fulu",
-  "type": "effect",
-  "effects": [],
-  "system": {
-    "_migration": {
-      "version": 0.939,
-      "previous": null
-    },
-    "description": {
-      "value": "<p>Granted by @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.foKrw4V35MXu9P2N]{Crafter's Fulu}.</p><p><span style=\"font-family:Roboto, sans-serif\">You recieve a +1 status bonus on your next check to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project}. This bonus lasts for the duration of your check, even if it takes place over a long period of downtime. If that check is an exploration activity, you can roll twice and take the better result; this is a fortune effect.</span></p>",
-      "gm": ""
-    },
-    "publication": {
-      "title": "Heroic Crafting",
-      "authors": "",
-      "license": "OGL",
-      "remaster": false
-    },
-    "rules": [
-      {
-        "key": "ChoiceSet",
-        "choices": [
-          {
-            "label": "Downtime",
-            "value": "downtime"
-          },
-          {
-            "label": "Exploration",
-            "value": "exploration"
-          }
-        ],
-        "flag": "craft-type",
-        "rollOption": "crafters-fulu-craft-type"
-      },
-      {
-        "key": "FlatModifier",
-        "priority": 120,
-        "label": "Crafter's Fulu (Downtime)",
-        "selector": "crafting",
-        "value": 1,
-        "type": "status",
-        "predicate": [
-          "action:craft-a-project",
-          "crafters-fulu-craft-type:downtime"
-        ]
-      },
-      {
-        "key": "RollTwice",
-        "selector": "crafting",
-        "keep": "higher",
-        "removeAfterRoll": "true",
-        "predicate": [
-          "action:craft-a-project",
-          "crafters-fulu-craft-type:exploration"
-        ],
-        "priority": 120
-      }
-    ],
-    "slug": null,
-    "traits": {
-      "otherTags": [],
-      "value": []
-    },
-    "level": {
-      "value": 8
-    },
-    "duration": {
-      "value": -1,
-      "unit": "unlimited",
-      "expiry": null,
-      "sustained": false
-    },
-    "tokenIcon": {
-      "show": true
-    },
-    "unidentified": false,
-    "start": {
-      "value": 0,
-      "initiative": null
-    },
-    "badge": null,
-    "fromSpell": false,
-    "context": null
-  },
-  "_id": "NMFQCuwei5L5ERAE",
-  "img": "systems/pf2e/icons/equipment/consumables/fulus/fulu-modest.webp",
-  "flags": {},
-  "_stats": {
-    "compendiumSource": null,
-    "duplicateSource": null,
-    "exportSource": null,
-    "coreVersion": "13.345",
-    "systemId": "pf2e",
-    "systemVersion": "7.1.1",
-    "modifiedTime": 1749874963497,
-    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
-  },
-  "sort": 0,
-  "ownership": {
-    "default": 0,
-    "xtF1DuSWhBdA8aGR": 3
-  },
-  "_key": "!items!NMFQCuwei5L5ERAE"
+	"folder": null,
+	"name": "Effect: Crafter's Fulu",
+	"type": "effect",
+	"effects": [],
+	"system": {
+		"_migration": {
+			"version": 0.939,
+			"previous": null
+		},
+		"description": {
+			"value": "<p>Granted by @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.foKrw4V35MXu9P2N]{Crafter's Fulu}.</p><p><span style=\"font-family:Roboto, sans-serif\">You recieve a +1 status bonus on your next check to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project}. This bonus lasts for the duration of your check, even if it takes place over a long period of downtime. If that check is an exploration activity, you can roll twice and take the better result; this is a fortune effect.</span></p>",
+			"gm": ""
+		},
+		"publication": {
+			"title": "Heroic Crafting",
+			"authors": "",
+			"license": "OGL",
+			"remaster": false
+		},
+		"rules": [
+			{
+				"key": "ChoiceSet",
+				"choices": [
+					{
+						"label": "Downtime",
+						"value": "downtime"
+					},
+					{
+						"label": "Exploration",
+						"value": "exploration"
+					}
+				],
+				"flag": "craft-type",
+				"rollOption": "crafters-fulu-craft-type"
+			},
+			{
+				"key": "FlatModifier",
+				"priority": 120,
+				"label": "Crafter's Fulu (Downtime)",
+				"selector": "crafting",
+				"value": 1,
+				"type": "status",
+				"predicate": ["action:craft-a-project", "crafters-fulu-craft-type:downtime"]
+			},
+			{
+				"key": "RollTwice",
+				"selector": "crafting",
+				"keep": "higher",
+				"removeAfterRoll": "true",
+				"predicate": ["action:craft-a-project", "crafters-fulu-craft-type:exploration"],
+				"priority": 120
+			}
+		],
+		"slug": "effect-crafters-fulu",
+		"traits": {
+			"otherTags": [],
+			"value": []
+		},
+		"level": {
+			"value": 8
+		},
+		"duration": {
+			"value": -1,
+			"unit": "unlimited",
+			"expiry": null,
+			"sustained": false
+		},
+		"tokenIcon": {
+			"show": true
+		},
+		"unidentified": false,
+		"start": {
+			"value": 0,
+			"initiative": null
+		},
+		"badge": null,
+		"fromSpell": false,
+		"context": null
+	},
+	"_id": "NMFQCuwei5L5ERAE",
+	"img": "systems/pf2e/icons/equipment/consumables/fulus/fulu-modest.webp",
+	"flags": {},
+	"_stats": {
+		"compendiumSource": null,
+		"duplicateSource": null,
+		"exportSource": null,
+		"coreVersion": "13.345",
+		"systemId": "pf2e",
+		"systemVersion": "7.1.1",
+		"modifiedTime": 1749874963497,
+		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
+	},
+	"sort": 0,
+	"ownership": {
+		"default": 0,
+		"xtF1DuSWhBdA8aGR": 3
+	},
+	"_key": "!items!NMFQCuwei5L5ERAE"
 }

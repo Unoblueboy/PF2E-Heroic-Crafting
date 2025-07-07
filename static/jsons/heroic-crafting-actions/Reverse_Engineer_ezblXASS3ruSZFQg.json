@@ -1,57 +1,55 @@
 {
-  "folder": null,
-  "name": "Reverse Engineer",
-  "type": "action",
-  "effects": [],
-  "system": {
-    "_migration": {
-      "version": 0.939,
-      "previous": null
-    },
-    "description": {
-      "value": "<p><strong>Requirements</strong> Trained in Crafting; you have the item and the prerequisite feats for the item; you have the appropriate proficiency to craft the item.</p><hr /><p>You can @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.LkGmdi4CzHghHhjA]{Begin a Project} to reverse-engineer the item’s formula. This destroys the item, but leaves behind fragments which can be @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.DfvGFDHV7pYIT7ct]{Salvaged} for 50% of the item’s value. To do this, a character must be trained in Crafting.</p>",
-      "gm": ""
-    },
-    "publication": {
-      "title": "Heroic Crafting",
-      "authors": "",
-      "license": "OGL",
-      "remaster": false
-    },
-    "rules": [],
-    "slug": null,
-    "traits": {
-      "otherTags": [],
-      "value": [
-        "exploration"
-      ]
-    },
-    "actionType": {
-      "value": "passive"
-    },
-    "actions": {
-      "value": null
-    },
-    "category": "interaction",
-    "deathNote": false
-  },
-  "img": "systems/pf2e/icons/actions/Passive.webp",
-  "flags": {},
-  "_stats": {
-    "compendiumSource": null,
-    "duplicateSource": null,
-    "exportSource": null,
-    "coreVersion": "13.345",
-    "systemId": "pf2e",
-    "systemVersion": "7.1.1",
-    "modifiedTime": 1749874968991,
-    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
-  },
-  "_id": "ezblXASS3ruSZFQg",
-  "sort": 0,
-  "ownership": {
-    "default": 0,
-    "xtF1DuSWhBdA8aGR": 3
-  },
-  "_key": "!items!ezblXASS3ruSZFQg"
+	"folder": null,
+	"name": "Reverse Engineer",
+	"type": "action",
+	"effects": [],
+	"system": {
+		"_migration": {
+			"version": 0.939,
+			"previous": null
+		},
+		"description": {
+			"value": "<p><strong>Requirements</strong> Trained in Crafting; you have the item and the prerequisite feats for the item; you have the appropriate proficiency to craft the item.</p><hr /><p>You can @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.LkGmdi4CzHghHhjA]{Begin a Project} to reverse-engineer the item’s formula. This destroys the item, but leaves behind fragments which can be @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.DfvGFDHV7pYIT7ct]{Salvaged} for 50% of the item’s value. To do this, a character must be trained in Crafting.</p>",
+			"gm": ""
+		},
+		"publication": {
+			"title": "Heroic Crafting",
+			"authors": "",
+			"license": "OGL",
+			"remaster": false
+		},
+		"rules": [],
+		"slug": "reverse-engineer",
+		"traits": {
+			"otherTags": [],
+			"value": ["exploration"]
+		},
+		"actionType": {
+			"value": "passive"
+		},
+		"actions": {
+			"value": null
+		},
+		"category": "interaction",
+		"deathNote": false
+	},
+	"img": "systems/pf2e/icons/actions/Passive.webp",
+	"flags": {},
+	"_stats": {
+		"compendiumSource": null,
+		"duplicateSource": null,
+		"exportSource": null,
+		"coreVersion": "13.345",
+		"systemId": "pf2e",
+		"systemVersion": "7.1.1",
+		"modifiedTime": 1749874968991,
+		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
+	},
+	"_id": "ezblXASS3ruSZFQg",
+	"sort": 0,
+	"ownership": {
+		"default": 0,
+		"xtF1DuSWhBdA8aGR": 3
+	},
+	"_key": "!items!ezblXASS3ruSZFQg"
 }
