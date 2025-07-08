@@ -1,0 +1,38 @@
+<div class="pf2e chat-card"
+     data-salvage-results
+     data-item-uuid="{{item.uuid}}"
+     data-salvage-max-PP="{{salvage.max.pp}}"
+     data-salvage-max-GP="{{salvage.max.gp}}"
+     data-salvage-max-SP="{{salvage.max.sp}}"
+     data-salvage-max-CP="{{salvage.max.cp}}"
+     data-salvage-income="{{salvage.income.copperValue}}">
+    <div class="card-content">
+        <div style="display: flex; align-items: center; margin-bottom: 3px;">
+            <img src="{{item.img}}"
+                 style="height:32px; width:32px; margin-right: 3px;">
+            <span>{{{itemLink}}}</span>
+        </div>
+        <hr>
+        {{#if success}}
+            <p><strong>Income per hour</strong> {{salvage.income.string}}</p>
+        {{/if}}
+    </div>
+    <hr>
+    <div class="card-buttons">
+        <button type="button"
+                data-action="gain-salvage-materials"
+                data-duration="1">Salvage for 1 hour</button>
+        {{#if (ne salvage.duration.given 1)}}
+            <button type="button"
+                    data-action="gain-salvage-materials"
+                    data-duration="{{salvage.duration.given}}">Salvage for {{salvage.duration.given}}
+                hour{{#if (ne salvage.duration.given 1)}}s{{/if}}</button>
+        {{/if}}
+        {{#if (lt salvage.duration.given salvage.duration.full)}}
+            <button type="button"
+                    data-action="gain-salvage-materials"
+                    data-duration="{{salvage.duration.full}}">Salvage for {{salvage.duration.full}}
+                hour{{#if (ne salvage.duration.full 1)}}s{{/if}}</button>
+        {{/if}}
+    </div>
+</div>

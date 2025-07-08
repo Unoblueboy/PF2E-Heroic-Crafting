@@ -1,4 +1,4 @@
-import { coinsToCopperValue, copperValueToCoins } from "../helper/currency.mjs";
+import { coinsToCopperValue, copperValueToCoins } from "../../helper/currency.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -112,8 +112,6 @@ class EditMaterialTroveApplication extends HandlebarsApplicationMixin(Applicatio
 	});
 
 	static async handler(event, form, formData) {
-		console.log(formData);
-		console.log(this);
 		switch (this.tabGroups.primary) {
 			case "add-sub":
 				this.result = {
@@ -223,7 +221,7 @@ class EditMaterialTroveApplication extends HandlebarsApplicationMixin(Applicatio
 				pp: 0,
 			},
 		};
-		return Object.assign(data, {
+		return mergeObject(data, {
 			buttons,
 			rootId: this.id,
 			fields,
