@@ -19,7 +19,7 @@ fs.watch(SOURCE_PATH, { recursive: true }, (eventType, fileName) => {
 });
 
 fs.watch(STATIC_PATH, { recursive: true }, (eventType, fileName) => {
-	if (STATIC_IGNORE.includes(fileName.split(path.sep)[0])) return;
+	if (!fileName || STATIC_IGNORE.includes(fileName.split(path.sep)[0])) return;
 	const from = path.join(STATIC_PATH, fileName);
 	const to = path.join(BUILD_PATH, fileName);
 	updateSystem(eventType, fileName, from, to);
