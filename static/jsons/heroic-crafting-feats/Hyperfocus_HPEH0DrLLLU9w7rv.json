@@ -22,7 +22,7 @@
 			{
 				"key": "Note",
 				"selector": "crafting",
-				"text": "Whenever you roll a critical success on a Crafting check to Craft a Project for 1 day, add the value listed in Table 1: Spending Limit for 1 hour ({actor|flags.pf2e.craftAProject.limits.hour.value} {actor|flags.pf2e.craftAProject.limits.hour.coin}) to your Current Value. This feat cannot add more than the Cost of the Craft a Project activity to the item’s Current Value.",
+				"text": "Whenever you roll a critical success on a Crafting check to Craft a Project for 1 day, add the value listed in Table 1: Spending Limit for 1 hour to your Current Value. This feat cannot add more than the Cost of the Craft a Project activity to the item’s Current Value.",
 				"outcome": ["criticalSuccess"],
 				"title": "{item|name}",
 				"predicate": ["action:craft-a-project", "length:day"]
@@ -30,7 +30,7 @@
 			{
 				"key": "Note",
 				"selector": "crafting",
-				"text": "Whenever you roll a critical success on a Crafting check to Craft a Project for 1 week, add the value listed in Table 1: Spending Limit for 1 day ({actor|flags.pf2e.craftAProject.limits.day.value} {actor|flags.pf2e.craftAProject.limits.day.coin}) to your Current Value. This feat cannot add more than the Cost of the Craft a Project activity to the item’s Current Value.",
+				"text": "Whenever you roll a critical success on a Crafting check to Craft a Project for 1 week, add the value listed in Table 1: Spending Limit for 1 day to your Current Value. This feat cannot add more than the Cost of the Craft a Project activity to the item’s Current Value.",
 				"outcome": ["criticalSuccess"],
 				"title": "{item|name}",
 				"predicate": ["action:craft-a-project", "length:week"]

@@ -18,24 +18,7 @@
 			"license": "OGL",
 			"remaster": false
 		},
-		"rules": [
-			{
-				"key": "Note",
-				"selector": "crafting",
-				"text": "On a success, add half of the item’s Salvage Maximum value or your Day value on Table 1: Spending Limit ({actor|flags.pf2e.craftAProject.limits.day.value} {actor|flags.pf2e.craftAProject.limits.day.coin}), whichever is less. The item is destroyed.",
-				"outcome": ["success"],
-				"title": "{item|name}",
-				"predicate": ["action:salvage-item", "savvy-teardown", "speciality"]
-			},
-			{
-				"key": "Note",
-				"selector": "crafting",
-				"text": "On a failure, You gain no materials.The item is destroyed.",
-				"outcome": ["failure"],
-				"title": "{item|name}",
-				"predicate": ["action:salvage-item", "savvy-teardown", "speciality"]
-			}
-		],
+		"rules": [],
 		"slug": "savvy-teardown",
 		"traits": {
 			"otherTags": [],
