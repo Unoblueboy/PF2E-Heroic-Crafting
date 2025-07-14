@@ -14,7 +14,10 @@ import {
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-type EditMaterialTroveApplicationResult = {};
+export type EditMaterialTroveApplicationResult = {
+	newMaterialCopperValue: number;
+	useActorCoins: boolean;
+};
 
 class EditMaterialTroveApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	CraftingMaterialsCopperValue: number;
@@ -22,9 +25,12 @@ class EditMaterialTroveApplication extends HandlebarsApplicationMixin(Applicatio
 	curEditValue: Coins;
 	curAddSubValue: Coins;
 	result?: EditMaterialTroveApplicationResult;
-	callback?: Function;
+	callback?: (result: EditMaterialTroveApplicationResult | undefined) => void;
 
-	constructor(CraftingMaterialsCopperValue: number, callback: Function) {
+	constructor(
+		CraftingMaterialsCopperValue: number,
+		callback: (result: EditMaterialTroveApplicationResult | undefined) => void
+	) {
 		super();
 		this.CraftingMaterialsCopperValue = CraftingMaterialsCopperValue;
 		this.addSubChosen = "add";
@@ -143,13 +149,13 @@ class EditMaterialTroveApplication extends HandlebarsApplicationMixin(Applicatio
 						this.addSubChosen == "add"
 							? this.CraftingMaterialsCopperValue + coinsToCopperValue(this.curAddSubValue ?? {})
 							: this.CraftingMaterialsCopperValue - coinsToCopperValue(this.curAddSubValue ?? {}),
-					useActorCoins: formData.object.addSubUseCoins,
+					useActorCoins: formData.object.addSubUseCoins as boolean,
 				};
 				break;
 			case "edit":
 				this.result = {
 					newMaterialCopperValue: coinsToCopperValue(this.curEditValue),
-					useActorCoins: formData.object.editUseCoins,
+					useActorCoins: formData.object.editUseCoins as boolean,
 				};
 				break;
 			default:
@@ -170,7 +176,7 @@ class EditMaterialTroveApplication extends HandlebarsApplicationMixin(Applicatio
 		event.stopImmediatePropagation();
 
 		const target = event.target as HTMLInputElement;
-		const denomination = target.dataset.currency as keyof Coins;
+		const denomination = target.dataset.denomination as keyof Coins;
 		const value = Number.parseInt(target.value);
 		switch (target.dataset.tab) {
 			case "edit": {
@@ -186,15 +192,15 @@ class EditMaterialTroveApplication extends HandlebarsApplicationMixin(Applicatio
 		}
 	}
 
-	static EditCurValue(this: EditMaterialTroveApplication, currency: keyof Coins, value: number) {
-		this.curEditValue[currency] = value;
+	static EditCurValue(this: EditMaterialTroveApplication, denomination: keyof Coins, value: number) {
+		this.curEditValue[denomination] = value;
 		const curValue = coinsToCoinString(this.curEditValue);
 		const newMaterialDiv = this.element.querySelector("#edit-material-trove-edit-new-materials");
 		if (newMaterialDiv) newMaterialDiv.textContent = curValue;
 	}
 
-	static AddSubCurValue(this: EditMaterialTroveApplication, currency?: keyof Coins, value?: number) {
-		if (currency && value != 0) this.curAddSubValue[currency] = value;
+	static AddSubCurValue(this: EditMaterialTroveApplication, denomination?: keyof Coins, value?: number) {
+		if (denomination && value != 0) this.curAddSubValue[denomination] = value;
 		const copperValue =
 			this.addSubChosen == "add"
 				? this.CraftingMaterialsCopperValue + coinsToCopperValue(this.curAddSubValue)
@@ -265,7 +271,7 @@ class EditMaterialTroveApplication extends HandlebarsApplicationMixin(Applicatio
 }
 
 export async function EditMaterialTrove(curValue: number) {
-	return new Promise((resolve, reject) => {
+	return new Promise<EditMaterialTroveApplicationResult | undefined>((resolve, reject) => {
 		const app = new EditMaterialTroveApplication(curValue, resolve);
 		app.render(true);
 	});

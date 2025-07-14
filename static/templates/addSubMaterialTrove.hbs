@@ -16,10 +16,10 @@
     </div>
     <hr style="margin:0.5rem 0;">
     <div class="standard-form">
-        {{formGroup fields.addSubPP dataset=fields.addSubPP.dataset label=(localize 'PF2E.CurrencyPP') value=0 rootId=partId}}
-        {{formGroup fields.addSubGP dataset=fields.addSubGP.dataset label=(localize 'PF2E.CurrencyGP') value=0 rootId=partId}}
-        {{formGroup fields.addSubSP dataset=fields.addSubSP.dataset label=(localize 'PF2E.CurrencySP') value=0 rootId=partId}}
-        {{formGroup fields.addSubCP dataset=fields.addSubCP.dataset label=(localize 'PF2E.CurrencyCP') value=0 rootId=partId}}
+        {{formGroup fields.addSubPP dataset=datasets.addSubPP label=(localize 'PF2E.CurrencyPP') value=0 rootId=partId}}
+        {{formGroup fields.addSubGP dataset=datasets.addSubGP label=(localize 'PF2E.CurrencyGP') value=0 rootId=partId}}
+        {{formGroup fields.addSubSP dataset=datasets.addSubSP label=(localize 'PF2E.CurrencySP') value=0 rootId=partId}}
+        {{formGroup fields.addSubCP dataset=datasets.addSubCP label=(localize 'PF2E.CurrencyCP') value=0 rootId=partId}}
         <div class="form-group">
             <ul id="edit-material-trove-add-sub-addSubChoice">
                 <li>

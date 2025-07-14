@@ -1,7 +1,8 @@
 import { ActorPF2e } from "../../types/src/module/actor";
+import { EquipmentPF2e, TreasurePF2e } from "../../types/src/module/item";
 import { copperValueToCoins } from "../helper/currency.mjs";
 import { HEROIC_CRAFTING_SPENDING_LIMIT } from "../helper/limits.mjs";
-import { EditMaterialTrove } from "./Applications/EditMaterialTroveApplication.mjs";
+import { EditMaterialTrove, EditMaterialTroveApplicationResult } from "./Applications/EditMaterialTroveApplication.mjs";
 
 function getMaterialTrove(actor: ActorPF2e) {
 	// Get Material Trove
@@ -18,14 +19,18 @@ function getMaterialTrove(actor: ActorPF2e) {
 			"Multiple Material Troves Found, please make sure that you only have one Material Trove"
 		);
 	}
-	return materialTroves[0];
+	return materialTroves[0] as EquipmentPF2e;
 }
 function getGenericCraftingMaterials(actor: ActorPF2e) {
 	// Get Generic Crafting Materials
-	return actor.items.filter((x) => x?.slug == CRAFTING_MATERIAL_SLUG);
+	return actor.items.filter((x) => x?.slug == CRAFTING_MATERIAL_SLUG) as TreasurePF2e[];
 }
 
-async function useActorCoins(result, CraftingMaterialsCopperValue, actor) {
+async function useActorCoins(
+	result: EditMaterialTroveApplicationResult,
+	CraftingMaterialsCopperValue: number,
+	actor: ActorPF2e
+) {
 	if (!!result.useActorCoins) {
 		const coinsToMoveCopper = result.newMaterialCopperValue - CraftingMaterialsCopperValue;
 		if (coinsToMoveCopper < 0) {
@@ -42,10 +47,10 @@ async function useActorCoins(result, CraftingMaterialsCopperValue, actor) {
 }
 
 async function updateMaterialTroveValue(
-	actor,
-	newMaterialCopperValue,
-	materialTrove = null,
-	genericCraftingMaterials = null
+	actor: ActorPF2e,
+	newMaterialCopperValue: number,
+	materialTrove?: EquipmentPF2e,
+	genericCraftingMaterials?: TreasurePF2e[]
 ) {
 	if (!genericCraftingMaterials) {
 		genericCraftingMaterials = getGenericCraftingMaterials(actor);
@@ -57,6 +62,12 @@ async function updateMaterialTroveValue(
 		ui.notifications.error("Material Trove not found, update failed");
 		return;
 	}
+
+	const spendingLimitForLevel = HEROIC_CRAFTING_SPENDING_LIMIT.get(actor.level);
+	if (!spendingLimitForLevel) {
+		return;
+	}
+
 	var bulkGenericCraftingMaterials = null;
 	var negligibleGenericCraftingMaterials = null;
 	for (const craftingMaterial of genericCraftingMaterials) {
@@ -76,19 +87,19 @@ async function updateMaterialTroveValue(
 		}
 	}
 
-	const lightValue = HEROIC_CRAFTING_SPENDING_LIMIT[actor.level].week / 20;
+	const lightValue = spendingLimitForLevel.week / 20;
 	const lightQuantity = Math.floor(newMaterialCopperValue / lightValue);
 	const negligibleValue = newMaterialCopperValue % lightValue;
 
 	if (lightQuantity > 0 && !bulkGenericCraftingMaterials) {
-		const data = await fromUuid(CRAFTING_MATERIAL_UUID);
+		const data = (await fromUuid(CRAFTING_MATERIAL_UUID)) as TreasurePF2e;
 		const clone = data.clone({
 			system: { containerId: materialTrove.id, equipped: { carryType: "stowed", handsHeld: 0, inSlot: false } },
 		});
-		bulkGenericCraftingMaterials = await Item.implementation.create(clone, { parent: actor });
+		bulkGenericCraftingMaterials = await Item.implementation.create(clone.toObject(), { parent: actor });
 		ui.notifications.info("Generic Crafting Materials (Light Bulk) Created");
 	}
-	if (lightQuantity > 0) {
+	if (lightQuantity > 0 && !!bulkGenericCraftingMaterials) {
 		await bulkGenericCraftingMaterials.update({
 			"system.level.value": actor.level,
 			"system.price.value": copperValueToCoins(lightValue),
@@ -102,14 +113,14 @@ async function updateMaterialTroveValue(
 	}
 
 	if (negligibleValue > 0 && !negligibleGenericCraftingMaterials) {
-		const data = await fromUuid(CRAFTING_MATERIAL_UUID);
+		const data = (await fromUuid(CRAFTING_MATERIAL_UUID)) as TreasurePF2e;
 		const clone = data.clone({
 			system: { containerId: materialTrove.id, equipped: { carryType: "stowed", handsHeld: 0, inSlot: false } },
 		});
-		negligibleGenericCraftingMaterials = await Item.implementation.create(clone, { parent: actor });
+		negligibleGenericCraftingMaterials = await Item.implementation.create(clone.toObject(), { parent: actor });
 		ui.notifications.info("Generic Crafting Materials (Negligible Bulk) Created");
 	}
-	if (negligibleValue > 0) {
+	if (negligibleValue > 0 && !!negligibleGenericCraftingMaterials) {
 		negligibleGenericCraftingMaterials.update({
 			"system.level.value": actor.level,
 			"system.price.value": copperValueToCoins(negligibleValue),
@@ -128,10 +139,10 @@ async function updateMaterialTroveValue(
 }
 
 export async function addMaterialTroveValue(
-	actor,
-	addedCopperValue,
-	materialTrove = null,
-	genericCraftingMaterials = null
+	actor: ActorPF2e,
+	addedCopperValue: number,
+	materialTrove?: EquipmentPF2e,
+	genericCraftingMaterials?: TreasurePF2e[]
 ) {
 	var copperValue = await getCurrentMaterialTroveValue(actor, genericCraftingMaterials);
 	copperValue += addedCopperValue;
@@ -139,7 +150,7 @@ export async function addMaterialTroveValue(
 	await updateMaterialTroveValue(actor, copperValue, materialTrove, genericCraftingMaterials);
 }
 
-async function getCurrentMaterialTroveValue(actor, genericCraftingMaterials = null) {
+async function getCurrentMaterialTroveValue(actor: ActorPF2e, genericCraftingMaterials?: TreasurePF2e[]) {
 	if (!genericCraftingMaterials) {
 		genericCraftingMaterials = getGenericCraftingMaterials(actor);
 	}
@@ -154,7 +165,7 @@ async function getCurrentMaterialTroveValue(actor, genericCraftingMaterials = nu
 	return copperValue;
 }
 
-export async function editMaterialTrove(actor) {
+export async function editMaterialTrove(actor: ActorPF2e) {
 	if (!actor) {
 		ui.notifications.error("An actor must be selected");
 		return;
@@ -167,7 +178,7 @@ export async function editMaterialTrove(actor) {
 	var CraftingMaterialsCopperValue = await getCurrentMaterialTroveValue(actor, genericCraftingMaterials);
 
 	// Get new value of Generic Crafting Materials
-	const result = await EditMaterialTrove(CraftingMaterialsCopperValue);
+	const result = (await EditMaterialTrove(CraftingMaterialsCopperValue)) as EditMaterialTroveApplicationResult;
 	if (!result) return;
 
 	if (!(await useActorCoins(result, CraftingMaterialsCopperValue, actor))) {
