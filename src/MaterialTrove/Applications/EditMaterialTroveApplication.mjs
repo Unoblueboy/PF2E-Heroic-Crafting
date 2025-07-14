@@ -221,7 +221,7 @@ class EditMaterialTroveApplication extends HandlebarsApplicationMixin(Applicatio
 				pp: 0,
 			},
 		};
-		return mergeObject(data, {
+		return foundry.utils.mergeObject(data, {
 			buttons,
 			rootId: this.id,
 			fields,

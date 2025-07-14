@@ -133,7 +133,7 @@ async function gainMaterials(event, message) {
 	if (event.target?.tagName != "BUTTON") return;
 	const button = event.target;
 	const generalDiv = event.currentTarget;
-	const data = mergeObject(generalDiv.dataset, button.dataset);
+	const data = foundry.utils.mergeObject(generalDiv.dataset, button.dataset);
 
 	switch (data.action) {
 		case "gain-salvage-materials":
