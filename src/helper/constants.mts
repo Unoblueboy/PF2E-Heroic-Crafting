@@ -1,5 +1,8 @@
-export type characterLevels = keyof typeof HEROIC_CRAFTING_SPENDING_LIMIT;
-export type itemLevels = keyof typeof LEVEL_BASED_DC;
+export const MATERIAL_TROVE_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.wtpSAjQwSyPOglzU`;
+export const CRAFTING_MATERIAL_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.UFqgBzSfC8XfuKVg`;
+
+export const MATERIAL_TROVE_SLUG = "material-trove";
+export const CRAFTING_MATERIAL_SLUG = "generic-crafting-material";
 
 export const HEROIC_CRAFTING_SPENDING_LIMIT = new Map<number, { hour: number; day: number; week: number }>([
 	[1, { hour: 30, day: 120, week: 600 }],
@@ -24,29 +27,29 @@ export const HEROIC_CRAFTING_SPENDING_LIMIT = new Map<number, { hour: number; da
 	[20, { hour: 80000, day: 320000, week: 1600000 }],
 ]); // prices are in CP
 
-export const HEROIC_CRAFTING_GATHERED_INCOME = [
-	10, // Level 0
-	40, // Level 1
-	60, // Level 2
-	100, // Level 3
-	160, // Level 4
-	200, // Level 5
-	400, // Level 6
-	500, // Level 7
-	600, // Level 8
-	800, // Level 9
-	1000, // Level 10
-	1200, // Level 11
-	1600, // Level 12
-	2400, // Level 13
-	3000, // Level 14
-	4000, // Level 15
-	6000, // Level 16
-	8000, // Level 17
-	14000, // Level 18
-	20000, // Level 19
-	30000, // Level 20
-]; // prices are in CP
+export const HEROIC_CRAFTING_GATHERED_INCOME = new Map<number, number>([
+	[0, 10],
+	[1, 40],
+	[2, 60],
+	[3, 100],
+	[4, 160],
+	[5, 200],
+	[6, 400],
+	[7, 500],
+	[8, 600],
+	[9, 800],
+	[10, 1000],
+	[11, 1200],
+	[12, 1600],
+	[13, 2400],
+	[14, 3000],
+	[15, 4000],
+	[16, 6000],
+	[17, 8000],
+	[18, 14000],
+	[19, 20000],
+	[20, 30000],
+]); // prices are in CP
 
 export const LEVEL_BASED_DC = new Map<number, number>([
 	[-1, 13],

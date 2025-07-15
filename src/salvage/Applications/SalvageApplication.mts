@@ -8,28 +8,10 @@ import {
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
 import { coinsToCopperValue, copperValueToCoins, copperValueToCoinString } from "../../helper/currency.mjs";
-import { HEROIC_CRAFTING_GATHERED_INCOME, HEROIC_CRAFTING_SPENDING_LIMIT } from "../../helper/limits.mjs";
-import { checkItemPhysical } from "../salvage.mjs";
+import { HEROIC_CRAFTING_GATHERED_INCOME, HEROIC_CRAFTING_SPENDING_LIMIT } from "../../helper/constants.mjs";
+import { checkItemPhysical } from "../../helper/guards.mjs";
+import { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
-
-export type SalvageApplicationResult = {
-	savvyTeardown: boolean;
-	max: Coins;
-	duration: number;
-	income: {
-		success: number;
-		failure: number;
-	};
-	actor: ActorPF2e;
-	item: PhysicalItemPF2e;
-};
-
-export type SalvageApplicationOptions = {
-	actor?: ActorPF2e;
-	item?: PhysicalItemPF2e;
-	lockItem?: boolean;
-	callback?: (result: SalvageApplicationResult | undefined) => void;
-};
 
 export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	result?: SalvageApplicationResult;
@@ -69,6 +51,8 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		if (!this.item || !this.actor) return;
 		const spendingLimitForLevel = HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level);
 		if (!spendingLimitForLevel) return;
+		const baseIncomeValue = HEROIC_CRAFTING_GATHERED_INCOME.get(this.item.level);
+		if (!baseIncomeValue) return;
 
 		let salvageMaxCoins: Coins = {
 			pp: formData.object.salvageMaximumPP as number,
@@ -98,8 +82,6 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 				}
 			}
 		}
-		const itemLevel = this.item.level;
-		const baseIncomeValue = HEROIC_CRAFTING_GATHERED_INCOME[itemLevel];
 		const salvageMaxCopper = coinsToCopperValue(salvageMaxCoins);
 		let incomeSuccessCopperValue, incomeFailureCopperValue;
 		if (formData.object.useSavvyTeardown) {
@@ -136,6 +118,17 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 	static async useSavvyTeardownClick(this: SalvageApplication, event: Event, target: HTMLElement) {
 		if (event.type != "click") return;
 		this.updateDetails();
+	}
+
+	static async GetSalvageDetails(options: SalvageApplicationOptions) {
+		return new Promise<SalvageApplicationResult | undefined>((resolve, reject) => {
+			const app = new SalvageApplication(
+				Object.assign(options, {
+					callback: resolve,
+				})
+			);
+			app.render(true);
+		});
 	}
 
 	static override PARTS = {
@@ -212,6 +205,8 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		if (!this.actor) return;
 		const spendingLimitForLevel = HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level);
 		if (!spendingLimitForLevel) return;
+		const baseIncomeValue = HEROIC_CRAFTING_GATHERED_INCOME.get(this.item.level);
+		if (!baseIncomeValue) return;
 
 		const dragDropDiv = this.element.querySelector(".drop-item-zone") as HTMLDivElement;
 		(dragDropDiv.querySelector(".item-icon") as HTMLImageElement).src = this.item.img;
@@ -288,8 +283,6 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		}
 		const useSavvyTeardown = savvyTeardownCheckBox.checked && !isSalvage && hasSavvyTeardownFeat;
 
-		const itemLevel = this.item.level;
-		const baseIncomeValue = HEROIC_CRAFTING_GATHERED_INCOME[itemLevel];
 		let tooltipSuccessText, tooltipFailureText, incomeSuccessString, incomeFailureString;
 		if (useSavvyTeardown) {
 			const halfSalvageMax = Math.floor(salvageMaxCopper / 2);

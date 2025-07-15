@@ -6,90 +6,36 @@ import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-s
 import { StatisticRollParameters } from "../../types/src/module/system/statistic";
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { copperValueToCoins, copperValueToCoinString, coinsToCopperValue } from "../helper/currency.mjs";
-import { LEVEL_BASED_DC } from "../helper/limits.mjs";
+import { LEVEL_BASED_DC } from "../helper/constants.mjs";
 import { addMaterialTroveValue } from "../MaterialTrove/materialTrove.mjs";
-import {
-	SalvageApplication,
-	SalvageApplicationOptions,
-	SalvageApplicationResult,
-} from "./Applications/SalvageApplication.mjs";
+import { SalvageApplication } from "./Applications/SalvageApplication.mjs";
+import { SalvageApplicationResult } from "./Applications/types.mjs";
 
 const SALVAGE_MATERIAL_UUID = "Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.R8QxNha74tYOrccl";
 
 export async function salvage(actor: ActorPF2e, item: PhysicalItemPF2e, lockItem = false) {
-	const salvageDetails = await GetSalvageDetails({ actor: actor, item: item, lockItem: lockItem });
+	const salvageDetails = await SalvageApplication.GetSalvageDetails({ actor: actor, item: item, lockItem: lockItem });
 
 	if (!salvageDetails) {
 		return;
 	}
 
 	const salvageActor = salvageDetails.actor;
+	const options: StatisticRollParameters = await getStatisticRollParameters(salvageDetails);
+	await salvageActor.skills?.crafting?.check?.roll(options);
+}
+
+async function getStatisticRollParameters(salvageDetails: SalvageApplicationResult): Promise<StatisticRollParameters> {
 	const salvageItem = salvageDetails.item;
 	const salvageItemLevel = salvageItem.level;
-
-	// data-visibility
 	const baseDC = LEVEL_BASED_DC.get(salvageItemLevel) ?? 0;
-	const options: StatisticRollParameters = await (async () => {
-		if (salvageDetails.savvyTeardown) {
-			return {
-				dc: { value: baseDC + 5, visible: true },
-				extraRollOptions: ["action:savvy-teardown", "specialty"],
-				extraRollNotes: [
-					{
-						selector: "crafting",
-						text: "<strong>Success</strong> Add half of the item's Salvage Maximum value or your Day value on Table 1: Spending Limit, whichever is less. The item is destroyed.",
-						outcome: ["success", "criticalSuccess"],
-					},
-					{
-						selector: "crafting",
-						text: "<strong>Failure</strong> You gain no materials. The item is destroyed.",
-						outcome: ["failure", "criticalFailure"],
-					},
-				],
-				label: await foundry.applications.handlebars.renderTemplate(
-					"systems/pf2e/templates/chat/action/header.hbs",
-					{
-						subtitle: "Crafting Check",
-						title: "Savvy Teardown",
-					}
-				),
-				traits: ["exploration"],
-				createMessage: false,
-			};
-		} else {
-			return {
-				dc: { value: baseDC, visible: true },
-				extraRollOptions: ["action:salvage-item"],
-				extraRollNotes: [
-					{
-						selector: "crafting",
-						text: "<strong>Success</strong> Add the amount listed on Table 2: Gathered Income for the item's level to your Material Trove each hour. If you are a master in Crafting, instead add twice as much. The item becomes unusable.",
-						outcome: ["success", "criticalSuccess"],
-					},
-					{
-						selector: "crafting",
-						text: "<strong>Failure</strong> Add half the amount listed on Table 2: Gathered Income for the item's level to your Material Trove each hour. If you are a master in Crafting, instead add the listed amount. The item becomes unusable.",
-						outcome: ["failure", "criticalFailure"],
-					},
-				],
-				label: await foundry.applications.handlebars.renderTemplate(
-					"systems/pf2e/templates/chat/action/header.hbs",
-					{
-						subtitle: "Crafting Check",
-						title: "Salvage Item",
-					}
-				),
-				traits: ["exploration"],
-				createMessage: false,
-			};
-		}
-	})();
-	options.callback = async (
+
+	async function getStatisticRollCallback(
 		roll: Rolled<CheckRoll>,
 		outcome: DegreeOfSuccessString | null | undefined,
 		message: ChatMessagePF2e,
 		event: Event | null
-	) => {
+	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
 			let incomeCopperValue;
 			switch (outcome) {
@@ -136,8 +82,63 @@ export async function salvage(actor: ActorPF2e, item: PhysicalItemPF2e, lockItem
 		} else {
 			console.error("PF2E | Unable to amend chat message with craft result.", message);
 		}
-	};
-	await salvageActor.skills?.crafting?.check?.roll(options);
+	}
+
+	if (salvageDetails.savvyTeardown) {
+		return {
+			dc: { value: baseDC + 5, visible: true },
+			extraRollOptions: ["action:savvy-teardown", "specialty"],
+			extraRollNotes: [
+				{
+					selector: "crafting",
+					text: "<strong>Success</strong> Add half of the item's Salvage Maximum value or your Day value on Table 1: Spending Limit, whichever is less. The item is destroyed.",
+					outcome: ["success", "criticalSuccess"],
+				},
+				{
+					selector: "crafting",
+					text: "<strong>Failure</strong> You gain no materials. The item is destroyed.",
+					outcome: ["failure", "criticalFailure"],
+				},
+			],
+			label: await foundry.applications.handlebars.renderTemplate(
+				"systems/pf2e/templates/chat/action/header.hbs",
+				{
+					subtitle: "Crafting Check",
+					title: "Savvy Teardown",
+				}
+			),
+			traits: ["exploration"],
+			createMessage: false,
+			callback: getStatisticRollCallback,
+		};
+	} else {
+		return {
+			dc: { value: baseDC, visible: true },
+			extraRollOptions: ["action:salvage-item"],
+			extraRollNotes: [
+				{
+					selector: "crafting",
+					text: "<strong>Success</strong> Add the amount listed on Table 2: Gathered Income for the item's level to your Material Trove each hour. If you are a master in Crafting, instead add twice as much. The item becomes unusable.",
+					outcome: ["success", "criticalSuccess"],
+				},
+				{
+					selector: "crafting",
+					text: "<strong>Failure</strong> Add half the amount listed on Table 2: Gathered Income for the item's level to your Material Trove each hour. If you are a master in Crafting, instead add the listed amount. The item becomes unusable.",
+					outcome: ["failure", "criticalFailure"],
+				},
+			],
+			label: await foundry.applications.handlebars.renderTemplate(
+				"systems/pf2e/templates/chat/action/header.hbs",
+				{
+					subtitle: "Crafting Check",
+					title: "Salvage Item",
+				}
+			),
+			traits: ["exploration"],
+			createMessage: false,
+			callback: getStatisticRollCallback,
+		};
+	}
 }
 
 export function salvageButtonListener(message: ChatMessagePF2e, html: HTMLElement, data: any) {
@@ -232,19 +233,4 @@ async function gainSavvyTeardownMaterials(data: DOMStringMap) {
 	}
 
 	await addMaterialTroveValue(item.actor, income);
-}
-
-export function checkItemPhysical(item: ItemPF2e): item is PhysicalItemPF2e {
-	return ["armor", "backpack", "book", "consumable", "equipment", "shield", "treasure", "weapon"].includes(item.type);
-}
-
-export async function GetSalvageDetails(options: SalvageApplicationOptions) {
-	return new Promise<SalvageApplicationResult | undefined>((resolve, reject) => {
-		const app = new SalvageApplication(
-			Object.assign(options, {
-				callback: resolve,
-			})
-		);
-		app.render(true);
-	});
 }

@@ -1,8 +1,10 @@
 import { ActorPF2e } from "../../types/src/module/actor";
 import { EquipmentPF2e, TreasurePF2e } from "../../types/src/module/item";
+import { MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, CRAFTING_MATERIAL_UUID } from "../helper/constants.mjs";
 import { copperValueToCoins } from "../helper/currency.mjs";
-import { HEROIC_CRAFTING_SPENDING_LIMIT } from "../helper/limits.mjs";
-import { EditMaterialTrove, EditMaterialTroveApplicationResult } from "./Applications/EditMaterialTroveApplication.mjs";
+import { HEROIC_CRAFTING_SPENDING_LIMIT } from "../helper/constants.mjs";
+import { EditMaterialTroveApplication } from "./Applications/EditMaterialTroveApplication.mjs";
+import { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";
 
 function getMaterialTrove(actor: ActorPF2e) {
 	// Get Material Trove
@@ -178,7 +180,9 @@ export async function editMaterialTrove(actor: ActorPF2e) {
 	var CraftingMaterialsCopperValue = await getCurrentMaterialTroveValue(actor, genericCraftingMaterials);
 
 	// Get new value of Generic Crafting Materials
-	const result = (await EditMaterialTrove(CraftingMaterialsCopperValue)) as EditMaterialTroveApplicationResult;
+	const result = (await EditMaterialTroveApplication.EditMaterialTrove(
+		CraftingMaterialsCopperValue
+	)) as EditMaterialTroveApplicationResult;
 	if (!result) return;
 
 	if (!(await useActorCoins(result, CraftingMaterialsCopperValue, actor))) {
@@ -188,9 +192,3 @@ export async function editMaterialTrove(actor: ActorPF2e) {
 
 	await updateMaterialTroveValue(actor, result.newMaterialCopperValue, materialTrove, genericCraftingMaterials);
 }
-
-export const MATERIAL_TROVE_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.wtpSAjQwSyPOglzU`;
-export const CRAFTING_MATERIAL_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.UFqgBzSfC8XfuKVg`;
-
-export const MATERIAL_TROVE_SLUG = "material-trove";
-export const CRAFTING_MATERIAL_SLUG = "generic-crafting-material";
