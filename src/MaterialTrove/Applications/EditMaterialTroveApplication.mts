@@ -17,7 +17,7 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	CraftingMaterialsCopperValue: number;
-	addSubChosen: string;
+	addSubChosen: "add" | "sub";
 	curEditValue: Coins;
 	curAddSubValue: Coins;
 	result?: EditMaterialTroveApplicationResult;
@@ -32,7 +32,7 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		this.addSubChosen = "add";
 		this.curEditValue = {};
 		this.curAddSubValue = {};
-		if (!!callback) {
+		if (callback) {
 			this.callback = callback;
 		}
 	}
@@ -52,12 +52,12 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		tag: "form",
 		position: { width: 300 },
 		form: {
-			handler: EditMaterialTroveApplication.#handler,
+			handler: EditMaterialTroveApplication.handler,
 			submitOnChange: false,
 			closeOnSubmit: true,
 		},
 		actions: {
-			"check-radio-box": EditMaterialTroveApplication.#checkRadioBox,
+			"check-radio-box": EditMaterialTroveApplication.checkRadioBox,
 		},
 	};
 
@@ -132,10 +132,10 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		}),
 	});
 
-	static async #handler(
+	private static async handler(
 		this: EditMaterialTroveApplication,
-		event: Event,
-		form: HTMLFormElement,
+		_event: Event,
+		_form: HTMLFormElement,
 		formData: FormDataExtended
 	) {
 		switch (this.tabGroups.primary) {
@@ -159,15 +159,15 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		}
 	}
 
-	static #checkRadioBox(this: EditMaterialTroveApplication, event: Event, target: HTMLElement) {
+	private static checkRadioBox(this: EditMaterialTroveApplication, event: Event, target: HTMLElement) {
 		if (event.type != "click") return;
 		const inputElement = target.parentElement?.getElementsByTagName("input")[0] as HTMLInputElement;
 		inputElement.checked = true;
-		this.addSubChosen = inputElement.value;
-		EditMaterialTroveApplication.#AddSubCurValue.bind(this)();
+		this.addSubChosen = inputElement.value as "add" | "sub";
+		EditMaterialTroveApplication.AddSubCurValue.bind(this)();
 	}
 
-	static #UpdateAddSubCurValue(this: EditMaterialTroveApplication, event: Event) {
+	private static UpdateAddSubCurValue(this: EditMaterialTroveApplication, event: Event) {
 		event.preventDefault();
 		event.stopImmediatePropagation();
 
@@ -176,11 +176,11 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		const value = Number.parseInt(target.value);
 		switch (target.dataset.tab) {
 			case "edit": {
-				EditMaterialTroveApplication.#EditCurValue.bind(this)(denomination, value);
+				EditMaterialTroveApplication.EditCurValue.bind(this)(denomination, value);
 				break;
 			}
 			case "addSub": {
-				EditMaterialTroveApplication.#AddSubCurValue.bind(this)(denomination, value);
+				EditMaterialTroveApplication.AddSubCurValue.bind(this)(denomination, value);
 				break;
 			}
 			default:
@@ -188,14 +188,14 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		}
 	}
 
-	static #EditCurValue(this: EditMaterialTroveApplication, denomination: keyof Coins, value: number) {
+	private static EditCurValue(this: EditMaterialTroveApplication, denomination: keyof Coins, value: number) {
 		this.curEditValue[denomination] = value;
 		const curValue = coinsToCoinString(this.curEditValue);
 		const newMaterialDiv = this.element.querySelector("#edit-material-trove-edit-new-materials");
 		if (newMaterialDiv) newMaterialDiv.textContent = curValue;
 	}
 
-	static #AddSubCurValue(this: EditMaterialTroveApplication, denomination?: keyof Coins, value?: number) {
+	private static AddSubCurValue(this: EditMaterialTroveApplication, denomination?: keyof Coins, value?: number) {
 		if (denomination && value != 0) this.curAddSubValue[denomination] = value;
 		const copperValue =
 			this.addSubChosen == "add"
@@ -207,7 +207,7 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 	}
 
 	static async EditMaterialTrove(curValue: number) {
-		return new Promise<EditMaterialTroveApplicationResult | undefined>((resolve, reject) => {
+		return new Promise<EditMaterialTroveApplicationResult | undefined>((resolve) => {
 			const app = new EditMaterialTroveApplication(curValue, resolve);
 			app.render(true);
 		});
@@ -218,10 +218,10 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		if (this.callback) this.callback(this.result);
 	}
 
-	override async _onRender(context: object, options: ApplicationRenderOptions) {
+	override async _onRender(_context: object, _options: ApplicationRenderOptions) {
 		const numberFields = this.element.querySelectorAll('[data-action="update-cur-value"]');
 		for (const input of numberFields) {
-			input.addEventListener("change", EditMaterialTroveApplication.#UpdateAddSubCurValue.bind(this));
+			input.addEventListener("change", EditMaterialTroveApplication.UpdateAddSubCurValue.bind(this));
 		}
 	}
 
@@ -265,9 +265,15 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		});
 	}
 
-	override async _preparePartContext(partId: string, context: Record<string, any>, options: HandlebarsRenderOptions) {
+	override async _preparePartContext(
+		partId: string,
+		context: Record<string, unknown>,
+		options: HandlebarsRenderOptions
+	) {
+		super._preparePartContext(partId, context, options);
 		context.partId = `${this.id}-${partId}`;
-		context.tab = context.tabs[partId];
+		console.log(context.tabs);
+		context.tab = (context.tabs as Record<string, string>)[partId];
 		return context;
 	}
 }

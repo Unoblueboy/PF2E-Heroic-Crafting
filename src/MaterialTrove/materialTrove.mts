@@ -1,8 +1,13 @@
 import { ActorPF2e } from "../../types/src/module/actor";
 import { EquipmentPF2e, TreasurePF2e } from "../../types/src/module/item";
-import { MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, CRAFTING_MATERIAL_UUID } from "../helper/constants.mjs";
+import {
+	MATERIAL_TROVE_SLUG,
+	CRAFTING_MATERIAL_SLUG,
+	CRAFTING_MATERIAL_UUID,
+	HEROIC_CRAFTING_SPENDING_LIMIT,
+} from "../helper/constants.mjs";
 import { copperValueToCoins } from "../helper/currency.mjs";
-import { HEROIC_CRAFTING_SPENDING_LIMIT } from "../helper/constants.mjs";
+
 import { EditMaterialTroveApplication } from "./Applications/EditMaterialTroveApplication.mjs";
 import { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";
 
@@ -33,7 +38,7 @@ async function useActorCoins(
 	CraftingMaterialsCopperValue: number,
 	actor: ActorPF2e
 ) {
-	if (!!result.useActorCoins) {
+	if (result.useActorCoins) {
 		const coinsToMoveCopper = result.newMaterialCopperValue - CraftingMaterialsCopperValue;
 		if (coinsToMoveCopper < 0) {
 			// Add Coins to character Sheet
@@ -54,12 +59,8 @@ async function updateMaterialTroveValue(
 	materialTrove?: EquipmentPF2e,
 	genericCraftingMaterials?: TreasurePF2e[]
 ) {
-	if (!genericCraftingMaterials) {
-		genericCraftingMaterials = getGenericCraftingMaterials(actor);
-	}
-	if (!materialTrove) {
-		materialTrove = getMaterialTrove(actor);
-	}
+	genericCraftingMaterials ??= getGenericCraftingMaterials(actor);
+	materialTrove ??= getMaterialTrove(actor);
 	if (!materialTrove) {
 		ui.notifications.error("Material Trove not found, update failed");
 		return;
@@ -70,74 +71,89 @@ async function updateMaterialTroveValue(
 		return;
 	}
 
-	var bulkGenericCraftingMaterials = null;
-	var negligibleGenericCraftingMaterials = null;
-	for (const craftingMaterial of genericCraftingMaterials) {
-		if (craftingMaterial.system.bulk.value > 0) {
-			if (!bulkGenericCraftingMaterials) {
-				bulkGenericCraftingMaterials = craftingMaterial;
-			} else {
-				craftingMaterial.delete();
-			}
-			continue;
-		}
-
-		if (!negligibleGenericCraftingMaterials) {
-			negligibleGenericCraftingMaterials = craftingMaterial;
-		} else {
-			craftingMaterial.delete();
-		}
-	}
-
 	const lightValue = spendingLimitForLevel.week / 20;
 	const lightQuantity = Math.floor(newMaterialCopperValue / lightValue);
 	const negligibleValue = newMaterialCopperValue % lightValue;
+	const negligibleQuantity = 1;
 
-	if (lightQuantity > 0 && !bulkGenericCraftingMaterials) {
+	await updateGenericCraftingMaterials(
+		actor,
+		lightQuantity,
+		lightValue,
+		false,
+		genericCraftingMaterials,
+		materialTrove
+	);
+	await updateGenericCraftingMaterials(
+		actor,
+		negligibleQuantity,
+		negligibleValue,
+		true,
+		genericCraftingMaterials,
+		materialTrove
+	);
+}
+
+async function updateGenericCraftingMaterials(
+	actor: ActorPF2e,
+	quantity: number,
+	value: number,
+	isNegligibleBulk: boolean,
+	genericCraftingMaterials: TreasurePF2e[],
+	materialTrove: EquipmentPF2e
+) {
+	let genericCraftingMaterial = null;
+	for (const craftingMaterial of genericCraftingMaterials) {
+		if (
+			(craftingMaterial.system.bulk.value == 0 && isNegligibleBulk) ||
+			(craftingMaterial.system.bulk.value > 0 && !isNegligibleBulk)
+		) {
+			if (!genericCraftingMaterial) {
+				genericCraftingMaterial = craftingMaterial;
+			} else {
+				craftingMaterial.delete();
+			}
+		}
+	}
+
+	if (value > 0 && !genericCraftingMaterial) {
 		const data = (await fromUuid(CRAFTING_MATERIAL_UUID)) as TreasurePF2e;
 		const clone = data.clone({
 			system: { containerId: materialTrove.id, equipped: { carryType: "stowed", handsHeld: 0, inSlot: false } },
 		});
-		bulkGenericCraftingMaterials = await Item.implementation.create(clone.toObject(), { parent: actor });
-		ui.notifications.info("Generic Crafting Materials (Light Bulk) Created");
+		genericCraftingMaterial = await Item.implementation.create(clone.toObject(), { parent: actor });
+		createCraftingMaterialNotifications(isNegligibleBulk, "Created");
 	}
-	if (lightQuantity > 0 && !!bulkGenericCraftingMaterials) {
-		await bulkGenericCraftingMaterials.update({
-			"system.level.value": actor.level,
-			"system.price.value": copperValueToCoins(lightValue),
-			"system.quantity": lightQuantity,
-		});
+	if (value > 0 && !!genericCraftingMaterial) {
+		const updateDetails: Record<string, unknown> = getUpdateDetails(actor, value, quantity, isNegligibleBulk);
+		genericCraftingMaterial.update(updateDetails);
 	}
 
-	if (lightQuantity == 0 && !!bulkGenericCraftingMaterials) {
-		bulkGenericCraftingMaterials.delete();
-		ui.notifications.info("Generic Crafting Materials (Light Bulk) Deleted");
+	if (value == 0 && !!genericCraftingMaterial) {
+		genericCraftingMaterial.delete();
+		createCraftingMaterialNotifications(isNegligibleBulk, "Deleted");
 	}
+}
 
-	if (negligibleValue > 0 && !negligibleGenericCraftingMaterials) {
-		const data = (await fromUuid(CRAFTING_MATERIAL_UUID)) as TreasurePF2e;
-		const clone = data.clone({
-			system: { containerId: materialTrove.id, equipped: { carryType: "stowed", handsHeld: 0, inSlot: false } },
-		});
-		negligibleGenericCraftingMaterials = await Item.implementation.create(clone.toObject(), { parent: actor });
-		ui.notifications.info("Generic Crafting Materials (Negligible Bulk) Created");
+function getUpdateDetails(actor: ActorPF2e, value: number, quantity: number, isNegligibleBulk: boolean) {
+	const updateDetails: Record<string, unknown> = {
+		"system.level.value": actor.level,
+		"system.price.value": copperValueToCoins(value),
+		"system.quantity": quantity,
+	};
+	if (isNegligibleBulk) {
+		updateDetails["system.bulk"] = {
+			value: 0,
+			heldOrStowed: 0,
+		};
 	}
-	if (negligibleValue > 0 && !!negligibleGenericCraftingMaterials) {
-		negligibleGenericCraftingMaterials.update({
-			"system.level.value": actor.level,
-			"system.price.value": copperValueToCoins(negligibleValue),
-			"system.quantity": 1,
-			"system.bulk": {
-				value: 0,
-				heldOrStowed: 0,
-			},
-		});
-	}
+	return updateDetails;
+}
 
-	if (negligibleValue == 0 && !!negligibleGenericCraftingMaterials) {
-		negligibleGenericCraftingMaterials.delete();
-		ui.notifications.info("Generic Crafting Materials (Negligible Bulk) Deleted");
-	}
+function createCraftingMaterialNotifications(isNegligibleBulk: boolean, operation: "Created" | "Deleted") {
+	ui.notifications.info(
+		`Generic Crafting Materials (${isNegligibleBulk ? "Negligible" : "Light"} Bulk) ${operation}`
+	);
 }
 
 export async function addMaterialTroveValue(
@@ -146,18 +162,16 @@ export async function addMaterialTroveValue(
 	materialTrove?: EquipmentPF2e,
 	genericCraftingMaterials?: TreasurePF2e[]
 ) {
-	var copperValue = await getCurrentMaterialTroveValue(actor, genericCraftingMaterials);
+	let copperValue = await getCurrentMaterialTroveValue(actor, genericCraftingMaterials);
 	copperValue += addedCopperValue;
 	copperValue = Math.max(copperValue, 0);
 	await updateMaterialTroveValue(actor, copperValue, materialTrove, genericCraftingMaterials);
 }
 
 async function getCurrentMaterialTroveValue(actor: ActorPF2e, genericCraftingMaterials?: TreasurePF2e[]) {
-	if (!genericCraftingMaterials) {
-		genericCraftingMaterials = getGenericCraftingMaterials(actor);
-	}
+	genericCraftingMaterials ??= getGenericCraftingMaterials(actor);
 
-	var copperValue = 0;
+	let copperValue = 0;
 
 	for (const material of genericCraftingMaterials) {
 		const materialSystem = material.system;
@@ -177,7 +191,7 @@ export async function editMaterialTrove(actor: ActorPF2e) {
 	const genericCraftingMaterials = getGenericCraftingMaterials(actor);
 
 	// Get current value of Generic Crafting Materials
-	var CraftingMaterialsCopperValue = await getCurrentMaterialTroveValue(actor, genericCraftingMaterials);
+	const CraftingMaterialsCopperValue = await getCurrentMaterialTroveValue(actor, genericCraftingMaterials);
 
 	// Get new value of Generic Crafting Materials
 	const result = (await EditMaterialTroveApplication.EditMaterialTrove(

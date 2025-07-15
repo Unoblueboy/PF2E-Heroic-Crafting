@@ -26,19 +26,15 @@
 	--button-hover-border-color: var(--color-light-3);
 	--button-hover-text-color: var(--color-light-1);
 
-	li {
-		flex: 1;
-		margin-bottom: 0;
-	}
-
 	input[name="addSubChoice"] {
 		display: none;
 	}
 
 	li {
+		flex: 1;
+		margin-bottom: 0;
+
 		label {
-			padding: 5px;
-			cursor: pointer;
 			display: flex;
 			justify-content: center;
 			align-items: center;
@@ -75,10 +71,6 @@
 			}
 		}
 	}
-
-	/* label:hover {
-		background: #ddd;
-	} */
 }
 
 .salvage-dialog {

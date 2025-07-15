@@ -17,7 +17,7 @@ export function copperValueToCoins(copperValue: number): Coins {
 
 export function coinsToCoinString(coins: Coins) {
 	const result = Object.entries(coins)
-		.toSorted(([k1, _1], [k2, _2]) => CURRENCY_LIST.indexOf(k1) - CURRENCY_LIST.indexOf(k2))
+		.toSorted(([k1, _v1], [k2, _v2]) => CURRENCY_LIST.indexOf(k1) - CURRENCY_LIST.indexOf(k2))
 		.filter(([_, v]) => !!v)
 		.map(([k, v]) => `${v} ${k.toLowerCase()}`)
 		.join(", ");

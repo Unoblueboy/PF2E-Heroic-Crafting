@@ -12,10 +12,13 @@
 	"author": "",
 	"license": "ISC",
 	"description": "",
-	"dependencies": {},
 	"devDependencies": {
+		"@eslint/js": "^9.31.0",
+		"@foundryvtt/foundryvtt-cli": "^1.1.0",
+		"eslint": "^9.31.0",
+		"globals": "^16.3.0",
 		"typescript": "^5.8.3",
-		"@foundryvtt/foundryvtt-cli": "^1.1.0"
+		"typescript-eslint": "^8.37.0"
 	},
 	"types": "./types"
 }

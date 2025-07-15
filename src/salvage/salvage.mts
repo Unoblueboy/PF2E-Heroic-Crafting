@@ -1,6 +1,6 @@
 import { ActorPF2e } from "../../types/src/module/actor";
 import { ChatMessagePF2e } from "../../types/src/module/chat-message";
-import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../types/src/module/item";
+import { PhysicalItemPF2e, TreasurePF2e } from "../../types/src/module/item";
 import { CheckRoll } from "../../types/src/module/system/check";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { StatisticRollParameters } from "../../types/src/module/system/statistic";
@@ -31,10 +31,10 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 	const baseDC = LEVEL_BASED_DC.get(salvageItemLevel) ?? 0;
 
 	async function getStatisticRollCallback(
-		roll: Rolled<CheckRoll>,
+		_roll: Rolled<CheckRoll>,
 		outcome: DegreeOfSuccessString | null | undefined,
 		message: ChatMessagePF2e,
-		event: Event | null
+		_event: Event | null
 	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
 			let incomeCopperValue;
@@ -75,7 +75,7 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 					savvyTeardown: salvageDetails.savvyTeardown,
 				}
 			);
-			if (!!flavor) {
+			if (flavor) {
 				message.updateSource({ flavor: message.flavor + flavor });
 			}
 			ChatMessage.create(message.toObject());
@@ -141,9 +141,9 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 	}
 }
 
-export function salvageButtonListener(message: ChatMessagePF2e, html: HTMLElement, data: any) {
+export function salvageButtonListener(message: ChatMessagePF2e, html: HTMLElement, _data: unknown) {
 	const salvageResults = html.querySelector("[data-salvage-results]");
-	if (!!salvageResults) salvageResults.addEventListener("click", (e: Event) => gainMaterials(e, message));
+	if (salvageResults) salvageResults.addEventListener("click", (e: Event) => gainMaterials(e, message));
 }
 
 async function gainMaterials(event: Event, message: ChatMessagePF2e) {
@@ -168,12 +168,13 @@ async function gainMaterials(event: Event, message: ChatMessagePF2e) {
 		button.disabled = true;
 	});
 	const flavorHtml = generalDiv.closest("span.flavor-text")?.innerHTML;
-	if (!!flavorHtml) message.update({ flavor: flavorHtml });
+	if (flavorHtml) message.update({ flavor: flavorHtml });
 }
 
 async function gainSalvageMaterials(data: DOMStringMap) {
 	const item = (await fromUuid(data.itemUuid as string)) as PhysicalItemPF2e;
-	if (!item || !item.actor) return;
+	if (!item) return;
+	if (!item.actor) return;
 
 	const salvageMaxCoins = {
 		pp: Number.parseInt(data.salvageMaxPp as string),
@@ -209,13 +210,11 @@ async function gainSalvageMaterials(data: DOMStringMap) {
 		} else {
 			await item.delete();
 		}
+	} else if (remainingSalvagePrice > 0) {
+		await item.update({ "system.price.value": copperValueToCoins(remainingSalvagePrice) });
 	} else {
-		if (remainingSalvagePrice > 0) {
-			await item.update({ "system.price.value": copperValueToCoins(remainingSalvagePrice) });
-		} else {
-			ui.notifications.info(`${item.name} fully salvaged`);
-			await item.delete();
-		}
+		ui.notifications.info(`${item.name} fully salvaged`);
+		await item.delete();
 	}
 
 	await addMaterialTroveValue(item.actor, Math.min(salvageMaxCopper, totalIncome));
@@ -223,7 +222,8 @@ async function gainSalvageMaterials(data: DOMStringMap) {
 
 async function gainSavvyTeardownMaterials(data: DOMStringMap) {
 	const item = (await fromUuid(data.itemUuid as string)) as PhysicalItemPF2e;
-	if (!item || !item.actor) return;
+	if (!item) return;
+	if (!item.actor) return;
 	const income = Number.parseInt(data.salvageIncome as string);
 
 	if (item.quantity > 1) {
