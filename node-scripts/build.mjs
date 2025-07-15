@@ -1,5 +1,5 @@
 import fs from "fs";
-import { buildStaticFiles, buildSourceFiles, BUILD_PATH } from "./build-helper.mjs";
+import { buildStaticFiles, BUILD_PATH } from "./build-helper.mjs";
 
 const DEV_BUILD = process.argv.length > 2 ? ["true", "dev"].includes(process.argv[2].toLowerCase()) : false;
 
@@ -15,4 +15,3 @@ if (!DEV_BUILD) {
 }
 
 buildStaticFiles();
-buildSourceFiles();
