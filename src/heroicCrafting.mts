@@ -1,4 +1,4 @@
-import { salvage, salvageButtonListener } from "./salvage/salvage.mjs";
+import { salvage, salvageButtonListener } from "./Salvage/salvage.mjs";
 import { editMaterialTrove } from "./MaterialTrove/materialTrove.mjs";
 import { ChatMessagePF2e } from "../types/src/module/chat-message";
 

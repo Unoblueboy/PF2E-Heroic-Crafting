@@ -7,9 +7,9 @@ import {
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
-import { coinsToCopperValue, copperValueToCoins, copperValueToCoinString } from "../../helper/currency.mjs";
-import { HEROIC_CRAFTING_GATHERED_INCOME, HEROIC_CRAFTING_SPENDING_LIMIT } from "../../helper/constants.mjs";
-import { checkItemPhysical } from "../../helper/guards.mjs";
+import { coinsToCopperValue, copperValueToCoins, copperValueToCoinString } from "../../Helper/currency.mjs";
+import { HEROIC_CRAFTING_GATHERED_INCOME, HEROIC_CRAFTING_SPENDING_LIMIT } from "../../Helper/constants.mjs";
+import { checkItemPhysical } from "../../Helper/guards.mjs";
 import { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 

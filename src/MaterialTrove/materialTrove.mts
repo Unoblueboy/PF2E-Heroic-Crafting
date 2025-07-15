@@ -5,8 +5,8 @@ import {
 	CRAFTING_MATERIAL_SLUG,
 	CRAFTING_MATERIAL_UUID,
 	HEROIC_CRAFTING_SPENDING_LIMIT,
-} from "../helper/constants.mjs";
-import { copperValueToCoins } from "../helper/currency.mjs";
+} from "../Helper/constants.mjs";
+import { copperValueToCoins } from "../Helper/currency.mjs";
 
 import { EditMaterialTroveApplication } from "./Applications/EditMaterialTroveApplication.mjs";
 import { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";

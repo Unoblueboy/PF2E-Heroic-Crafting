@@ -10,7 +10,7 @@ import {
 	coinsToCopperValue,
 	copperValueToCoins,
 	copperValueToCoinString,
-} from "../../helper/currency.mjs";
+} from "../../Helper/currency.mjs";
 import { EditMaterialTroveApplicationResult } from "./types.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
