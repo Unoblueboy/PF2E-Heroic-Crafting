@@ -1,3 +1,4 @@
+import { ActorFlagsPF2e } from "../../types/src/module/actor/data/base";
 import { Rarity } from "../../types/src/module/data";
 import { Coins } from "../../types/src/module/item/physical";
 
@@ -15,9 +16,15 @@ type itemDataCustom = {
 	price: Coins;
 	description?: string;
 	bulk?: string;
-};
+} & EmbeddedSpell;
 
 type itemDataUuid = {
 	type: "uuid";
 	uuid: string;
+} & EmbeddedSpell;
+
+type EmbeddedSpell = {
+	spellUuid?: string;
 };
+
+type _ActorFlagsPF2eHeroicCrafting = ActorFlagsPF2e & { pf2eHeroicCrafting?: { projects: ProjectItemDetails[] } };

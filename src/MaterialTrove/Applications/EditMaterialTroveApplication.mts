@@ -37,7 +37,7 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		}
 	}
 
-	static override PARTS = {
+	static override readonly PARTS = {
 		tabs: { template: "templates/generic/tab-navigation.hbs", classes: ["standard-form"] },
 		edit: { template: "modules/pf2e-heroic-crafting/templates/editMaterialTrove.hbs" },
 		"add-sub": {
@@ -46,7 +46,7 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		footer: { template: "templates/generic/form-footer.hbs", classes: ["standard-form"] },
 	};
 
-	static override DEFAULT_OPTIONS = {
+	static override readonly DEFAULT_OPTIONS = {
 		id: "edit-material-trove",
 		window: { title: "Edit Material Trove", icon: "fa-solid fa-treasure-chest" },
 		tag: "form",
@@ -61,7 +61,7 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		},
 	};
 
-	static override TABS = {
+	static override readonly TABS = {
 		primary: {
 			tabs: [
 				{ id: "edit", label: "Edit" },
@@ -71,7 +71,7 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		},
 	};
 
-	static SCHEMA = new foundry.data.fields.SchemaField({
+	static readonly SCHEMA = new foundry.data.fields.SchemaField({
 		editCP: new foundry.data.fields.NumberField({
 			required: true,
 			integer: true,

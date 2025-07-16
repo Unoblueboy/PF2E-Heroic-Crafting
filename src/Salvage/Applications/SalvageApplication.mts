@@ -28,7 +28,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		if (options.callback) this.callback = options.callback;
 	}
 
-	static DEFAULT_OPTIONS = {
+	static override readonly DEFAULT_OPTIONS = {
 		id: "salvage",
 		classes: ["salvage-dialog"],
 		position: { width: 350 },
@@ -47,7 +47,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		},
 	};
 
-	static override PARTS = {
+	static override readonly PARTS = {
 		"drag-drop": { template: "modules/pf2e-heroic-crafting/templates/salvage/drag-drop.hbs" },
 		details: {
 			template: "modules/pf2e-heroic-crafting/templates/salvage/details.hbs",
@@ -56,7 +56,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		footer: { template: "templates/generic/form-footer.hbs", classes: ["footer-button-panel"] },
 	};
 
-	static SCHEMA = new foundry.data.fields.SchemaField({
+	static readonly SCHEMA = new foundry.data.fields.SchemaField({
 		useSavvyTeardown: new foundry.data.fields.BooleanField({
 			initial: false,
 			label: "Savvy Teardown",
@@ -454,7 +454,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			},
 			{
 				type: "button",
-				icon: "fa-sharp fa-solid fa-recycle",
+				icon: "fa-solid fa-xmark",
 				label: "Cancel",
 				cssClass: "cancel-button",
 				action: "close",

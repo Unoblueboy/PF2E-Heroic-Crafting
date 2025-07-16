@@ -1,0 +1,95 @@
+<section class="tab {{tab.cssClass}}"
+         data-group="{{tab.group}}"
+         data-tab="{{tab.id}}">
+    <hr style="margin:0.5rem 0;">
+    <div class="begin-project-craft-summary">
+        <h4>Crafting Summary</h4>
+        <div class="input-group">
+            <label for="summary-is-formula">Is Formula?</label>
+            <div class="input-fields">
+                <input type="checkbox"
+                       name="summary-is-formula">
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="summary-dc">DC</label>
+            <div class="input-fields">
+                <input type="number"
+                       min="1"
+                       value="1"
+                       step="1"
+                       name="summary-dc"
+                       required>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="summary-batch-size">Batch Size</label>
+            <div class="input-fields batch-fields">
+                <button type="button"
+                        data-action="decrease-summary-batch-size">-</button>
+                <input type="number"
+                       min="1"
+                       value="1"
+                       step="1"
+                       name="summary-batch-size"
+                       required>
+                <button type="button"
+                        data-action="increase-summary-batch-size">+</button>
+            </div>
+        </div>
+    </div>
+    <hr style="margin:0.5rem 0;">
+    <div class="begin-project-start-summary">
+        <h4>Starting Value</h4>
+        <div>
+            <span>Max</span>
+            <span>INSERT COINS HERE</span>
+        </div>
+        <div class="money-group">
+            <div class="input-group">
+                <label for="summary-starting-pp">Platinum</label>
+                <div class="input-fields">
+                    <input type="number"
+                           min="0"
+                           value="0"
+                           step="1"
+                           name="summary-starting-pp"
+                           required>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="summary-starting-gp">Gold</label>
+                <div class="input-fields">
+                    <input type="number"
+                           min="0"
+                           value="0"
+                           step="1"
+                           name="summary-starting-gp"
+                           required>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="summary-starting-sp">Silver</label>
+                <div class="input-fields">
+                    <input type="number"
+                           min="0"
+                           value="0"
+                           step="1"
+                           name="summary-starting-sp"
+                           required>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="summary-starting-cp">Copper</label>
+                <div class="input-fields">
+                    <input type="number"
+                           min="0"
+                           value="0"
+                           step="1"
+                           name="summary-starting-cp"
+                           required>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
