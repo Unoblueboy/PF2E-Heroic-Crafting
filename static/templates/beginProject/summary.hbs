@@ -1,6 +1,4 @@
-<section class="tab {{tab.cssClass}}"
-         data-group="{{tab.group}}"
-         data-tab="{{tab.id}}">
+<div class="begin-project-summary">
     <hr style="margin:0.5rem 0;">
     <div class="begin-project-craft-summary">
         <h4>Crafting Summary</h4>
@@ -8,13 +6,16 @@
             <label for="summary-is-formula">Is Formula?</label>
             <div class="input-fields">
                 <input type="checkbox"
+                       class="summary-is-formula"
+                       data-action="click-is-formula"
                        name="summary-is-formula">
             </div>
         </div>
         <div class="input-group">
             <label for="summary-dc">DC</label>
             <div class="input-fields">
-                <input type="number"
+                <input class="summary-dc"
+                       type="number"
                        min="1"
                        value="1"
                        step="1"
@@ -27,7 +28,8 @@
             <div class="input-fields batch-fields">
                 <button type="button"
                         data-action="decrease-summary-batch-size">-</button>
-                <input type="number"
+                <input class="summary-batch-size"
+                       type="number"
                        min="1"
                        value="1"
                        step="1"
@@ -42,10 +44,11 @@
     <div class="begin-project-start-summary">
         <h4>Starting Value</h4>
         <div>
-            <span>Max</span>
-            <span>INSERT COINS HERE</span>
+            <span>Current/Max Starting Value</span>
+            <span class="begin-project-start-values-coins">INSERT COINS HERE</span>
         </div>
-        <div class="money-group">
+        <div class="money-group"
+             data-action="update-money-group">
             <div class="input-group">
                 <label for="summary-starting-pp">Platinum</label>
                 <div class="input-fields">
@@ -92,4 +95,4 @@
             </div>
         </div>
     </div>
-</section>
+</div>

@@ -9,7 +9,6 @@ import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/app
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
 import { coinsToCopperValue, copperValueToCoins, copperValueToCoinString } from "../../Helper/currency.mjs";
 import { HEROIC_CRAFTING_GATHERED_INCOME, HEROIC_CRAFTING_SPENDING_LIMIT } from "../../Helper/constants.mjs";
-import { checkItemPhysical } from "../../Helper/guards.mjs";
 import { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -162,7 +161,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		};
 	}
 
-	static async useSavvyTeardownClick(this: SalvageApplication, event: Event, _target: HTMLElement) {
+	private static async useSavvyTeardownClick(this: SalvageApplication, event: Event, _target: HTMLElement) {
 		if (event.type != "click") return;
 		this.updateDetails();
 	}
@@ -184,7 +183,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 	 * @protected
 	 */
 	private async onDrop(event: DragEvent) {
-		const data = foundry.applications.ux.TextEditor.getDragEventData(event);
+		const data = game.pf2e.TextEditor.getDragEventData(event);
 
 		const item = await this.getItem(data);
 		if (!item) return;
@@ -386,24 +385,24 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		if (itemLevelSpan) itemLevelSpan.textContent = String(this.item.level).padStart(2, "0");
 	}
 
-	async getItem(data: Record<string, JSONValue>) {
+	async getItem(data: Record<string, JSONValue>): Promise<PhysicalItemPF2e | null> {
 		if (typeof data.type == "string" && data.type?.toLowerCase() != "item") {
 			ui.notifications.info("Only items can be salvaged");
 			return null;
 		}
 
-		const item = (await fromUuid(data.uuid as string)) as ItemPF2e;
+		const item = await CONFIG.PF2E.Item.documentClasses.armor.fromDropData<ItemPF2e>(data);
 
 		if (!item) return null;
 		if (!data.fromInventory && !item.parent) {
 			ui.notifications.info("Only items from an actors inventory can be salvaged");
 			return null;
 		}
-		if (!checkItemPhysical(item)) {
+		if (!item.isOfType("physical")) {
 			ui.notifications.info("Only physical items can be salvaged");
 			return null;
 		}
-		if (item.type == "treasure" && (item as TreasurePF2e).isCoinage) {
+		if (item.isOfType("treasure") && (item as TreasurePF2e).isCoinage) {
 			ui.notifications.info("Coins cannot be salvaged");
 			return null;
 		}

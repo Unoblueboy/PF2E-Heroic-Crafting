@@ -226,13 +226,27 @@
 		margin: 0;
 		padding: 0.5rem 0 0;
 
-		.item-icon {
+		&.hide {
+			visibility: hidden;
+			max-height: 0;
+			padding: 0;
+			margin: 0;
+			opacity: 0;
+		}
+
+		.embed-svg {
+			flex: 0 0 auto;
+		}
+
+		.item-icon,
+		.spell-icon {
 			height: 32px;
 			width: 32px;
 			margin-right: 1em;
+			flex: 0 0 auto;
 		}
 
-		input.item-name {
+		input {
 			padding: 0px;
 			&:disabled {
 				background-color: #00000000;
@@ -241,18 +255,20 @@
 			}
 		}
 
-		.item-level-spacer {
+		.item-level-spacer,
+		.spell-rank-spacer {
 			margin-left: auto;
 		}
 
-		.item-level {
+		.item-level,
+		.spell-rank {
 			margin-left: 0.5em;
 			text-align: right;
 			width: 17px;
 		}
 	}
 
-	section[data-group="primary"][data-tab="summary"] {
+	div.begin-project-summary {
 		padding-bottom: 0.5rem;
 		.begin-project-craft-summary {
 			display: flex;
@@ -301,6 +317,10 @@
 
 			h4 {
 				margin: 0;
+			}
+
+			.begin-project-start-values-coins {
+				float: right;
 			}
 
 			.money-group {

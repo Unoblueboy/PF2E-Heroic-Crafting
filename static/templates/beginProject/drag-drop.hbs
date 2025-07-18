@@ -1,11 +1,43 @@
-<div class="drop-item-zone">
-    <img src="systems/pf2e/icons/actions/craft/unknown-item.webp"
-         class="item-icon">
-    <input type="text"
-           class="item-name"
-           value="Drag item here..."
-           name="summary-item-name"
-           disabled>
-    <span class="item-level-spacer">Item</span>
-    <span class="item-level">??</span>
+<div>
+    <div class="item-drop drop-item-zone">
+        <img src="systems/pf2e/icons/actions/craft/unknown-item.webp"
+             class="item-icon">
+        <input type="text"
+               class="item-name"
+               value="Drag item here..."
+               name="summary-item-name"
+               disabled>
+        <span class="item-level-spacer">Item</span>
+        <input type="text"
+               class="item-level"
+               value="??"
+               name="summary-item-level"
+               disabled>
+    </div>
+    <div class="spell-drop drop-item-zone">
+        <svg class="embed-svg"
+             width="32"
+             height="32"
+             xmlns="http://www.w3.org/2000/svg"
+             style="flex: 0 0 auto;">
+            <polyline points="16 1 16 16 23 16"
+                      stroke="rgb(239, 230, 216)"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                      stroke-linecap="round"></polyline>
+        </svg>
+        <img src="systems/pf2e/icons/actions/craft/unknown-item.webp"
+             class="spell-icon">
+        <input type="text"
+               class="spell-name"
+               value="Drag Spell here..."
+               name="summary-spell-name"
+               disabled>
+        <span class="spell-rank-spacer">Spell</span>
+        <input type="text"
+               class="spell-rank"
+               value="??"
+               name="summary-spell-rank"
+               disabled>
+    </div>
 </div>
