@@ -186,30 +186,10 @@ async function gainSalvageMaterials(data: DOMStringMap) {
 	const income = Number.parseInt(data.salvageIncome as string);
 	const totalIncome = duration * income;
 
-	const genericSalvage = (await fromUuid(SALVAGE_MATERIAL_UUID)) as TreasurePF2e;
 	const salvageMaxCopper = coinsToCopperValue(salvageMaxCoins);
 	const remainingSalvagePrice = Math.max(salvageMaxCopper - totalIncome, 0);
 	if (item.slug != "generic-salvage-material") {
-		const genericSalvageClone = genericSalvage.clone({
-			system: {
-				level: { value: item.level },
-				bulk: item.system.bulk,
-				containerId: item.container,
-				equipped: item.system.equipped,
-				price: { value: copperValueToCoins(remainingSalvagePrice) },
-			},
-		});
-		if (remainingSalvagePrice > 0) {
-			await Item.implementation.create(genericSalvageClone.toObject(), { parent: item.actor });
-		} else {
-			ui.notifications.info(`${item.name} fully salvaged`);
-		}
-
-		if (item.quantity > 1) {
-			await item.update({ "system.quantity": item.quantity - 1 });
-		} else {
-			await item.delete();
-		}
+		await createSalvage(item, remainingSalvagePrice);
 	} else if (remainingSalvagePrice > 0) {
 		await item.update({ "system.price.value": copperValueToCoins(remainingSalvagePrice) });
 	} else {
@@ -218,6 +198,33 @@ async function gainSalvageMaterials(data: DOMStringMap) {
 	}
 
 	await addMaterialTroveValue(item.actor, Math.min(salvageMaxCopper, totalIncome));
+}
+
+export async function createSalvage(item: PhysicalItemPF2e, priceCopperValue?: number) {
+	if (!priceCopperValue) {
+		priceCopperValue = Math.floor(item.price.value.copperValue / 2); // Use default salvage value of 50%
+	}
+	const genericSalvage = (await fromUuid(SALVAGE_MATERIAL_UUID)) as TreasurePF2e;
+	const genericSalvageClone = genericSalvage.clone({
+		system: {
+			level: { value: item.level },
+			bulk: item.system.bulk,
+			containerId: item.container,
+			equipped: item.system.equipped,
+			price: { value: copperValueToCoins(priceCopperValue) },
+		},
+	});
+	if (priceCopperValue > 0) {
+		await Item.implementation.create(genericSalvageClone.toObject(), { parent: item.actor });
+	} else {
+		ui.notifications.info(`${item.name} fully salvaged`);
+	}
+
+	if (item.quantity > 1) {
+		await item.update({ "system.quantity": item.quantity - 1 });
+	} else {
+		await item.delete();
+	}
 }
 
 async function gainSavvyTeardownMaterials(data: DOMStringMap) {

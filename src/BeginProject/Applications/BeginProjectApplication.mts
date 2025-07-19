@@ -23,11 +23,24 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 type BeginProjectApplicationOptions = {
 	actor: ActorPF2e;
 	callback: (result: ProjectItemDetails | undefined) => void;
+	itemSettings?: {
+		formula?: {
+			defaultValue: boolean;
+			include: boolean;
+		};
+		lockItem?: boolean;
+		item?: PhysicalItemPF2e;
+		checkFromInventory?: boolean;
+	};
 };
 
 export class BeginProjectApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	actor: ActorPF2e;
 	callback: (result: ProjectItemDetails | undefined) => void;
+	includeIsFormula: boolean;
+	isFormulaDefaultValue: boolean;
+	lockItem: boolean;
+	checkFromInventory: boolean;
 	result?: ProjectItemDetails;
 	item?: PhysicalItemPF2e;
 	spell?: SpellPF2e;
@@ -35,6 +48,11 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		super(options as object);
 		this.actor = options.actor;
 		this.callback = options.callback;
+		this.includeIsFormula = options.itemSettings?.formula?.include ?? true;
+		this.isFormulaDefaultValue = options.itemSettings?.formula?.defaultValue ?? false;
+		this.lockItem = options.itemSettings?.lockItem ?? false;
+		this.item = options.itemSettings?.item;
+		this.checkFromInventory = options.itemSettings?.checkFromInventory ?? false;
 	}
 
 	static override readonly DEFAULT_OPTIONS = {
@@ -72,12 +90,15 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 	) {
 		if (!this.item) return;
 
+		const isFormula = this.includeIsFormula
+			? (_formData.object["summary-is-formula"] as boolean)
+			: this.isFormulaDefaultValue;
 		this.result = {
 			dc: _formData.object["summary-dc"] as number,
 			batchSize: _formData.object["summary-batch-size"] as number,
 			itemData: {
 				uuid: this.item.uuid,
-				isFormula: _formData.object["summary-is-formula"] as boolean,
+				isFormula: isFormula,
 			},
 		};
 
@@ -86,9 +107,12 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		this.result.itemData.heightenedLevel = getGenericScrollOrWandRank(this.item as ConsumablePF2e);
 	}
 
-	static async GetItemDetails(actor: ActorPF2e): Promise<ProjectItemDetails | undefined> {
+	static async GetItemDetails(
+		options: Omit<BeginProjectApplicationOptions, "callback">
+	): Promise<ProjectItemDetails | undefined> {
 		return new Promise<ProjectItemDetails | undefined>((resolve) => {
-			const app = new BeginProjectApplication({ actor, callback: resolve });
+			const applicationOptions: BeginProjectApplicationOptions = Object.assign(options, { callback: resolve });
+			const app = new BeginProjectApplication(applicationOptions);
 			app.render(true);
 		});
 	}
@@ -134,7 +158,11 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		if (moneyGroupDiv) {
 			moneyGroupDiv.addEventListener("change", (event: Event) => this.updateStartingValueFromEvent(event));
 		}
-		this.updateDetails();
+		const updateDetailsOptions: BeginProjectUpdateDetailsOptions = {};
+		if (this.item && options.isFirstRender) {
+			updateDetailsOptions.itemDropped = true;
+		}
+		this.updateDetails(updateDetailsOptions);
 	}
 
 	private updateStartingValueFromEvent(event: Event) {
@@ -221,6 +249,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		];
 		return foundry.utils.mergeObject(data, {
 			buttons,
+			includeIsFormula: this.includeIsFormula,
 		});
 	}
 
@@ -242,7 +271,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 		if (classes.contains("item-drop")) {
 			const item = await this.getItem(data);
-			if (item) {
+			if (item && (!this.item || (this.item && !this.lockItem))) {
 				this.item = item;
 				options.itemDropped = true;
 			}
@@ -250,7 +279,6 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			const spell = await this.getSpell(data);
 			if (spell) {
 				this.spell = spell;
-				options.spellDropped = true;
 			}
 		}
 
@@ -274,6 +302,15 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			["material-trove", "generic-crafting-material", "generic-salvage-material"].includes(item.slug)
 		) {
 			ui.notifications.info(`${item.name} cannot be crafted`);
+			return null;
+		}
+		console.log(data);
+		if (this.checkFromInventory && !data.fromInventory) {
+			ui.notifications.info("Items must be from an actors inventory");
+			return null;
+		}
+		if (this.checkFromInventory && item.actor != this.actor) {
+			ui.notifications.info(`Items must be from ${this.actor.name}'s inventory`);
 			return null;
 		}
 
@@ -357,7 +394,8 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		if (!spellDragDropDiv) return;
 
 		const isFormulaCheckbox = this.element.querySelector<HTMLInputElement>(".summary-is-formula");
-		if (isFormulaCheckbox?.checked) {
+		const isFormula = this.includeIsFormula ? isFormulaCheckbox?.checked : this.isFormulaDefaultValue;
+		if (isFormula) {
 			spellDragDropDiv.classList.add("hide");
 			return;
 		}

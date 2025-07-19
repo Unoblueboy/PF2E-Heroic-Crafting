@@ -206,7 +206,8 @@
 }
 
 .salvage-dialog,
-.begin-project-dialog {
+.begin-project-dialog,
+.reverse-engineer-dialog {
 	.footer-button-panel {
 		display: flex;
 		flex-direction: row;
@@ -335,6 +336,30 @@
 					align-items: center;
 				}
 			}
+		}
+	}
+}
+
+.reverse-engineer-dialog {
+	.drop-item-zone {
+		display: flex;
+		align-items: center;
+		margin: 0 2px 5px;
+
+		.item-icon {
+			height: 32px;
+			width: 32px;
+			margin-right: 1em;
+		}
+
+		.item-level-spacer {
+			margin-left: auto;
+		}
+
+		.item-level {
+			margin-left: 0.5em;
+			text-align: right;
+			width: 17px;
 		}
 	}
 }

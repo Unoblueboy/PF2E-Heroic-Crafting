@@ -2,15 +2,17 @@
     <hr style="margin:0.5rem 0;">
     <div class="begin-project-craft-summary">
         <h4>Crafting Summary</h4>
-        <div class="input-group">
-            <label for="summary-is-formula">Is Formula?</label>
-            <div class="input-fields">
-                <input type="checkbox"
-                       class="summary-is-formula"
-                       data-action="click-is-formula"
-                       name="summary-is-formula">
+        {{#if includeIsFormula}}
+            <div class="input-group">
+                <label for="summary-is-formula">Is Formula?</label>
+                <div class="input-fields">
+                    <input type="checkbox"
+                           class="summary-is-formula"
+                           data-action="click-is-formula"
+                           name="summary-is-formula">
+                </div>
             </div>
-        </div>
+        {{/if}}
         <div class="input-group">
             <label for="summary-dc">DC</label>
             <div class="input-fields">

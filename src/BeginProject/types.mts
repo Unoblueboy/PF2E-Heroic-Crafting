@@ -16,6 +16,6 @@ type EmbeddedSpell = {
 	heightenedLevel?: number;
 };
 
-export type BeginProjectUpdateDetailsOptions = { itemDropped?: boolean; spellDropped?: boolean };
+export type BeginProjectUpdateDetailsOptions = { itemDropped?: boolean };
 
 type _ActorFlagsPF2eHeroicCrafting = ActorFlagsPF2e & { pf2eHeroicCrafting?: { projects: ProjectItemDetails[] } };
