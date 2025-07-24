@@ -363,3 +363,33 @@
 		}
 	}
 }
+
+.pf2e.chat-card {
+	.spent-materials-list {
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+		line-height: normal;
+
+		.spent-material {
+			display: grid;
+			grid-template-columns: 2em auto;
+			grid-template-rows: 1em 1em;
+			column-gap: 5px;
+			row-gap: 2px;
+
+			img {
+				width: calc(2em + 2px);
+				height: calc(2em + 2px);
+				grid-row: 1 / span 2;
+			}
+
+			.spent-material-item-name {
+				font-weight: bold;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+		}
+	}
+}
