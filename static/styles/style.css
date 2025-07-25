@@ -394,4 +394,45 @@
 			}
 		}
 	}
+
+	.project-progress {
+		h4 {
+			line-height: 1.5em;
+			margin: 0;
+		}
+
+		.progress-bar {
+			height: 16px;
+			width: calc(100% - 4px);
+			background-color: #6f6c66;
+			border: 2px inset #000000;
+			border-radius: 4px;
+			margin-bottom: 4px;
+
+			.internal-bar {
+				height: 100%;
+				line-height: calc(100% + 4px);
+				background-color: #00f000;
+				border-radius: 2px;
+				span {
+					margin-left: 2px;
+				}
+			}
+		}
+		.project-progress-line {
+			display: flex;
+			flex-wrap: wrap;
+			flex-direction: row;
+			justify-content: flex-end;
+
+			span {
+				white-space: nowrap;
+			}
+
+			.seperator {
+				flex-grow: 1;
+				text-align: center;
+			}
+		}
+	}
 }

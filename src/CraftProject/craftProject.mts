@@ -9,6 +9,7 @@ import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-s
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { ItemUUID } from "../../types/types/foundry/common/documents/_module.mjs";
 import { ProjectItemDetails } from "../BeginProject/types.mjs";
+import { FORMULA_PRICE } from "../Helper/constants.mjs";
 import {
 	addCoins,
 	coinsToCoinString,
@@ -84,12 +85,19 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 						await getWandOrScrollName(item, { spellUuid: itemDetails.itemData.spellUuid })
 				  )
 				: baseItemLink;
+			const projectMax = getProjectMax(itemDetails, item);
+			const projectCur = itemDetails.value;
 			const flavor = await foundry.applications.handlebars.renderTemplate(
 				"modules/pf2e-heroic-crafting/templates/chat/craftProject/result.hbs",
 				{
 					item: item,
 					actorUuid: actor.uuid,
-					projectId,
+					project: {
+						id: projectId,
+						max: coinsToCoinString(projectMax),
+						cur: coinsToCoinString(projectCur),
+						percent: fractionToPercent(coinsToCopperValue(projectCur), coinsToCopperValue(projectMax)),
+					},
 					itemLink: await foundry.applications.ux.TextEditor.enrichHTML(craftItemLink, {
 						rollData: item.getRollData(),
 					}),
@@ -289,13 +297,33 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	console.log(outcome, itemDetails.value, totalSpent, newProjectTotal);
 	const item = (await foundry.utils.fromUuid(itemDetails.itemData.uuid)) as PhysicalItemPF2e;
 	const newProjectTotalCopper = coinsToCopperValue(newProjectTotal);
+	const projectMaxCopper = coinsToCopperValue(getProjectMax(itemDetails, item));
 	if (newProjectTotalCopper < 0) {
 		actor.update({ [`flags.pf2eHeroicCrafting.projects.-=${projectId}`]: null });
 		ui.notifications.info("Project Destroyed lol, git gud");
-	} else if (newProjectTotalCopper >= item.price.value.copperValue) {
+	} else if (newProjectTotalCopper >= projectMaxCopper) {
 		await finishProject(item, itemDetails, actor as CharacterPF2e, projectId);
 	} else {
 		actor.update({ [`flags.pf2eHeroicCrafting.projects.${projectId}.value`]: newProjectTotal });
+	}
+
+	const projectProgressPercent = fractionToPercent(newProjectTotalCopper, projectMaxCopper);
+	const internalBar = generalDiv.querySelector<HTMLDivElement>(".project-progress .progress-bar .internal-bar");
+	if (internalBar) {
+		internalBar.style = `width:${projectProgressPercent};`;
+	}
+	const internalBarSpan = generalDiv.querySelector<HTMLSpanElement>(
+		".project-progress .progress-bar .internal-bar span"
+	);
+	if (internalBarSpan) {
+		internalBarSpan.textContent = projectProgressPercent;
+	}
+
+	const curValueSpan = generalDiv.querySelector<HTMLSpanElement>(
+		".project-progress .project-progress-line .project-cur-value"
+	);
+	if (curValueSpan) {
+		curValueSpan.textContent = coinsToCoinString(newProjectTotal);
 	}
 
 	generalDiv.querySelectorAll<HTMLButtonElement>(".card-buttons button").forEach((button) => {
@@ -303,6 +331,19 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	});
 	const flavorHtml = generalDiv.closest("span.flavor-text")?.innerHTML;
 	if (flavorHtml) message.update({ flavor: flavorHtml });
+}
+
+function fractionToPercent(numerator: number, denominator: number) {
+	const projectProgressFraction = Math.clamp(numerator / (denominator || 1), 0, 1);
+	const projectProgressPercent = projectProgressFraction.toLocaleString("en", {
+		style: "percent",
+		maximumFractionDigits: 2,
+	});
+	return projectProgressPercent;
+}
+
+function getProjectMax(itemDetails: ProjectItemDetails, item: PhysicalItemPF2e): Coins {
+	return itemDetails.itemData.isFormula ? copperValueToCoins(FORMULA_PRICE.get(item.level) ?? 0) : item.price.value;
 }
 
 async function finishProject(
@@ -316,27 +357,30 @@ async function finishProject(
 		if (!formulas) {
 			return;
 		}
-		formulas.push({ uuid: itemDetails.itemData.uuid as ItemUUID });
+		const uuid = itemDetails.itemData.uuid as ItemUUID;
+		formulas.push({ uuid: uuid });
 		actor.update({ "system.crafting.formulas": formulas });
-		return;
+		const newFormula = (await foundry.utils.fromUuid(uuid)) as PhysicalItemPF2e;
+		ui.notifications.info(`Project Done, ${newFormula.name} Formula Created`);
+	} else {
+		const clone = item.clone();
+		if (itemDetails.itemData.spellUuid) {
+			const spell = (await foundry.utils.fromUuid(itemDetails.itemData.spellUuid)) as SpellPF2e;
+			const spellObject = spell.toObject();
+			spellObject.system.location.heightenedLevel = itemDetails.itemData.heightenedLevel;
+			const description = clone.system.description.value;
+			clone.updateSource({
+				name: await getWandOrScrollName(item, { spell }),
+				"system.spell": spellObject,
+				"system.description.value": `<p>${spell.link}</p><hr />${description}`,
+				"system.traits.value": [...item.traits.union(spell.traits)],
+				"system.traits.rarity": getWandOrScrollRarity(item, spell),
+			});
+		}
+		clone.updateSource({ "system.quantity": itemDetails.batchSize });
+		const newItem = await Item.implementation.create(clone.toObject(), { parent: actor });
+		ui.notifications.info(`Project Done, ${newItem!.name} Created`);
 	}
-	const clone = item.clone();
-	if (itemDetails.itemData.spellUuid) {
-		const spell = (await foundry.utils.fromUuid(itemDetails.itemData.spellUuid)) as SpellPF2e;
-		const spellObject = spell.toObject();
-		spellObject.system.location.heightenedLevel = itemDetails.itemData.heightenedLevel;
-		const description = clone.system.description.value;
-		clone.updateSource({
-			name: await getWandOrScrollName(item, { spell }),
-			"system.spell": spellObject,
-			"system.description.value": `<p>${spell.link}</p><hr />${description}`,
-			"system.trait.value": [...item.traits.union(spell.traits)],
-			"system.trait.rarity": getWandOrScrollRarity(item, spell),
-		});
-	}
-
-	await Item.implementation.create(clone.toObject(), { parent: actor });
-	ui.notifications.info("Project Done, Item Created");
 	actor.update({ [`flags.pf2eHeroicCrafting.projects.-=${projectId}`]: null });
 }
 
