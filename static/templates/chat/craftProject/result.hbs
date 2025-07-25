@@ -1,6 +1,8 @@
 <div class="pf2e chat-card"
      data-craft-project-results
-     data-craft-details="{{craft-details}}">
+     data-craft-details="{{craftDetails}}"
+     data-actor-uuid="{{actorUuid}}"
+     data-project-id="{{projectId}}">
     <div class="card-content">
         <div style="display: flex; align-items: center; margin-bottom: 3px;">
             <img src="{{item.img}}"
@@ -13,18 +15,28 @@
                 <div class="spent-material">
                     {{#with material.item as | item |}}
                         <img src="{{item.img}}" />
-                        <span class="spent-material-item-name">{{item.name}}</span>
+                        <span class="spent-material-item-name">{{#if material.quantity}}{{material.quantity}}x
+                            {{/if}}{{item.name}}</span>
                     {{/with}}
-                    <span class="spent-material-value">{{material.spent}}</span>
+                    <span class="spent-material-value">{{#if material.quantity}}{{material.quantity}}x
+                        {{/if}}{{material.spent}}</span>
                 </div>
             {{/each}}
         </div>
-        <p>Total Spent: {{totalMaterialsSpent}}</p>
+        <p>Total Cost: {{totalMaterialsSpent}}</p>
     </div>
     <hr>
     <div class="card-buttons"
          data-visibility="owner">
-        <button type="button"
-                data-outcome="{{outcome}}">Craft Project {{outcome}}</button>
+        {{#if (eq outcome "criticalFailure")}}
+            <button type="button"
+                    data-outcome="{{outcome}}">Deduct Cost from the Project Value</button>
+        {{else if (eq outcome "failure")}}
+            <button type="button"
+                    data-outcome="{{outcome}}">Add half the Cost to the Project Value</button>
+        {{else}}
+            <button type="button"
+                    data-outcome="{{outcome}}">Add double the Cost to the Project Value</button>
+        {{/if}}
     </div>
 </div>

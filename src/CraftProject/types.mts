@@ -1,8 +1,7 @@
 import { Coins } from "../../types/src/module/item/physical";
-import { ProjectItemDetails } from "../BeginProject/types.mjs";
 
 export type ProjectCraftDetails = {
-	itemDetails: ProjectItemDetails;
+	projectId: string;
 	materialsSpent: {
 		generic?: Coins;
 		currency?: Coins;
@@ -15,6 +14,7 @@ export type ProjectCraftDetails = {
 export type TreasureMaterialSpent = {
 	uuid: string;
 	value: Coins;
+	quantity?: number;
 	postUseOperation: TreasurePostUseOperation;
 };
 

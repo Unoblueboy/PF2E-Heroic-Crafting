@@ -370,17 +370,19 @@
 		flex-direction: column;
 		gap: 5px;
 		line-height: normal;
+		font-size: var(--font-size-12);
+		--material-height: calc(2.5em + 2px);
 
 		.spent-material {
 			display: grid;
-			grid-template-columns: 2em auto;
-			grid-template-rows: 1em 1em;
+			grid-template-columns: var(--material-height) auto;
+			grid-template-rows: 1.25em 1.25em;
 			column-gap: 5px;
 			row-gap: 2px;
 
 			img {
-				width: calc(2em + 2px);
-				height: calc(2em + 2px);
+				width: var(--material-height);
+				height: var(--material-height);
 				grid-row: 1 / span 2;
 			}
 

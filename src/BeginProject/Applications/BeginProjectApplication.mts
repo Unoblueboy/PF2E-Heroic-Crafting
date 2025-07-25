@@ -100,6 +100,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 				uuid: this.item.uuid,
 				isFormula: isFormula,
 			},
+			value: {}, // TODO: Get the starting value
 		};
 
 		if (!this.spell) return;

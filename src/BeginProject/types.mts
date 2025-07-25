@@ -1,9 +1,11 @@
 import { ActorFlagsPF2e } from "../../types/src/module/actor/data/base";
+import { Coins } from "../../types/src/module/item/physical";
 
 export type ProjectItemDetails = {
 	dc: number;
 	batchSize: number;
 	itemData: itemDataUuid;
+	value: Coins;
 };
 
 type itemDataUuid = {

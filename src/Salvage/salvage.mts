@@ -141,7 +141,7 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 	}
 }
 
-export function salvageButtonListener(message: ChatMessagePF2e, html: HTMLElement, _data: unknown) {
+export function salvageChatButtonListener(message: ChatMessagePF2e, html: HTMLElement, _data: unknown) {
 	const salvageResults = html.querySelector("[data-salvage-results]");
 	if (salvageResults) salvageResults.addEventListener("click", (e: Event) => gainMaterials(e, message));
 }
