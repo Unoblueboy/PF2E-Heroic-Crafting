@@ -11,20 +11,22 @@ import { copperValueToCoins } from "../Helper/currency.mjs";
 import { EditMaterialTroveApplication } from "./Applications/EditMaterialTroveApplication.mjs";
 import { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";
 
-function getMaterialTrove(actor: ActorPF2e) {
+export function getMaterialTrove(actor: ActorPF2e, errorOnFailure: boolean = true) {
 	// Get Material Trove
 	const materialTroves = actor.items.filter((x) => x?.slug == MATERIAL_TROVE_SLUG);
 
 	if (materialTroves.length == 0) {
-		ui.notifications.error(
-			"No Material Trove Found, please add a material trove from the Heroic Crafting Items Compendium"
-		);
+		if (errorOnFailure)
+			ui.notifications.error(
+				"No Material Trove Found, please add a material trove from the Heroic Crafting Items Compendium"
+			);
 		return;
 	}
 	if (materialTroves.length > 1) {
-		ui.notifications.error(
-			"Multiple Material Troves Found, please make sure that you only have one Material Trove"
-		);
+		if (errorOnFailure)
+			ui.notifications.error(
+				"Multiple Material Troves Found, please make sure that you only have one Material Trove"
+			);
 	}
 	return materialTroves[0] as EquipmentPF2e;
 }

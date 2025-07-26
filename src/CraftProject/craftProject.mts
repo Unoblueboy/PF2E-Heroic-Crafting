@@ -9,7 +9,6 @@ import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-s
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { ItemUUID } from "../../types/types/foundry/common/documents/_module.mjs";
 import { ProjectItemDetails } from "../BeginProject/types.mjs";
-import { FORMULA_PRICE } from "../Helper/constants.mjs";
 import {
 	addCoins,
 	coinsToCoinString,
@@ -18,8 +17,9 @@ import {
 	multCoins,
 	subCoins,
 } from "../Helper/currency.mjs";
-import { Either } from "../Helper/generics.mjs";
+import { Either, fractionToPercent } from "../Helper/generics.mjs";
 import { addMaterialTroveValue } from "../MaterialTrove/materialTrove.mjs";
+import { CraftProjectApplication, getItemDetails, getProjectMax } from "./Applications/CraftProjectApplications.mjs";
 import {
 	ProjectCraftDetails,
 	ProjectCraftDuration,
@@ -32,7 +32,9 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 	if (!projectId) return;
 	// TODO: Get projectId and totalSpent
 
-	const craftDetails = await getCraftDetails({ actor, projectId });
+	const craftDetails = await CraftProjectApplication.getCraftDetails({ actor, projectId });
+	if (!craftDetails) return;
+
 	const itemDetails = getItemDetails(actor, projectId);
 	const totalSpent = await getTotalMaterialSpent(craftDetails);
 	const item = (await foundry.utils.fromUuid(itemDetails.itemData.uuid)) as PhysicalItemPF2e;
@@ -44,39 +46,7 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 		_event: Event | null
 	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
-			const materials = [];
-			if (craftDetails.materialsSpent.generic) {
-				materials.push({
-					item: {
-						name: "Generic Crafting Material",
-						img: "icons/tools/fasteners/nails-steel-brown.webp",
-					},
-					spent: coinsToCoinString(craftDetails.materialsSpent.generic),
-				});
-			}
-			if (craftDetails.materialsSpent.currency) {
-				materials.push({
-					item: {
-						name: "Currency",
-						img: "systems/pf2e/icons/equipment/treasure/currency/gold-pieces.webp",
-					},
-					spent: coinsToCoinString(craftDetails.materialsSpent.currency),
-				});
-			}
-
-			for (const treasureSpent of craftDetails.materialsSpent.treasure ?? []) {
-				const treasure = await foundry.utils.fromUuid<PhysicalItemPF2e>(treasureSpent.uuid);
-				if (!treasure) continue;
-
-				materials.push({
-					item: {
-						name: treasure.name,
-						img: treasure.img,
-					},
-					quantity: treasureSpent.quantity,
-					spent: coinsToCoinString(treasureSpent.value),
-				});
-			}
+			const materials = await getMaterialsSpent();
 
 			const baseItemLink = item.link;
 			const craftItemLink = itemDetails.itemData.spellUuid
@@ -112,7 +82,7 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 			}
 			ChatMessage.create(message.toObject());
 		} else {
-			console.error("PF2E | Unable to amend chat message with craft result.", message);
+			console.error("PF2E Heroic Crafting | Unable to amend chat message with craft result.", message);
 		}
 	}
 
@@ -144,15 +114,50 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 		createMessage: false,
 		callback: getStatisticRollCallback,
 	});
+
+	async function getMaterialsSpent() {
+		if (!craftDetails) return [];
+		const materials = [];
+		if (craftDetails.materialsSpent.generic) {
+			materials.push({
+				item: {
+					name: "Generic Crafting Material",
+					img: "icons/tools/fasteners/nails-steel-brown.webp",
+				},
+				spent: coinsToCoinString(craftDetails.materialsSpent.generic),
+			});
+		}
+		if (craftDetails.materialsSpent.currency) {
+			materials.push({
+				item: {
+					name: "Currency",
+					img: "systems/pf2e/icons/equipment/treasure/currency/gold-pieces.webp",
+				},
+				spent: coinsToCoinString(craftDetails.materialsSpent.currency),
+			});
+		}
+
+		for (const treasureSpent of craftDetails.materialsSpent.treasure ?? []) {
+			const treasure = await foundry.utils.fromUuid<PhysicalItemPF2e>(treasureSpent.uuid);
+			if (!treasure) continue;
+
+			materials.push({
+				item: {
+					name: treasure.name,
+					img: treasure.img,
+				},
+				quantity: treasureSpent.quantity,
+				spent: coinsToCoinString(treasureSpent.value),
+			});
+		}
+		return materials;
+	}
 }
 
-function getItemDetails(actor: ActorPF2e, projectId: string) {
-	const projects = actor.flags["pf2eHeroicCrafting"].projects as Record<string, ProjectItemDetails>;
-	const itemDetails = projects[projectId];
-	return itemDetails;
-}
-
-async function getCraftDetails(options: { actor: ActorPF2e; projectId: string }): Promise<ProjectCraftDetails> {
+async function getCraftDetails(options: {
+	actor: ActorPF2e;
+	projectId: string;
+}): Promise<ProjectCraftDetails | undefined> {
 	return {
 		projectId: options.projectId,
 		materialsSpent: {
@@ -331,19 +336,6 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	});
 	const flavorHtml = generalDiv.closest("span.flavor-text")?.innerHTML;
 	if (flavorHtml) message.update({ flavor: flavorHtml });
-}
-
-function fractionToPercent(numerator: number, denominator: number) {
-	const projectProgressFraction = Math.clamp(numerator / (denominator || 1), 0, 1);
-	const projectProgressPercent = projectProgressFraction.toLocaleString("en", {
-		style: "percent",
-		maximumFractionDigits: 2,
-	});
-	return projectProgressPercent;
-}
-
-function getProjectMax(itemDetails: ProjectItemDetails, item: PhysicalItemPF2e): Coins {
-	return itemDetails.itemData.isFormula ? copperValueToCoins(FORMULA_PRICE.get(item.level) ?? 0) : item.price.value;
 }
 
 async function finishProject(

@@ -1,0 +1,10 @@
+<div class="item-summary">
+    <div class="summary-details">
+        <img src={{item.img}}
+             class="item-icon">
+        <span class="item-name">{{#if (gt item.quantity 1)}}{{item.quantity}}x {{/if}}{{item.name}}</span>
+        <span class="item-level-spacer">Item</span>
+        <span class="item-level">{{item.level}}</span>
+    </div>
+    <hr>
+</div>

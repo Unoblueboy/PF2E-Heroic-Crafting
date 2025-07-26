@@ -207,7 +207,8 @@
 
 .salvage-dialog,
 .begin-project-dialog,
-.reverse-engineer-dialog {
+.reverse-engineer-dialog,
+.craft-project-dialog {
 	.footer-button-panel {
 		display: flex;
 		flex-direction: row;
@@ -361,6 +362,193 @@
 			text-align: right;
 			width: 17px;
 		}
+	}
+}
+
+.craft-project-dialog {
+	min-width: 350px;
+	min-height: 290px;
+
+	.item-summary {
+		flex: 0;
+
+		& .summary-details {
+			display: flex;
+			align-items: center;
+			margin: 0 2px 5px;
+
+			.item-icon {
+				height: 32px;
+				width: 32px;
+				margin-right: 1em;
+			}
+
+			.item-level-spacer {
+				margin-left: auto;
+			}
+
+			.item-level {
+				margin-left: 0.5em;
+				text-align: right;
+				width: 17px;
+			}
+		}
+
+		hr {
+			margin: 0.5rem 0 0;
+		}
+	}
+
+	.project-summary {
+		flex: 0;
+
+		h4 {
+			line-height: 1.5em;
+			margin: 0;
+		}
+
+		.progress-bar {
+			height: var(--input-height);
+			width: calc(100% - 4px);
+			background-color: #6f6c66;
+			border: 2px inset #000000;
+			border-radius: 4px;
+			margin-bottom: 4px;
+			position: relative;
+
+			.overlap-bars {
+				width: 100%;
+				display: flex;
+				flex-direction: row;
+				height: 100%;
+
+				&.result-bars {
+					position: absolute;
+					top: 0;
+					left: 0;
+				}
+			}
+
+			.internal-bar {
+				background-color: #00f000;
+
+				&.invisible-bar {
+					opacity: 0;
+				}
+				&.criticalFailure-bar {
+					background-color: var(--color-pf-text-critical-failure);
+					height: 80%;
+					align-self: flex-end;
+				}
+				&.failure-bar {
+					background-color: var(--color-pf-text-failure);
+				}
+				&.success-bar {
+					background-color: var(--color-pf-text-success);
+				}
+				&.start {
+					border-top-left-radius: 2px;
+					border-bottom-left-radius: 2px;
+				}
+				&.end {
+					border-bottom-right-radius: 2px;
+					border-top-right-radius: 2px;
+				}
+			}
+		}
+
+		.project-progress-line {
+			display: flex;
+			flex-wrap: wrap;
+			flex-direction: row;
+			justify-content: flex-end;
+
+			span {
+				white-space: nowrap;
+			}
+
+			.seperator {
+				flex-grow: 1;
+				text-align: center;
+			}
+		}
+	}
+
+	.material-summary {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 50px;
+
+		hr {
+			margin: 0.5rem 0;
+			flex: 0 0 auto;
+		}
+
+		.duration-select {
+			margin-bottom: 0.5rem;
+		}
+
+		.material-list {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+			min-height: 0;
+			overflow-y: auto;
+
+			hr {
+				height: 1px;
+				margin: 0;
+				flex: 0 0 1px;
+			}
+
+			.basic-material,
+			.treasure-material {
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+
+				.item-summary {
+					display: flex;
+					align-items: center;
+					margin: 0 2px;
+
+					.item-icon {
+						height: 32px;
+						width: 32px;
+						margin-right: 1em;
+					}
+				}
+
+				.money-group {
+					display: flex;
+					flex-direction: row;
+					gap: 0.5rem;
+					align-items: center;
+					color: var(--color-form-label);
+
+					.input-group {
+						display: flex;
+						flex-direction: column;
+						align-items: center;
+						label {
+							font-weight: 700;
+						}
+					}
+
+					.input-group:hover {
+						label {
+							color: var(--color-form-label-hover);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.footer-button-panel {
+		flex: 0;
+		margin-top: 0.5em;
 	}
 }
 

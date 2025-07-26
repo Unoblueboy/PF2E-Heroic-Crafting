@@ -1,0 +1,207 @@
+<div class="material-summary">
+    <hr>
+    <div class="standard-form duration-select">
+        <div class="form-group">
+            <label for="craftProject-material-summary-duration">Duration</label>
+            <div class="form-fields">
+                <select name="duration"
+                        id="craftProject-material-summary-duration">
+                    <option value="hour">Hour</option>
+                    <option value="day"
+                            selected>Day</option>
+                    <option value="week">Week</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="material-list">
+        <div class="basic-material">
+            <div class="item-summary">
+                <img src="systems/pf2e/icons/equipment/treasure/currency/gold-pieces.webp"
+                     class="item-icon">
+                <span class="item-name">Currency</span>
+            </div>
+            <div class="money-group"
+                 data-action="update-money-group"
+                 data-type="basic"
+                 data-item="currency">
+                <div class="input-group">
+                    <label for="craftProject-material-summary-currency-pp">Platinum</label>
+                    <div class="input-fields">
+                        <input type="number"
+                               min="0"
+                               value="0"
+                               step="1"
+                               name="currency-pp"
+                               id="craftProject-material-summary-currency-pp">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="craftProject-material-summary-currency-gp">Gold</label>
+                    <div class="input-fields">
+                        <input type="number"
+                               min="0"
+                               value="0"
+                               step="1"
+                               name="currency-gp"
+                               id="craftProject-material-summary-currency-gp">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="craftProject-material-summary-currency-sp">Silver</label>
+                    <div class="input-fields">
+                        <input type="number"
+                               min="0"
+                               value="0"
+                               step="1"
+                               name="currency-sp"
+                               id="craftProject-material-summary-currency-sp">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="craftProject-material-summary-currency-cp">Copper</label>
+                    <div class="input-fields">
+                        <input type="number"
+                               min="0"
+                               value="0"
+                               step="1"
+                               name="currency-cp"
+                               id="craftProject-material-summary-currency-cp">
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{#if hasMaterialTrove}}
+            <hr>
+            <div class="basic-material">
+                <div class="item-summary">
+                    <img src="icons/tools/fasteners/nails-steel-brown.webp"
+                         class="item-icon">
+                    <span class="item-name">Generic Crafting Materials</span>
+                </div>
+                <div class="money-group"
+                     data-action="update-money-group"
+                     data-type="basic"
+                     data-item="generic-crafting-material">
+                    <div class="input-group">
+                        <label for="craftProject-material-summary-trove-pp">Platinum</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="0"
+                                   step="1"
+                                   name="trove-pp"
+                                   id="craftProject-material-summary-trove-pp">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="craftProject-material-summary-trove-gp">Gold</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="0"
+                                   step="1"
+                                   name="trove-gp"
+                                   id="craftProject-material-summary-trove-gp">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="craftProject-material-summary-trove-sp">Silver</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="0"
+                                   step="1"
+                                   name="trove-sp"
+                                   id="craftProject-material-summary-trove-sp">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="craftProject-material-summary-trove-cp">Copper</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="0"
+                                   step="1"
+                                   name="trove-cp"
+                                   id="craftProject-material-summary-trove-cp">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{/if}}
+        {{#each materials as | material |}}
+            <hr>
+            <div class="treasure-material">
+                <div class="item-summary">
+                    <img src={{material.img}}
+                         class="item-icon">
+                    <span class="item-name">{{material.name}}</span>
+                </div>
+                <div class="standard-form post-use-operation-select">
+                    <div class="form-group">
+                        <label for="craftProject-material-summary-{{material.uuid}}-post-use-operation">Duration</label>
+                        <div class="form-fields">
+                            <select name="{{material.uuid}}-post-use-operation"
+                                    id="craftProject-material-summary-{{material.uuid}}-post-use-operation">
+                                <option value="decrease-value"
+                                        selected>Decrease Value</option>
+                                <option value="delete">Delete</option>
+                                <option value="nothing">Nothing</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="money-group"
+                     data-action="update-money-group"
+                     data-type="advanced"
+                     data-uuid="{{material.uuid}}">
+                    <div class="input-group">
+                        <label for="craftProject-material-summary-{{material.uuid}}-pp">Platinum</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="0"
+                                   step="1"
+                                   name="{{material.uuid}}-pp"
+                                   id="craftProject-material-summary-{{material.uuid}}-pp">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="craftProject-material-summary-{{material.uuid}}-gp">Gold</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="0"
+                                   step="1"
+                                   name="{{material.uuid}}-gp"
+                                   id="craftProject-material-summary-{{material.uuid}}-gp">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="craftProject-material-summary-{{material.uuid}}-sp">Silver</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="0"
+                                   step="1"
+                                   name="{{material.uuid}}-sp"
+                                   id="craftProject-material-summary-{{material.uuid}}-sp">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="craftProject-material-summary-{{material.uuid}}-cp">Copper</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="0"
+                                   step="1"
+                                   name="{{material.uuid}}-cp"
+                                   id="craftProject-material-summary-{{material.uuid}}-cp">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{/each }}
+    </div>
+</div>

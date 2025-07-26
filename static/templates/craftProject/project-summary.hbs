@@ -1,0 +1,24 @@
+<div class="project-summary">
+    <h4><strong>Project Progression</strong></h4>
+    <div class="progress-bar">
+        <div class="overlap-bars">
+            <div class="internal-bar base-bar start"
+                 style="width:{{project.percent}};"></div>
+        </div>
+        <div class="overlap-bars result-bars">
+            <div class="internal-bar invisible-bar"
+                 style="width:0%;"></div>
+            <div class="internal-bar criticalFailure-bar start"
+                 style="width:0%;"></div>
+            <div class="internal-bar failure-bar"
+                 style="width:0%;"></div>
+            <div class="internal-bar success-bar end"
+                 style="width:0%;"></div>
+        </div>
+    </div>
+    <div class="project-progress-line">
+        <span class="project-cur-value">{{project.cur}}</span>
+        <span class="seperator">/</span>
+        <span>{{project.max}}</span>
+    </div>
+</div>
