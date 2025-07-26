@@ -170,7 +170,7 @@ export async function addMaterialTroveValue(
 	await updateMaterialTroveValue(actor, copperValue, materialTrove, genericCraftingMaterials);
 }
 
-async function getCurrentMaterialTroveValue(actor: ActorPF2e, genericCraftingMaterials?: TreasurePF2e[]) {
+export async function getCurrentMaterialTroveValue(actor: ActorPF2e, genericCraftingMaterials?: TreasurePF2e[]) {
 	genericCraftingMaterials ??= getGenericCraftingMaterials(actor);
 
 	let copperValue = 0;

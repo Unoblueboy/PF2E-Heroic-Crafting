@@ -30,7 +30,6 @@ import {
 export async function craftProject(actor: ActorPF2e, projectId?: string) {
 	if (!actor) return;
 	if (!projectId) return;
-	// TODO: Get projectId and totalSpent
 
 	const craftDetails = await CraftProjectApplication.getCraftDetails({ actor, projectId });
 	if (!craftDetails) return;
@@ -55,7 +54,7 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 						await getWandOrScrollName(item, { spellUuid: itemDetails.itemData.spellUuid })
 				  )
 				: baseItemLink;
-			const projectMax = getProjectMax(itemDetails, item);
+			const projectMax = await getProjectMax(itemDetails, item);
 			const projectCur = itemDetails.value;
 			const flavor = await foundry.applications.handlebars.renderTemplate(
 				"modules/pf2e-heroic-crafting/templates/chat/craftProject/result.hbs",
@@ -152,27 +151,6 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 		}
 		return materials;
 	}
-}
-
-async function getCraftDetails(options: {
-	actor: ActorPF2e;
-	projectId: string;
-}): Promise<ProjectCraftDetails | undefined> {
-	return {
-		projectId: options.projectId,
-		materialsSpent: {
-			currency: { pp: 800 },
-			treasure: [
-				{
-					uuid: "Actor.H1Q6r7n9442o2lks.Item.i2zZkjWqDVSrlhVv",
-					value: { gp: 100 },
-					quantity: 5,
-					postUseOperation: TreasurePostUseOperation.DECREASE_VALUE,
-				},
-			],
-		},
-		duration: ProjectCraftDuration.HOUR,
-	};
 }
 
 async function getTotalMaterialSpent(craftDetails: ProjectCraftDetails): Promise<Coins> {
@@ -302,7 +280,7 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	console.log(outcome, itemDetails.value, totalSpent, newProjectTotal);
 	const item = (await foundry.utils.fromUuid(itemDetails.itemData.uuid)) as PhysicalItemPF2e;
 	const newProjectTotalCopper = coinsToCopperValue(newProjectTotal);
-	const projectMaxCopper = coinsToCopperValue(getProjectMax(itemDetails, item));
+	const projectMaxCopper = coinsToCopperValue(await getProjectMax(itemDetails, item));
 	if (newProjectTotalCopper < 0) {
 		actor.update({ [`flags.pf2eHeroicCrafting.projects.-=${projectId}`]: null });
 		ui.notifications.info("Project Destroyed lol, git gud");

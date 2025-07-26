@@ -366,7 +366,7 @@
 }
 
 .craft-project-dialog {
-	min-width: 350px;
+	min-width: 400px;
 	min-height: 290px;
 
 	.item-summary {
@@ -485,6 +485,28 @@
 			flex: 0 0 auto;
 		}
 
+		h4 {
+			margin: 0;
+		}
+
+		.total-material {
+			display: flex;
+			flex-wrap: wrap;
+			flex-direction: row;
+			justify-content: flex-end;
+			margin: 0.5em 0;
+
+			span,
+			strong {
+				white-space: nowrap;
+			}
+
+			.seperator {
+				flex-grow: 1;
+				text-align: center;
+			}
+		}
+
 		.duration-select {
 			margin-bottom: 0.5rem;
 		}
@@ -507,6 +529,10 @@
 				display: flex;
 				flex-direction: column;
 				gap: 5px;
+
+				&.hide {
+					display: none;
+				}
 
 				.item-summary {
 					display: flex;
@@ -531,8 +557,14 @@
 						display: flex;
 						flex-direction: column;
 						align-items: center;
+						flex: 1;
+
 						label {
 							font-weight: 700;
+						}
+
+						.input-fields {
+							width: 100%;
 						}
 					}
 
