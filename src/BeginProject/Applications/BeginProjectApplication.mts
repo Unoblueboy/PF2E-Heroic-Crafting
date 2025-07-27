@@ -16,13 +16,19 @@ import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/app
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
 import { coinsToCoinString, coinsToCopperValue, copperValueToCoins } from "../../Helper/currency.mjs";
 import { calculateDC } from "../../Helper/dc.mjs";
+import { getCurrentMaterialTroveValue, getMaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
 import { BeginProjectUpdateDetailsOptions, ProjectItemDetails } from "../types.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
+type StartingItemDetails = {
+	currency?: Coins;
+	generic?: Coins;
+};
+
 type BeginProjectApplicationOptions = {
 	actor: ActorPF2e;
-	callback: (result: ProjectItemDetails | undefined) => void;
+	callback: (result: [ProjectItemDetails, StartingItemDetails] | undefined) => void;
 	itemSettings?: {
 		formula?: {
 			defaultValue: boolean;
@@ -36,12 +42,12 @@ type BeginProjectApplicationOptions = {
 
 export class BeginProjectApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	actor: ActorPF2e;
-	callback: (result: ProjectItemDetails | undefined) => void;
+	callback: (result: [ProjectItemDetails, StartingItemDetails] | undefined) => void;
 	includeIsFormula: boolean;
 	isFormulaDefaultValue: boolean;
 	lockItem: boolean;
 	checkFromInventory: boolean;
-	result?: ProjectItemDetails;
+	result?: [ProjectItemDetails, StartingItemDetails];
 	item?: PhysicalItemPF2e;
 	spell?: SpellPF2e;
 	constructor(options: BeginProjectApplicationOptions) {
@@ -93,25 +99,28 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		const isFormula = this.includeIsFormula
 			? (_formData.object["summary-is-formula"] as boolean)
 			: this.isFormulaDefaultValue;
-		this.result = {
-			dc: _formData.object["summary-dc"] as number,
-			batchSize: _formData.object["summary-batch-size"] as number,
-			itemData: {
-				uuid: this.item.uuid,
-				isFormula: isFormula,
+		this.result = [
+			{
+				dc: _formData.object["summary-dc"] as number,
+				batchSize: _formData.object["summary-batch-size"] as number,
+				itemData: {
+					uuid: this.item.uuid,
+					isFormula: isFormula,
+				},
+				value: this.getCurrentStartingValue(), // TODO: Get the starting value
 			},
-			value: {}, // TODO: Get the starting value
-		};
+			this.getCurrentStartingValueBreakdown(),
+		];
 
 		if (!this.spell) return;
-		this.result.itemData.spellUuid = this.spell.uuid;
-		this.result.itemData.heightenedLevel = getGenericScrollOrWandRank(this.item as ConsumablePF2e);
+		this.result[0].itemData.spellUuid = this.spell.uuid;
+		this.result[0].itemData.heightenedLevel = getGenericScrollOrWandRank(this.item as ConsumablePF2e);
 	}
 
 	static async GetItemDetails(
 		options: Omit<BeginProjectApplicationOptions, "callback">
-	): Promise<ProjectItemDetails | undefined> {
-		return new Promise<ProjectItemDetails | undefined>((resolve) => {
+	): Promise<[ProjectItemDetails, StartingItemDetails] | undefined> {
+		return new Promise<[ProjectItemDetails, StartingItemDetails] | undefined>((resolve) => {
 			const applicationOptions: BeginProjectApplicationOptions = Object.assign(options, { callback: resolve });
 			const app = new BeginProjectApplication(applicationOptions);
 			app.render(true);
@@ -129,6 +138,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			const batchMax = Number.parseInt(batchSizeInput.max) || Infinity;
 			batchSizeInput.value = Math.min(batchSize, batchMax).toString();
 		}
+		this.scaleStartingValue();
 	}
 
 	private static async decreaseSummaryBatchSize(this: BeginProjectApplication, _event: Event, _target: HTMLElement) {
@@ -138,6 +148,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			const batchMin = Number.parseInt(batchSizeInput.min);
 			batchSizeInput.value = Math.max(batchSize, batchMin).toString();
 		}
+		this.scaleStartingValue();
 	}
 
 	protected override _onClose(_options: ApplicationClosingOptions): void {
@@ -154,11 +165,18 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 				},
 			},
 		}).bind(this.element);
-		// "update-money-group": BeginProjectApplication.updateMoneyGroup,
-		const moneyGroupDiv = this.element.querySelector<HTMLElement>("div[data-action='update-money-group']");
-		if (moneyGroupDiv) {
-			moneyGroupDiv.addEventListener("change", (event: Event) => this.updateStartingValueFromEvent(event));
-		}
+		const moneyGroupDivs = this.element.querySelectorAll<HTMLElement>("div[data-action='update-money-group']");
+		moneyGroupDivs.forEach((moneyGroupDiv) =>
+			moneyGroupDiv.addEventListener("change", (event: Event) => this.updateStartingValue(event))
+		);
+
+		const batchSizeInputs = this.element.querySelectorAll<HTMLInputElement>(
+			"input[data-action='update-batch-size']"
+		);
+		batchSizeInputs.forEach((batchSizeInput) =>
+			batchSizeInput.addEventListener("change", (_event: Event) => this.scaleStartingValue())
+		);
+
 		const updateDetailsOptions: BeginProjectUpdateDetailsOptions = {};
 		if (this.item && options.isFirstRender) {
 			updateDetailsOptions.itemDropped = true;
@@ -166,47 +184,163 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		this.updateDetails(updateDetailsOptions);
 	}
 
-	private updateStartingValueFromEvent(event: Event) {
-		this.updateStartingValueFromElement(event.currentTarget as HTMLElement);
-	}
-
-	private updateStartingValueFromElement(element: HTMLElement) {
-		const currentStartingValue: Coins = this.getCurrentStartingValue();
-		const inputs = element.querySelectorAll<HTMLInputElement>("input");
-
+	private scaleStartingValue() {
+		const curValue = this.getCurrentStartingValue();
+		const curValueCopper = coinsToCopperValue(curValue);
 		const maxStartingValue = this.getMaxStartingValue();
 		const maxStartingValueCopper = coinsToCopperValue(maxStartingValue);
-		if (maxStartingValueCopper < coinsToCopperValue(currentStartingValue)) {
-			this.setMoneyGroupMax(inputs, maxStartingValue);
+		const scalingFactor = maxStartingValueCopper / curValueCopper;
+		if (scalingFactor >= 1) {
+			this.updateStartingValueText();
+			return;
 		}
+
+		const scaleCoins = (coins: Coins) => copperValueToCoins(Math.floor(coinsToCopperValue(coins) * scalingFactor));
+
+		const breakdown = this.getCurrentStartingValueBreakdown();
+		const newBreakdown = {
+			currency: scaleCoins(breakdown.currency ?? {}),
+			trove: scaleCoins(breakdown.generic ?? {}),
+		};
+		this.setInputs(newBreakdown);
 		this.updateStartingValueText();
 	}
 
-	private updateStartingValueFromNothing() {
-		const element = this.element.querySelector<HTMLElement>(".begin-project-start-summary .money-group");
-		if (!element) return;
-		this.updateStartingValueFromElement(element);
+	private async updateStartingValue(event: Event) {
+		const element = event.currentTarget as HTMLElement;
+		const curMoneyGroupInputs = element.querySelectorAll<HTMLInputElement>("input");
+
+		await this.enforceMax(curMoneyGroupInputs, element.dataset);
+		this.updateStartingValueText();
 	}
 
-	private setMoneyGroupMax(inputs: NodeListOf<HTMLInputElement>, maxStartingValue: Coins) {
+	private async enforceMax(inputs: NodeListOf<HTMLInputElement>, materialData: Record<string, string | undefined>) {
+		const breakdown = this.getCurrentStartingValueBreakdown();
+		const curValue = this.getCurrentStartingValue();
+
+		const maxStartingValue = this.getMaxStartingValue();
+		const maxStartingValueCopper = coinsToCopperValue(maxStartingValue);
+		const key = (materialData.item == "trove" ? "generic" : materialData.item) as "currency" | "generic";
+		const breakdownData = breakdown[key] ?? {};
+		const breakdownCopper = coinsToCopperValue(breakdownData);
+
+		const preMaterialContribution = coinsToCopperValue(curValue) - breakdownCopper;
+		const remainingBudgetCopper = maxStartingValueCopper - preMaterialContribution;
+
+		let maxSpendCopper = 0;
+		switch (key) {
+			case "currency":
+				maxSpendCopper = Math.min(this.actor.inventory.coins.copperValue, remainingBudgetCopper);
+				break;
+			case "generic":
+				maxSpendCopper = Math.min(await getCurrentMaterialTroveValue(this.actor), remainingBudgetCopper);
+				break;
+			default:
+				maxSpendCopper = maxStartingValueCopper;
+				break;
+		}
+		if (breakdownCopper <= maxSpendCopper) return;
+
+		const maxSpend = copperValueToCoins(maxSpendCopper);
+		for (const input of inputs) {
+			const name = input.name.toLowerCase();
+			if (name.endsWith("pp")) {
+				input.value = `${maxSpend.pp ?? 0}`;
+			} else if (name.endsWith("gp")) {
+				input.value = `${maxSpend.gp ?? 0}`;
+			} else if (name.endsWith("sp")) {
+				input.value = `${maxSpend.sp ?? 0}`;
+			} else if (name.endsWith("cp")) {
+				input.value = `${maxSpend.cp ?? 0}`;
+			}
+		}
+	}
+
+	private ResetStartingValue() {
+		const inputs = this.element.querySelectorAll<HTMLInputElement>(
+			".begin-project-start-summary .money-group input"
+		);
+		inputs.forEach((input) => (input.value = "0"));
+		this.updateStartingValueText();
+	}
+
+	private setInputs(breakdown: StartingItemDetails) {
+		const inputs = this.element.querySelectorAll<HTMLInputElement>(
+			".begin-project-start-summary .money-group input"
+		);
+
 		for (const input of inputs) {
 			switch (input.name) {
-				case "summary-starting-pp":
-					input.value = (maxStartingValue.pp ?? 0).toString();
+				case "currency-pp":
+					input.value = (breakdown.currency?.pp || 0).toString();
 					break;
-				case "summary-starting-gp":
-					input.value = (maxStartingValue.gp ?? 0).toString();
+				case "trove-pp":
+					input.value = (breakdown.generic?.pp || 0).toString();
 					break;
-				case "summary-starting-sp":
-					input.value = (maxStartingValue.sp ?? 0).toString();
+				case "currency-gp":
+					input.value = (breakdown.currency?.gp || 0).toString();
 					break;
-				case "summary-starting-cp":
-					input.value = (maxStartingValue.cp ?? 0).toString();
+				case "trove-gp":
+					input.value = (breakdown.generic?.gp || 0).toString();
+					break;
+				case "currency-sp":
+					input.value = (breakdown.currency?.sp || 0).toString();
+					break;
+				case "trove-sp":
+					input.value = (breakdown.generic?.sp || 0).toString();
+					break;
+				case "currency-cp":
+					input.value = (breakdown.currency?.cp || 0).toString();
+					break;
+				case "trove-cp":
+					input.value = (breakdown.generic?.cp || 0).toString();
 					break;
 				default:
 					break;
 			}
 		}
+	}
+
+	private getCurrentStartingValueBreakdown(): StartingItemDetails {
+		const inputs = this.element.querySelectorAll<HTMLInputElement>(
+			".begin-project-start-summary .money-group input"
+		);
+
+		const result: { currency: Coins; generic: Coins } = {
+			currency: {},
+			generic: {},
+		};
+		for (const input of inputs) {
+			switch (input.name) {
+				case "currency-pp":
+					result.currency.pp = Number.parseInt(input.value) || 0;
+					break;
+				case "trove-pp":
+					result.generic.pp = Number.parseInt(input.value) || 0;
+					break;
+				case "currency-gp":
+					result.currency.gp = Number.parseInt(input.value) || 0;
+					break;
+				case "trove-gp":
+					result.generic.gp = Number.parseInt(input.value) || 0;
+					break;
+				case "currency-sp":
+					result.currency.sp = Number.parseInt(input.value) || 0;
+					break;
+				case "trove-sp":
+					result.generic.sp = Number.parseInt(input.value) || 0;
+					break;
+				case "currency-cp":
+					result.currency.cp = Number.parseInt(input.value) || 0;
+					break;
+				case "trove-cp":
+					result.generic.cp = Number.parseInt(input.value) || 0;
+					break;
+				default:
+					break;
+			}
+		}
+		return result;
 	}
 
 	private getCurrentStartingValue(): Coins {
@@ -216,17 +350,25 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		const coins: Coins = {};
 		for (const input of inputs) {
 			switch (input.name) {
-				case "summary-starting-pp":
-					coins.pp = Number.parseInt(input.value) || 0;
+				case "currency-pp":
+				case "trove-pp":
+					if (!coins.pp) coins.pp = 0;
+					coins.pp += Number.parseInt(input.value) || 0;
 					break;
-				case "summary-starting-gp":
-					coins.gp = Number.parseInt(input.value) || 0;
+				case "currency-gp":
+				case "trove-gp":
+					if (!coins.gp) coins.gp = 0;
+					coins.gp += Number.parseInt(input.value) || 0;
 					break;
-				case "summary-starting-sp":
-					coins.sp = Number.parseInt(input.value) || 0;
+				case "currency-sp":
+				case "trove-sp":
+					if (!coins.sp) coins.sp = 0;
+					coins.sp += Number.parseInt(input.value) || 0;
 					break;
-				case "summary-starting-cp":
-					coins.cp = Number.parseInt(input.value) || 0;
+				case "currency-cp":
+				case "trove-cp":
+					if (!coins.cp) coins.cp = 0;
+					coins.cp += Number.parseInt(input.value) || 0;
 					break;
 				default:
 					break;
@@ -251,6 +393,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		return foundry.utils.mergeObject(data, {
 			buttons,
 			includeIsFormula: this.includeIsFormula,
+			hasMaterialTrove: !!getMaterialTrove(this.actor),
 		});
 	}
 
@@ -361,8 +504,8 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 		if (options.itemDropped) {
 			this.updateDcInput();
-			this.updateBatchSizeInput();
-			this.updateStartingValueFromNothing();
+			this.resetBatchSizeInput();
+			this.ResetStartingValue();
 		}
 
 		const submitButton = this.element.querySelector<HTMLButtonElement>(
@@ -436,7 +579,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		}
 	}
 
-	private updateBatchSizeInput() {
+	private resetBatchSizeInput() {
 		if (!this.item) return;
 		const batchSizeInput = this.element.querySelector<HTMLInputElement>(".summary-batch-size");
 		if (batchSizeInput) {
@@ -459,19 +602,24 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 	private updateStartingValueText() {
 		if (!this.item) return;
 
-		const startingValuesSpan = this.element.querySelector<HTMLSpanElement>(
-			".begin-project-start-summary .begin-project-start-values-coins"
+		const startingValueSpan = this.element.querySelector<HTMLSpanElement>(
+			".begin-project-start-summary .total-starting .starting-value"
 		);
-		if (!startingValuesSpan) return;
+		const startingMaxSpan = this.element.querySelector<HTMLSpanElement>(
+			".begin-project-start-summary .total-starting .starting-max"
+		);
+
+		if (!startingValueSpan || !startingMaxSpan) return;
+		startingValueSpan.textContent = coinsToCoinString(this.getCurrentStartingValue());
 		const maxStartingValue = this.getMaxStartingValue();
-		startingValuesSpan.textContent = `${coinsToCoinString(this.getCurrentStartingValue())} / ${coinsToCoinString(
-			maxStartingValue
-		)}`;
+		startingMaxSpan.textContent = coinsToCoinString(maxStartingValue);
 	}
 
 	private getMaxStartingValue(): Coins {
 		if (!this.item) return {};
-		const maxStartingValueCopper = Math.floor(this.item.price.value.copperValue / 2);
+		const batchSizeInput = this.element.querySelector<HTMLInputElement>(".summary-batch-size");
+		const batchSize = batchSizeInput ? Number.parseInt(batchSizeInput.value) || 1 : 1;
+		const maxStartingValueCopper = Math.floor(this.item.price.value.copperValue / 2) * batchSize;
 		return copperValueToCoins(maxStartingValueCopper);
 	}
 }

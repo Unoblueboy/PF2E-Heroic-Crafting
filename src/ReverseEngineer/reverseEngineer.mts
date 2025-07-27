@@ -23,7 +23,7 @@ export async function reverseEngineer(actor: ActorPF2e, item?: PhysicalItemPF2e)
 		return;
 	}
 
-	const itemDetails = await BeginProjectApplication.GetItemDetails({
+	const details = await BeginProjectApplication.GetItemDetails({
 		actor,
 		itemSettings: {
 			formula: {
@@ -36,9 +36,9 @@ export async function reverseEngineer(actor: ActorPF2e, item?: PhysicalItemPF2e)
 		},
 	});
 
-	if (!itemDetails) return;
-	itemDetails.itemData.uuid = item.sourceId;
+	if (!details) return;
+	details[0].itemData.uuid = item.sourceId;
 
-	if (!(await beginProject(actor, itemDetails))) return;
+	if (!(await beginProject(actor, details))) return;
 	await createSalvage(item);
 }

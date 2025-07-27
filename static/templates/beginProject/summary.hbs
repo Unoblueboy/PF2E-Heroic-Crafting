@@ -31,6 +31,7 @@
                 <button type="button"
                         data-action="decrease-summary-batch-size">-</button>
                 <input class="summary-batch-size"
+                       data-action="update-batch-size"
                        type="number"
                        min="1"
                        value="1"
@@ -45,56 +46,126 @@
     <hr style="margin:0.5rem 0;">
     <div class="begin-project-start-summary">
         <h4>Starting Value</h4>
-        <div>
-            <span>Current/Max Starting Value</span>
-            <span class="begin-project-start-values-coins">INSERT COINS HERE</span>
+        <div class="total-starting">
+            <span class="starting-value">0 gp</span>
+            <span class="seperator">/</span>
+            <span class="starting-max">???</span>
         </div>
-        <div class="money-group"
-             data-action="update-money-group">
-            <div class="input-group">
-                <label for="summary-starting-pp">Platinum</label>
-                <div class="input-fields">
-                    <input type="number"
-                           min="0"
-                           value="0"
-                           step="1"
-                           name="summary-starting-pp"
-                           required>
+        <div class="material-list">
+            <div class="basic-material currency">
+                <hr>
+                <div class="item-summary">
+                    <img src="systems/pf2e/icons/equipment/treasure/currency/gold-pieces.webp"
+                         class="item-icon">
+                    <span class="item-name">Currency</span>
+                </div>
+                <div class="money-group"
+                     data-action="update-money-group"
+                     data-item="currency">
+                    <div class="input-group">
+                        <label for="beginProject-summary-currency-pp">Platinum</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="0"
+                                   step="1"
+                                   name="currency-pp"
+                                   id="beginProject-summary-currency-pp">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="beginProject-summary-currency-gp">Gold</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="0"
+                                   step="1"
+                                   name="currency-gp"
+                                   id="beginProject-summary-currency-gp">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="beginProject-summary-currency-sp">Silver</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="0"
+                                   step="1"
+                                   name="currency-sp"
+                                   id="beginProject-summary-currency-sp">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="beginProject-summary-currency-cp">Copper</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="0"
+                                   step="1"
+                                   name="currency-cp"
+                                   id="beginProject-summary-currency-cp">
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="input-group">
-                <label for="summary-starting-gp">Gold</label>
-                <div class="input-fields">
-                    <input type="number"
-                           min="0"
-                           value="0"
-                           step="1"
-                           name="summary-starting-gp"
-                           required>
+            {{#if hasMaterialTrove}}
+                <div class="basic-material trove">
+                    <hr>
+                    <div class="item-summary">
+                        <img src="icons/tools/fasteners/nails-steel-brown.webp"
+                             class="item-icon">
+                        <span class="item-name">Generic Crafting Materials</span>
+                    </div>
+                    <div class="money-group"
+                         data-action="update-money-group"
+                         data-item="trove">
+                        <div class="input-group">
+                            <label for="beginProject-summary-trove-pp">Platinum</label>
+                            <div class="input-fields">
+                                <input type="number"
+                                       min="0"
+                                       value="0"
+                                       step="1"
+                                       name="trove-pp"
+                                       id="beginProject-summary-trove-pp">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="beginProject-summary-trove-gp">Gold</label>
+                            <div class="input-fields">
+                                <input type="number"
+                                       min="0"
+                                       value="0"
+                                       step="1"
+                                       name="trove-gp"
+                                       id="beginProject-summary-trove-gp">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="beginProject-summary-trove-sp">Silver</label>
+                            <div class="input-fields">
+                                <input type="number"
+                                       min="0"
+                                       value="0"
+                                       step="1"
+                                       name="trove-sp"
+                                       id="beginProject-summary-trove-sp">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="beginProject-summary-trove-cp">Copper</label>
+                            <div class="input-fields">
+                                <input type="number"
+                                       min="0"
+                                       value="0"
+                                       step="1"
+                                       name="trove-cp"
+                                       id="beginProject-summary-trove-cp">
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="input-group">
-                <label for="summary-starting-sp">Silver</label>
-                <div class="input-fields">
-                    <input type="number"
-                           min="0"
-                           value="0"
-                           step="1"
-                           name="summary-starting-sp"
-                           required>
-                </div>
-            </div>
-            <div class="input-group">
-                <label for="summary-starting-cp">Copper</label>
-                <div class="input-fields">
-                    <input type="number"
-                           min="0"
-                           value="0"
-                           step="1"
-                           name="summary-starting-cp"
-                           required>
-                </div>
-            </div>
+            {{/if}}
         </div>
     </div>
 </div>

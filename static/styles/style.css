@@ -321,20 +321,81 @@
 				margin: 0;
 			}
 
-			.begin-project-start-values-coins {
-				float: right;
+			.total-starting {
+				display: flex;
+				flex-wrap: wrap;
+				flex-direction: row;
+				justify-content: flex-end;
+				margin: 0.5em 0;
+
+				span {
+					white-space: nowrap;
+				}
+
+				.seperator {
+					flex-grow: 1;
+					text-align: center;
+				}
 			}
 
-			.money-group {
+			.material-list {
 				display: flex;
-				flex-direction: row;
+				flex-direction: column;
 				gap: 0.5rem;
-				align-items: center;
+				min-height: 0;
+				overflow-y: auto;
 
-				.input-group {
+				hr {
+					height: 1px;
+					margin: 0;
+					flex: 0 0 1px;
+				}
+
+				.basic-material {
 					display: flex;
 					flex-direction: column;
-					align-items: center;
+					gap: 5px;
+
+					.item-summary {
+						display: flex;
+						align-items: center;
+						margin: 0 2px;
+
+						.item-icon {
+							height: 32px;
+							width: 32px;
+							margin-right: 1em;
+						}
+					}
+
+					.money-group {
+						display: flex;
+						flex-direction: row;
+						gap: 0.5rem;
+						align-items: center;
+						color: var(--color-form-label);
+
+						.input-group {
+							display: flex;
+							flex-direction: column;
+							align-items: center;
+							flex: 1;
+
+							label {
+								font-weight: 700;
+							}
+
+							.input-fields {
+								width: 100%;
+							}
+						}
+
+						.input-group:hover {
+							label {
+								color: var(--color-form-label-hover);
+							}
+						}
+					}
 				}
 			}
 		}
