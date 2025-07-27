@@ -272,7 +272,6 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 	) {
 		super._preparePartContext(partId, context, options);
 		context.partId = `${this.id}-${partId}`;
-		console.log(context.tabs);
 		context.tab = (context.tabs as Record<string, string>)[partId];
 		return context;
 	}

@@ -80,8 +80,6 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		form: HTMLFormElement,
 		_formData: FormDataExtended
 	) {
-		console.log(_formData, form);
-
 		const treasureUuids: string[] = [];
 		form.querySelectorAll<HTMLDivElement>(
 			".material-summary .treasure-material [data-type='advanced'].money-group"

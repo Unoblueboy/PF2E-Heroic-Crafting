@@ -107,7 +107,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 					uuid: this.item.uuid,
 					isFormula: isFormula,
 				},
-				value: this.getCurrentStartingValue(), // TODO: Get the starting value
+				value: this.getCurrentStartingValue(),
 			},
 			this.getCurrentStartingValueBreakdown(),
 		];
@@ -448,7 +448,6 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			ui.notifications.info(`${item.name} cannot be crafted`);
 			return null;
 		}
-		console.log(data);
 		if (this.checkFromInventory && !data.fromInventory) {
 			ui.notifications.info("Items must be from an actors inventory");
 			return null;

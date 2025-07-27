@@ -29,5 +29,3 @@ export enum ProjectCraftDuration {
 	DAY = "day",
 	WEEK = "week",
 }
-
-// delete, decrease value, Do Nothing

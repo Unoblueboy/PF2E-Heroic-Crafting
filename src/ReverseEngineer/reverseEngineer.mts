@@ -13,7 +13,6 @@ export async function reverseEngineer(actor: ActorPF2e, item?: PhysicalItemPF2e)
 	if (!item) {
 		const result = await ReverseEngineerApplication.GetItemUuid(actor);
 		if (!result) return;
-		console.log(result);
 		const resultItem = (await fromUuid(result.uuid)) as PhysicalItemPF2e;
 		if (!resultItem) return;
 		item = resultItem;

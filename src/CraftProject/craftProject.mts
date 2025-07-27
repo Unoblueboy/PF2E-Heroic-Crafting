@@ -277,7 +277,6 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 			break;
 	}
 
-	console.log(outcome, itemDetails.value, totalSpent, newProjectTotal);
 	const item = (await foundry.utils.fromUuid(itemDetails.itemData.uuid)) as PhysicalItemPF2e;
 	const newProjectTotalCopper = coinsToCopperValue(newProjectTotal);
 	const projectMaxCopper = coinsToCopperValue(await getProjectMax(itemDetails, item));
