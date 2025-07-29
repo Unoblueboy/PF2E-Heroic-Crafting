@@ -2,21 +2,14 @@ import { ActorPF2e, CharacterPF2e } from "../../types/src/module/actor";
 import { ChatMessagePF2e } from "../../types/src/module/chat-message";
 import { Rarity } from "../../types/src/module/data";
 import { PhysicalItemPF2e, SpellPF2e } from "../../types/src/module/item";
-import { Coins } from "../../types/src/module/item/physical";
+import { CoinsPF2e } from "../../types/src/module/item/physical";
 import { TokenDocumentPF2e, ScenePF2e } from "../../types/src/module/scene";
 import { CheckRoll } from "../../types/src/module/system/check";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { ItemUUID } from "../../types/types/foundry/common/documents/_module.mjs";
 import { ProjectItemDetails } from "../BeginProject/types.mjs";
-import {
-	addCoins,
-	coinsToCoinString,
-	coinsToCopperValue,
-	copperValueToCoins,
-	multCoins,
-	subCoins,
-} from "../Helper/currency.mjs";
+import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 import { Either, fractionToPercent } from "../Helper/generics.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { CraftProjectApplication, getItemDetails, getProjectMax } from "./Applications/CraftProjectApplications.mjs";
@@ -55,7 +48,7 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 				  )
 				: baseItemLink;
 			const projectMax = await getProjectMax(itemDetails, item);
-			const projectCur = itemDetails.value;
+			const projectCur = new game.pf2e.Coins(itemDetails.value);
 			const flavor = await foundry.applications.handlebars.renderTemplate(
 				"modules/pf2e-heroic-crafting/templates/chat/craftProject/result.hbs",
 				{
@@ -63,16 +56,16 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 					actorUuid: actor.uuid,
 					project: {
 						id: projectId,
-						max: coinsToCoinString(projectMax),
-						cur: coinsToCoinString(projectCur),
-						percent: fractionToPercent(coinsToCopperValue(projectCur), coinsToCopperValue(projectMax)),
+						max: projectMax,
+						cur: projectCur,
+						percent: fractionToPercent(projectCur.copperValue, projectMax.copperValue),
 					},
 					itemLink: await foundry.applications.ux.TextEditor.enrichHTML(craftItemLink, {
 						rollData: item.getRollData(),
 					}),
 					craftDetails: JSON.stringify(craftDetails),
 					materials,
-					totalMaterialsSpent: coinsToCoinString(totalSpent),
+					totalMaterialsSpent: totalSpent,
 					outcome,
 				}
 			);
@@ -109,7 +102,7 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 			subtitle: "Crafting Check",
 			title: "Craft A Project",
 		}),
-		traits: [craftDetails.duration == ProjectCraftDuration.HOUR ? "exploration" : "downtime", "manipulate"],
+		traits: [craftDetails.duration === ProjectCraftDuration.HOUR ? "exploration" : "downtime", "manipulate"],
 		createMessage: false,
 		callback: getStatisticRollCallback,
 	});
@@ -123,7 +116,7 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 					name: "Generic Crafting Material",
 					img: "icons/tools/fasteners/nails-steel-brown.webp",
 				},
-				spent: coinsToCoinString(craftDetails.materialsSpent.generic),
+				spent: craftDetails.materialsSpent.generic,
 			});
 		}
 		if (craftDetails.materialsSpent.currency) {
@@ -132,7 +125,7 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 					name: "Currency",
 					img: "systems/pf2e/icons/equipment/treasure/currency/gold-pieces.webp",
 				},
-				spent: coinsToCoinString(craftDetails.materialsSpent.currency),
+				spent: craftDetails.materialsSpent.currency,
 			});
 		}
 
@@ -146,31 +139,29 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 					img: treasure.img,
 				},
 				quantity: treasureSpent.quantity,
-				spent: coinsToCoinString(treasureSpent.value),
+				spent: treasureSpent.value,
 			});
 		}
 		return materials;
 	}
 }
 
-async function getTotalMaterialSpent(craftDetails: ProjectCraftDetails): Promise<Coins> {
+async function getTotalMaterialSpent(craftDetails: ProjectCraftDetails): Promise<CoinsPF2e> {
 	const materialsSpent = craftDetails.materialsSpent;
-	let totalSpent = 0;
+	let totalSpent = new game.pf2e.Coins();
 	if (materialsSpent.generic) {
-		const genericCraftingCost = coinsToCopperValue(materialsSpent.generic);
-		totalSpent += genericCraftingCost;
+		totalSpent = totalSpent.plus(materialsSpent.generic);
 	}
 	if (materialsSpent.currency) {
-		totalSpent += coinsToCopperValue(materialsSpent.currency);
+		totalSpent = totalSpent.plus(materialsSpent.currency);
 	}
 	for (const material of materialsSpent.treasure ?? []) {
-		// material
 		const item = await foundry.utils.fromUuid<PhysicalItemPF2e>(material.uuid);
 		if (!item) continue;
-		totalSpent += coinsToCopperValue(material.value) * (material.quantity ?? 1);
+		totalSpent = totalSpent.plus(CoinsPF2eUtility.multCoins(material.quantity ?? 1, material.value));
 	}
 
-	return copperValueToCoins(totalSpent);
+	return totalSpent;
 }
 
 async function updateSpentTreasure(item: PhysicalItemPF2e, material: TreasureMaterialSpent) {
@@ -189,19 +180,19 @@ async function updateSpentTreasure(item: PhysicalItemPF2e, material: TreasureMat
 
 async function decreaseTreasureValue(item: PhysicalItemPF2e, material: TreasureMaterialSpent) {
 	const basePrice = item.price.value;
-	const baseCopperPrice = basePrice.copperValue;
 	const materialSpent = material.value;
-	const materialCopperSpent = coinsToCopperValue(materialSpent);
-	const newCopperPrice = Math.max(baseCopperPrice - materialCopperSpent, 0);
-	const newPrice = copperValueToCoins(newCopperPrice);
+	const newPrice = CoinsPF2eUtility.maxCoins(
+		CoinsPF2eUtility.subCoins(basePrice, materialSpent),
+		new game.pf2e.Coins()
+	);
 
 	const baseQuantity = item.quantity;
 	const quantitySpent = material.quantity ?? 1;
-	if (newCopperPrice == 0 && baseQuantity == quantitySpent) {
+	if (newPrice.copperValue === 0 && baseQuantity === quantitySpent) {
 		await item.delete();
-	} else if (newCopperPrice != 0 && baseQuantity == quantitySpent) {
+	} else if (newPrice.copperValue != 0 && baseQuantity === quantitySpent) {
 		await item.update({ "system.price.value": newPrice });
-	} else if (newCopperPrice == 0 && baseQuantity != quantitySpent) {
+	} else if (newPrice.copperValue === 0 && baseQuantity != quantitySpent) {
 		await item.update({ "system.quantity": baseQuantity - quantitySpent });
 	} else {
 		await item.update({ "system.quantity": baseQuantity - quantitySpent });
@@ -260,35 +251,34 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	await useMaterialSpent(actor, craftDetails);
 
 	const totalSpent = await getTotalMaterialSpent(craftDetails);
-	let newProjectTotal: Coins = {};
+	let newProjectTotal: CoinsPF2e = new game.pf2e.Coins();
 	switch (outcome) {
 		case "criticalFailure":
-			newProjectTotal = subCoins(itemDetails.value, totalSpent);
+			newProjectTotal = CoinsPF2eUtility.subCoins(itemDetails.value, totalSpent);
 			break;
 		case "failure":
-			newProjectTotal = addCoins(itemDetails.value, multCoins(0.5, totalSpent));
+			newProjectTotal = CoinsPF2eUtility.addCoins(itemDetails.value, CoinsPF2eUtility.multCoins(0.5, totalSpent));
 			break;
 		case "criticalSuccess":
 		case "success":
-			newProjectTotal = addCoins(itemDetails.value, multCoins(2, totalSpent));
+			newProjectTotal = CoinsPF2eUtility.addCoins(itemDetails.value, CoinsPF2eUtility.multCoins(2, totalSpent));
 			break;
 		default:
 			break;
 	}
 
 	const item = (await foundry.utils.fromUuid(itemDetails.itemData.uuid)) as PhysicalItemPF2e;
-	const newProjectTotalCopper = coinsToCopperValue(newProjectTotal);
-	const projectMaxCopper = coinsToCopperValue(await getProjectMax(itemDetails, item));
-	if (newProjectTotalCopper < 0) {
+	const projectMax = await getProjectMax(itemDetails, item);
+	if (newProjectTotal.copperValue < 0) {
 		actor.update({ [`flags.pf2eHeroicCrafting.projects.-=${projectId}`]: null });
 		ui.notifications.info("Project Destroyed lol, git gud");
-	} else if (newProjectTotalCopper >= projectMaxCopper) {
+	} else if (newProjectTotal.copperValue >= projectMax.copperValue) {
 		await finishProject(item, itemDetails, actor as CharacterPF2e, projectId);
 	} else {
 		actor.update({ [`flags.pf2eHeroicCrafting.projects.${projectId}.value`]: newProjectTotal });
 	}
 
-	const projectProgressPercent = fractionToPercent(newProjectTotalCopper, projectMaxCopper);
+	const projectProgressPercent = fractionToPercent(newProjectTotal.copperValue, projectMax.copperValue);
 	const internalBar = generalDiv.querySelector<HTMLDivElement>(".project-progress .progress-bar .internal-bar");
 	if (internalBar) {
 		internalBar.style = `width:${projectProgressPercent};`;
@@ -304,7 +294,7 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 		".project-progress .project-progress-line .project-cur-value"
 	);
 	if (curValueSpan) {
-		curValueSpan.textContent = coinsToCoinString(newProjectTotal);
+		curValueSpan.textContent = newProjectTotal.toString();
 	}
 
 	generalDiv.querySelectorAll<HTMLButtonElement>(".card-buttons button").forEach((button) => {

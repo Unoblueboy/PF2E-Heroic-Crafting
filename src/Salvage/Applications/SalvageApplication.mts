@@ -1,14 +1,20 @@
 import { ActorPF2e } from "../../../types/src/module/actor";
 import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../../types/src/module/item";
-import { Coins } from "../../../types/src/module/item/physical";
+import { Coins, CoinsPF2e } from "../../../types/src/module/item/physical";
 import {
 	ApplicationClosingOptions,
 	ApplicationRenderOptions,
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
-import { coinsToCopperValue, copperValueToCoins, copperValueToCoinString } from "../../Helper/currency.mjs";
-import { HEROIC_CRAFTING_GATHERED_INCOME, HEROIC_CRAFTING_SPENDING_LIMIT } from "../../Helper/constants.mjs";
+import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
+import {
+	CRAFTING_MATERIAL_SLUG,
+	HEROIC_CRAFTING_GATHERED_INCOME,
+	HEROIC_CRAFTING_SPENDING_LIMIT,
+	MATERIAL_TROVE_SLUG,
+	SALVAGE_MATERIAL_SLUG,
+} from "../../Helper/constants.mjs";
 import { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -101,13 +107,13 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		if (!baseIncomeValue) return;
 
 		const salvageMaxCoins: Coins = {
-			pp: formData.object.salvageMaximumPP as number,
-			gp: formData.object.salvageMaximumGP as number,
-			sp: formData.object.salvageMaximumSP as number,
-			cp: formData.object.salvageMaximumCP as number,
+			pp: formData.object.salvageMaximumPP as number | undefined,
+			gp: formData.object.salvageMaximumGP as number | undefined,
+			sp: formData.object.salvageMaximumSP as number | undefined,
+			cp: formData.object.salvageMaximumCP as number | undefined,
 		};
 
-		if (Object.values(salvageMaxCoins).some((x) => x == undefined)) {
+		if (Object.values(salvageMaxCoins).some((x) => x === undefined)) {
 			const maximumInputs = form.querySelectorAll<HTMLInputElement>(".details .maximum input");
 			for (const ele of maximumInputs) {
 				switch (ele.name) {
@@ -128,33 +134,38 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 				}
 			}
 		}
-		const salvageMaxCopper = coinsToCopperValue(salvageMaxCoins);
-		let incomeSuccessCopperValue, incomeFailureCopperValue;
+		let incomeSuccessValue, incomeFailureValue;
 		if (formData.object.useSavvyTeardown) {
-			const halfSalvageMax = Math.floor(salvageMaxCopper / 2);
+			const halfSalvageMax = CoinsPF2eUtility.multCoins(1 / 2, salvageMaxCoins);
 			const dailySpendingLimit = spendingLimitForLevel.day;
-			const baseIncomeSuccessValue = Math.min(halfSalvageMax, dailySpendingLimit);
-			incomeSuccessCopperValue = baseIncomeSuccessValue;
-			incomeFailureCopperValue = 0;
+			const baseIncomeSuccessValue = CoinsPF2eUtility.minCoins(halfSalvageMax, dailySpendingLimit);
+			incomeSuccessValue = baseIncomeSuccessValue;
+			incomeFailureValue = new game.pf2e.Coins();
 		} else {
 			const baseIncomeSuccessValue = baseIncomeValue;
-			const baseIncomeFailureValue = Math.floor(baseIncomeValue / 2);
+			const baseIncomeFailureValue = CoinsPF2eUtility.multCoins(1 / 2, baseIncomeValue);
 			const craftingRank = this.actor.skills?.crafting?.rank ?? 0;
 			const hasMasterCrafting = craftingRank >= 3;
-			const hasDismantlerFeat = this.actor.items.some((x) => x.slug == "dismantler" && x.type == "feat");
+			const hasDismantlerFeat = this.actor.items.some((x) => x.slug === "dismantler" && x.type === "feat");
 			const masterCraftingModifier = hasMasterCrafting ? 2 : 1;
 			const dismantlerModifier = hasDismantlerFeat ? 2 : 1;
-			incomeSuccessCopperValue = dismantlerModifier * masterCraftingModifier * baseIncomeSuccessValue;
-			incomeFailureCopperValue = dismantlerModifier * masterCraftingModifier * baseIncomeFailureValue;
+			incomeSuccessValue = CoinsPF2eUtility.multCoins(
+				dismantlerModifier,
+				CoinsPF2eUtility.multCoins(masterCraftingModifier, baseIncomeSuccessValue)
+			);
+			incomeFailureValue = CoinsPF2eUtility.multCoins(
+				dismantlerModifier,
+				CoinsPF2eUtility.multCoins(masterCraftingModifier, baseIncomeFailureValue)
+			);
 		}
 
 		this.result = {
 			savvyTeardown: formData.object.useSavvyTeardown as boolean,
-			max: salvageMaxCoins,
+			max: new game.pf2e.Coins(salvageMaxCoins),
 			duration: formData.object.salvageDuration as number,
 			income: {
-				success: incomeSuccessCopperValue,
-				failure: incomeFailureCopperValue,
+				success: incomeSuccessValue,
+				failure: incomeFailureValue,
 			},
 			actor: this.actor,
 			item: this.item,
@@ -209,19 +220,19 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 
 		this.extractDragDropDiv();
 
-		const isSalvage = this.item.slug == "generic-salvage-material";
-		const salvageMaxCopper = options?.useDefaultSalvageMax
+		const isSalvage = this.item.slug === SALVAGE_MATERIAL_SLUG;
+		const salvageMax = options?.useDefaultSalvageMax
 			? this.getDefaultSalvageMax(isSalvage, detailsDiv)
 			: this.getSalvageMaxFromInputs(detailsDiv);
 
-		const hasSavvyTeardownFeat = this.actor.items.some((x) => x.slug == "savvy-teardown" && x.type == "feat");
+		const hasSavvyTeardownFeat = this.actor.items.some((x) => x.slug === "savvy-teardown" && x.type === "feat");
 		const savvyTeardownCheckBox = detailsDiv.querySelector("#salvage-details-useSavvyTeardown") as HTMLInputElement;
 		const savvyTeardownEles = detailsDiv.querySelectorAll(".savvy-teardown");
 		this.updateSavvyTeardownEles(isSalvage, hasSavvyTeardownFeat, savvyTeardownCheckBox, savvyTeardownEles);
 		const useSavvyTeardown = savvyTeardownCheckBox.checked && !isSalvage && hasSavvyTeardownFeat;
 
 		const { tooltipSuccessText, tooltipFailureText, incomeSuccessString, incomeFailureString } = useSavvyTeardown
-			? this.getSavvyTeardownStrings(salvageMaxCopper, spendingLimitForLevel)
+			? this.getSavvyTeardownStrings(salvageMax, spendingLimitForLevel)
 			: this.getSalvageStrings(baseIncomeValue);
 
 		const salvageIncomeSuccessDiv = detailsDiv.querySelector(".income #salvage-success-income") as HTMLDivElement;
@@ -244,56 +255,59 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		detailsDiv.classList.remove("hide");
 	}
 
-	private getSalvageStrings(baseIncomeValue: number) {
+	private getSalvageStrings(baseIncomeValue: CoinsPF2e) {
 		if (!this.actor) return { incomeSuccessString: "", incomeFailureString: "" }; // This should never happen
 
 		const craftingRank = this.actor.skills?.crafting?.rank ?? 0;
 		const hasMasterCrafting = craftingRank >= 3;
-		const hasDismantlerFeat = this.actor.items.some((x) => x.slug == "dismantler" && x.type == "feat");
+		const hasDismantlerFeat = this.actor.items.some((x) => x.slug === "dismantler" && x.type === "feat");
 		const masterCraftingModifier = hasMasterCrafting ? 2 : 1;
 		const dismantlerModifier = hasDismantlerFeat ? 2 : 1;
 
 		const baseIncomeSuccessValue = baseIncomeValue;
-		const baseIncomeFailureValue = Math.floor(baseIncomeValue / 2);
-		const incomeSuccessCopperValue = dismantlerModifier * masterCraftingModifier * baseIncomeSuccessValue;
-		const incomeFailureCopperValue = dismantlerModifier * masterCraftingModifier * baseIncomeFailureValue;
+		const baseIncomeFailureValue = CoinsPF2eUtility.multCoins(1 / 2, baseIncomeValue);
+		const incomeSuccessValue = CoinsPF2eUtility.multCoins(
+			dismantlerModifier,
+			CoinsPF2eUtility.multCoins(masterCraftingModifier, baseIncomeSuccessValue)
+		);
+		const incomeFailureValue = CoinsPF2eUtility.multCoins(
+			dismantlerModifier,
+			CoinsPF2eUtility.multCoins(masterCraftingModifier, baseIncomeFailureValue)
+		);
 
-		const incomeSuccessString = copperValueToCoinString(incomeSuccessCopperValue);
-		const incomeFailureString = copperValueToCoinString(incomeFailureCopperValue);
+		const incomeSuccessString = incomeSuccessValue.toString();
+		const incomeFailureString = incomeFailureValue.toString();
 
 		const tooltipTextArray = [];
 		if (hasMasterCrafting) tooltipTextArray.push("Master Crafting Proficiency: (×2)");
 		if (hasDismantlerFeat) tooltipTextArray.push("Dismantler Feat (×2)");
-		const tooltipSuccessText = [`Base: ${copperValueToCoinString(baseIncomeSuccessValue)}`]
-			.concat(tooltipTextArray)
-			.join("<br>");
-		const tooltipFailureText = [`Base: ${copperValueToCoinString(baseIncomeFailureValue)}`]
-			.concat(tooltipTextArray)
-			.join("<br>");
+		const tooltipSuccessText = [`Base: ${baseIncomeSuccessValue}`].concat(tooltipTextArray).join("<br>");
+		const tooltipFailureText = [`Base: ${baseIncomeFailureValue}`].concat(tooltipTextArray).join("<br>");
 		return { incomeSuccessString, incomeFailureString, tooltipSuccessText, tooltipFailureText };
 	}
 
 	private getSavvyTeardownStrings(
-		salvageMaxCopper: number,
-		spendingLimitForLevel: { hour: number; day: number; week: number }
+		salvageMax: CoinsPF2e,
+		spendingLimitForLevel: { hour: CoinsPF2e; day: CoinsPF2e; week: CoinsPF2e }
 	) {
-		const halfSalvageMax = Math.floor(salvageMaxCopper / 2);
+		const halfSalvageMax = CoinsPF2eUtility.multCoins(0.5, salvageMax);
 		const dailySpendingLimit = spendingLimitForLevel.day;
-		const baseIncomeSuccessValue = Math.min(halfSalvageMax, dailySpendingLimit);
-		const incomeSuccessCopperValue = baseIncomeSuccessValue;
+		const baseIncomeSuccessValue = CoinsPF2eUtility.minCoins(halfSalvageMax, dailySpendingLimit);
+		const incomeSuccessValue = baseIncomeSuccessValue;
+		const incomeFailureValue = new game.pf2e.Coins();
 
-		const incomeSuccessString = copperValueToCoinString(incomeSuccessCopperValue);
-		const incomeFailureString = copperValueToCoinString(0);
+		const incomeSuccessString = incomeSuccessValue.toString();
+		const incomeFailureString = incomeFailureValue.toString();
 
 		let tooltipSuccessText = `Base: `;
-		if (halfSalvageMax <= dailySpendingLimit) {
-			tooltipSuccessText += `${copperValueToCoinString(halfSalvageMax)} `;
-			tooltipSuccessText += `<s>${copperValueToCoinString(dailySpendingLimit)}</s>`;
+		if (halfSalvageMax.copperValue <= dailySpendingLimit.copperValue) {
+			tooltipSuccessText += `${halfSalvageMax.toString()} `;
+			tooltipSuccessText += `<s>${dailySpendingLimit.toString()}</s>`;
 		} else {
-			tooltipSuccessText += `<s>${copperValueToCoinString(halfSalvageMax)}</s> `;
-			tooltipSuccessText += `${copperValueToCoinString(dailySpendingLimit)}`;
+			tooltipSuccessText += `<s>${halfSalvageMax.toString()}</s> `;
+			tooltipSuccessText += `${dailySpendingLimit.toString()}`;
 		}
-		const tooltipFailureText = `Base: ${copperValueToCoinString(0)}`;
+		const tooltipFailureText = `Base: ${incomeFailureString}`;
 		return { incomeSuccessString, incomeFailureString, tooltipSuccessText, tooltipFailureText };
 	}
 
@@ -313,7 +327,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		}
 	}
 
-	private getSalvageMaxFromInputs(detailsDiv: HTMLDivElement) {
+	private getSalvageMaxFromInputs(detailsDiv: HTMLDivElement): CoinsPF2e {
 		const maximumInputs = detailsDiv.querySelectorAll<HTMLInputElement>(".maximum input");
 		const coins: Coins = {};
 		for (const ele of maximumInputs) {
@@ -334,16 +348,16 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 					break;
 			}
 		}
-		return coinsToCopperValue(coins);
+		return new game.pf2e.Coins(coins);
 	}
 
-	private getDefaultSalvageMax(isSalvage: boolean, detailsDiv: HTMLDivElement) {
-		if (!this.item) return 0; // This should never happen
+	private getDefaultSalvageMax(isSalvage: boolean, detailsDiv: HTMLDivElement): CoinsPF2e {
+		if (!this.item) return new game.pf2e.Coins(); // This should never happen
 
 		const salvageMaxCopper = isSalvage
 			? this.item.price.value.copperValue
 			: Math.floor(this.item.price.value.copperValue / 2);
-		const salvageMaxCoins = copperValueToCoins(salvageMaxCopper);
+		const salvageMaxCoins = CoinsPF2eUtility.copperValueToCoins(salvageMaxCopper);
 
 		const maximumInputs = detailsDiv.querySelectorAll<HTMLInputElement>(".maximum input");
 		for (const ele of maximumInputs) {
@@ -367,7 +381,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			ele.value = value.toString();
 			ele.disabled = isSalvage;
 		}
-		return salvageMaxCopper;
+		return salvageMaxCoins;
 	}
 
 	private extractDragDropDiv() {
@@ -386,7 +400,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 	}
 
 	async getItem(data: Record<string, JSONValue>): Promise<PhysicalItemPF2e | null> {
-		if (typeof data.type == "string" && data.type?.toLowerCase() != "item") {
+		if (typeof data.type === "string" && data.type?.toLowerCase() != "item") {
 			ui.notifications.info("Only items can be salvaged");
 			return null;
 		}
@@ -406,7 +420,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			ui.notifications.info("Coins cannot be salvaged");
 			return null;
 		}
-		if (item.slug && ["material-trove", "generic-crafting-material"].includes(item.slug)) {
+		if (item.slug && [MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG].includes(item.slug)) {
 			ui.notifications.info(`${item.name} cannot be salvaged`);
 			return null;
 		}

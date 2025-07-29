@@ -8,25 +8,25 @@ import {
 	CRAFTING_MATERIAL_UUID,
 	HEROIC_CRAFTING_SPENDING_LIMIT,
 } from "../Helper/constants.mjs";
-import { copperValueToCoins, subCoins } from "../Helper/currency.mjs";
+import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 
 import { EditMaterialTroveApplication } from "./Applications/EditMaterialTroveApplication.mjs";
 import { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";
 
 async function useActorCoins(
 	result: EditMaterialTroveApplicationResult,
-	CraftingMaterialsCopperValue: number,
+	craftingMaterials: CoinsPF2e,
 	actor: ActorPF2e
 ) {
 	if (result.useActorCoins) {
-		const coinsToMoveCopper = result.newMaterialCopperValue - CraftingMaterialsCopperValue;
+		const coinsToMoveCopper = result.newMaterialTroveValue.copperValue - craftingMaterials.copperValue;
 		if (coinsToMoveCopper < 0) {
 			// Add Coins to character Sheet
-			const coinsToMove = copperValueToCoins(-coinsToMoveCopper);
+			const coinsToMove = CoinsPF2eUtility.copperValueToCoins(-coinsToMoveCopper);
 			actor.inventory.addCoins(coinsToMove);
 		} else if (coinsToMoveCopper > 0) {
 			// Take Coins from character Sheet
-			const coinsToMove = copperValueToCoins(coinsToMoveCopper);
+			const coinsToMove = CoinsPF2eUtility.copperValueToCoins(coinsToMoveCopper);
 			return await actor.inventory.removeCoins(coinsToMove);
 		}
 	}
@@ -44,16 +44,16 @@ export async function editMaterialTrove(actor: ActorPF2e) {
 
 	// Get new value of Generic Crafting Materials
 	const result = (await EditMaterialTroveApplication.EditMaterialTrove(
-		materialTrove.value.copperValue
+		materialTrove.value
 	)) as EditMaterialTroveApplicationResult;
 	if (!result) return;
 
-	if (!(await useActorCoins(result, materialTrove.value.copperValue, actor))) {
+	if (!(await useActorCoins(result, materialTrove.value, actor))) {
 		ui.notifications.error("Not enough coins in inventory");
 		return;
 	}
 
-	materialTrove.setValue(copperValueToCoins(result.newMaterialCopperValue));
+	materialTrove.setValue(result.newMaterialTroveValue);
 }
 
 export class MaterialTrove {
@@ -76,13 +76,13 @@ export class MaterialTrove {
 	}
 
 	private async initializeGenericCraftingMaterials(): Promise<void> {
-		const craftingMaterials = this.actor.items.filter((x) => x?.slug == CRAFTING_MATERIAL_SLUG) as TreasurePF2e[];
+		const craftingMaterials = this.actor.items.filter((x) => x?.slug === CRAFTING_MATERIAL_SLUG) as TreasurePF2e[];
 		const deleteIds = [];
 		for (const craftingMaterial of craftingMaterials) {
 			this.value = this.value.plus(craftingMaterial.price.value.scale(craftingMaterial.quantity));
-			if (craftingMaterial.system.bulk.value == 0 && !this.genericCraftingMaterials.negligible) {
+			if (craftingMaterial.system.bulk.value === 0 && !this.genericCraftingMaterials.negligible) {
 				this.genericCraftingMaterials.negligible = craftingMaterial;
-			} else if (craftingMaterial.system.bulk.value == 0.1 && !this.genericCraftingMaterials.light) {
+			} else if (craftingMaterial.system.bulk.value === 0.1 && !this.genericCraftingMaterials.light) {
 				this.genericCraftingMaterials.light = craftingMaterial;
 			} else {
 				deleteIds.push(craftingMaterial.id);
@@ -102,9 +102,9 @@ export class MaterialTrove {
 		actor: ActorPF2e,
 		notifyOnFailure: boolean = true
 	): Promise<MaterialTrove | undefined> {
-		const materialTroves = actor.items.filter((x) => x?.slug == MATERIAL_TROVE_SLUG);
+		const materialTroves = actor.items.filter((x) => x?.slug === MATERIAL_TROVE_SLUG);
 
-		if (materialTroves.length == 0) {
+		if (materialTroves.length === 0) {
 			if (notifyOnFailure)
 				ui.notifications.error(
 					"No Material Trove Found, please add a material trove from the Heroic Crafting Items Compendium"
@@ -163,10 +163,9 @@ export class MaterialTrove {
 		}
 		const coinValue = new game.pf2e.Coins(value);
 
-		const lightValueCopper = Math.floor(spendingLimitForLevel.week / 20);
-		const lightValue = copperValueToCoins(lightValueCopper);
-		const lightQuantity = Math.floor(coinValue.copperValue / lightValueCopper);
-		const negligibleValue = copperValueToCoins(coinValue.copperValue % lightValueCopper);
+		const lightValue = CoinsPF2eUtility.multCoins(1 / 20, spendingLimitForLevel.week);
+		const lightQuantity = Math.floor(coinValue.copperValue / lightValue.copperValue);
+		const negligibleValue = CoinsPF2eUtility.copperValueToCoins(coinValue.copperValue % lightValue.copperValue);
 		const negligibleQuantity = 1;
 
 		const operations = [
@@ -186,10 +185,8 @@ export class MaterialTrove {
 			{ create: [], update: [], delete: [] }
 		);
 
-		console.log(operations);
-
 		for (const item of (await this.actor.createEmbeddedDocuments("Item", operations.create)) as TreasurePF2e[]) {
-			if (item.system.bulk.value == 0.1) {
+			if (item.system.bulk.value === 0.1) {
 				this.genericCraftingMaterials.light = item;
 			} else {
 				this.genericCraftingMaterials.negligible = item;
@@ -197,7 +194,7 @@ export class MaterialTrove {
 		}
 		await this.actor.updateEmbeddedDocuments("Item", operations.update);
 		for (const item of (await this.actor.deleteEmbeddedDocuments("Item", operations.delete)) as TreasurePF2e[]) {
-			if (item.system.bulk.value == 0.1) {
+			if (item.system.bulk.value === 0.1) {
 				this.genericCraftingMaterials.light = undefined;
 			} else {
 				this.genericCraftingMaterials.negligible = undefined;
@@ -213,7 +210,7 @@ export class MaterialTrove {
 	}
 
 	async subtract(value: Coins) {
-		const newValue = subCoins(this.value, value);
+		const newValue = CoinsPF2eUtility.subCoins(this.value, value);
 		await this.setValue(newValue);
 	}
 
@@ -244,7 +241,7 @@ export class MaterialTrove {
 				},
 				{ inplace: true }
 			);
-			foundry.utils.mergeObject(data, this.getUpdateDetails(value, quantity, bulk == "negligible"), {
+			foundry.utils.mergeObject(data, this.getUpdateDetails(value, quantity, bulk === "negligible"), {
 				inplace: true,
 			});
 			operations.create = data;
@@ -254,12 +251,12 @@ export class MaterialTrove {
 			const updateDetails: EmbeddedDocumentUpdateData = this.getUpdateDetails(
 				value,
 				quantity,
-				bulk == "negligible"
+				bulk === "negligible"
 			);
 			operations.update = updateDetails;
 		}
 
-		if ((value.copperValue == 0 || quantity == 0) && !!genericCraftingMaterial) {
+		if ((value.copperValue === 0 || quantity === 0) && !!genericCraftingMaterial) {
 			operations.delete = genericCraftingMaterial.id;
 			ui.notifications.info(`Generic Crafting Materials (${bulk} Bulk) Deleted`);
 		}

@@ -1,55 +1,229 @@
+import { CoinsPF2e } from "../../types/src/module/item/physical";
+
 export const MATERIAL_TROVE_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.wtpSAjQwSyPOglzU`;
 export const CRAFTING_MATERIAL_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.UFqgBzSfC8XfuKVg`;
+export const SALVAGE_MATERIAL_UUID = "Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.R8QxNha74tYOrccl";
 
 export const MATERIAL_TROVE_SLUG = "material-trove";
 export const CRAFTING_MATERIAL_SLUG = "generic-crafting-material";
+export const SALVAGE_MATERIAL_SLUG = "generic-salvage-material";
 
-export const HEROIC_CRAFTING_SPENDING_LIMIT = new Map<number, { hour: number; day: number; week: number }>([
-	[1, { hour: 30, day: 120, week: 600 }],
-	[2, { hour: 50, day: 200, week: 1000 }],
-	[3, { hour: 80, day: 320, week: 1600 }],
-	[4, { hour: 150, day: 600, week: 3000 }],
-	[5, { hour: 200, day: 800, week: 4000 }],
-	[6, { hour: 300, day: 1200, week: 6000 }],
-	[7, { hour: 500, day: 2000, week: 10000 }],
-	[8, { hour: 700, day: 2800, week: 14000 }],
-	[9, { hour: 1000, day: 4000, week: 20000 }],
-	[10, { hour: 1500, day: 6000, week: 30000 }],
-	[11, { hour: 2100, day: 8400, week: 42000 }],
-	[12, { hour: 3000, day: 12000, week: 60000 }],
-	[13, { hour: 4000, day: 16000, week: 80000 }],
-	[14, { hour: 7000, day: 28000, week: 140000 }],
-	[15, { hour: 10000, day: 40000, week: 200000 }],
-	[16, { hour: 12500, day: 50000, week: 250000 }],
-	[17, { hour: 20000, day: 80000, week: 400000 }],
-	[18, { hour: 30000, day: 120000, week: 600000 }],
-	[19, { hour: 50000, day: 200000, week: 1000000 }],
-	[20, { hour: 80000, day: 320000, week: 1600000 }],
-]); // prices are in CP
+Hooks.on("ready", () => {
+	HEROIC_CRAFTING_SPENDING_LIMIT = new Map<number, { hour: CoinsPF2e; day: CoinsPF2e; week: CoinsPF2e }>([
+		[
+			1,
+			{
+				hour: new game.pf2e.Coins({ sp: 3 }),
+				day: new game.pf2e.Coins({ gp: 1, sp: 2 }),
+				week: new game.pf2e.Coins({ gp: 6 }),
+			},
+		],
+		[
+			2,
+			{
+				hour: new game.pf2e.Coins({ sp: 5 }),
+				day: new game.pf2e.Coins({ gp: 2 }),
+				week: new game.pf2e.Coins({ gp: 10 }),
+			},
+		],
+		[
+			3,
+			{
+				hour: new game.pf2e.Coins({ sp: 8 }),
+				day: new game.pf2e.Coins({ gp: 3, sp: 2 }),
+				week: new game.pf2e.Coins({ gp: 16 }),
+			},
+		],
+		[
+			4,
+			{
+				hour: new game.pf2e.Coins({ gp: 1, sp: 5 }),
+				day: new game.pf2e.Coins({ gp: 6 }),
+				week: new game.pf2e.Coins({ gp: 30 }),
+			},
+		],
+		[
+			5,
+			{
+				hour: new game.pf2e.Coins({ gp: 2 }),
+				day: new game.pf2e.Coins({ gp: 8 }),
+				week: new game.pf2e.Coins({ gp: 40 }),
+			},
+		],
+		[
+			6,
+			{
+				hour: new game.pf2e.Coins({ gp: 3 }),
+				day: new game.pf2e.Coins({ gp: 12 }),
+				week: new game.pf2e.Coins({ gp: 60 }),
+			},
+		],
+		[
+			7,
+			{
+				hour: new game.pf2e.Coins({ gp: 5 }),
+				day: new game.pf2e.Coins({ gp: 20 }),
+				week: new game.pf2e.Coins({ gp: 100 }),
+			},
+		],
+		[
+			8,
+			{
+				hour: new game.pf2e.Coins({ gp: 7 }),
+				day: new game.pf2e.Coins({ gp: 28 }),
+				week: new game.pf2e.Coins({ gp: 140 }),
+			},
+		],
+		[
+			9,
+			{
+				hour: new game.pf2e.Coins({ gp: 10 }),
+				day: new game.pf2e.Coins({ gp: 40 }),
+				week: new game.pf2e.Coins({ gp: 200 }),
+			},
+		],
+		[
+			10,
+			{
+				hour: new game.pf2e.Coins({ gp: 15 }),
+				day: new game.pf2e.Coins({ gp: 60 }),
+				week: new game.pf2e.Coins({ gp: 300 }),
+			},
+		],
+		[
+			11,
+			{
+				hour: new game.pf2e.Coins({ gp: 21 }),
+				day: new game.pf2e.Coins({ gp: 84 }),
+				week: new game.pf2e.Coins({ gp: 420 }),
+			},
+		],
+		[
+			12,
+			{
+				hour: new game.pf2e.Coins({ gp: 30 }),
+				day: new game.pf2e.Coins({ gp: 120 }),
+				week: new game.pf2e.Coins({ gp: 600 }),
+			},
+		],
+		[
+			13,
+			{
+				hour: new game.pf2e.Coins({ gp: 40 }),
+				day: new game.pf2e.Coins({ gp: 160 }),
+				week: new game.pf2e.Coins({ gp: 800 }),
+			},
+		],
+		[
+			14,
+			{
+				hour: new game.pf2e.Coins({ gp: 70 }),
+				day: new game.pf2e.Coins({ gp: 280 }),
+				week: new game.pf2e.Coins({ gp: 1400 }),
+			},
+		],
+		[
+			15,
+			{
+				hour: new game.pf2e.Coins({ gp: 100 }),
+				day: new game.pf2e.Coins({ gp: 400 }),
+				week: new game.pf2e.Coins({ gp: 2000 }),
+			},
+		],
+		[
+			16,
+			{
+				hour: new game.pf2e.Coins({ gp: 125 }),
+				day: new game.pf2e.Coins({ gp: 500 }),
+				week: new game.pf2e.Coins({ gp: 2500 }),
+			},
+		],
+		[
+			17,
+			{
+				hour: new game.pf2e.Coins({ gp: 200 }),
+				day: new game.pf2e.Coins({ gp: 800 }),
+				week: new game.pf2e.Coins({ gp: 4000 }),
+			},
+		],
+		[
+			18,
+			{
+				hour: new game.pf2e.Coins({ gp: 300 }),
+				day: new game.pf2e.Coins({ gp: 1200 }),
+				week: new game.pf2e.Coins({ gp: 6000 }),
+			},
+		],
+		[
+			19,
+			{
+				hour: new game.pf2e.Coins({ gp: 500 }),
+				day: new game.pf2e.Coins({ gp: 2000 }),
+				week: new game.pf2e.Coins({ gp: 10000 }),
+			},
+		],
+		[
+			20,
+			{
+				hour: new game.pf2e.Coins({ gp: 800 }),
+				day: new game.pf2e.Coins({ gp: 3200 }),
+				week: new game.pf2e.Coins({ gp: 16000 }),
+			},
+		],
+	]);
 
-export const HEROIC_CRAFTING_GATHERED_INCOME = new Map<number, number>([
-	[0, 10],
-	[1, 40],
-	[2, 60],
-	[3, 100],
-	[4, 160],
-	[5, 200],
-	[6, 400],
-	[7, 500],
-	[8, 600],
-	[9, 800],
-	[10, 1000],
-	[11, 1200],
-	[12, 1600],
-	[13, 2400],
-	[14, 3000],
-	[15, 4000],
-	[16, 6000],
-	[17, 8000],
-	[18, 14000],
-	[19, 20000],
-	[20, 30000],
-]); // prices are in CP
+	HEROIC_CRAFTING_GATHERED_INCOME = new Map<number, CoinsPF2e>([
+		[0, new game.pf2e.Coins({ sp: 1 })],
+		[1, new game.pf2e.Coins({ sp: 4 })],
+		[2, new game.pf2e.Coins({ sp: 6 })],
+		[3, new game.pf2e.Coins({ gp: 1 })],
+		[4, new game.pf2e.Coins({ gp: 1, sp: 6 })],
+		[5, new game.pf2e.Coins({ gp: 2 })],
+		[6, new game.pf2e.Coins({ gp: 4 })],
+		[7, new game.pf2e.Coins({ gp: 5 })],
+		[8, new game.pf2e.Coins({ gp: 6 })],
+		[9, new game.pf2e.Coins({ gp: 8 })],
+		[10, new game.pf2e.Coins({ gp: 10 })],
+		[11, new game.pf2e.Coins({ gp: 12 })],
+		[12, new game.pf2e.Coins({ gp: 16 })],
+		[13, new game.pf2e.Coins({ gp: 24 })],
+		[14, new game.pf2e.Coins({ gp: 30 })],
+		[15, new game.pf2e.Coins({ gp: 40 })],
+		[16, new game.pf2e.Coins({ gp: 60 })],
+		[17, new game.pf2e.Coins({ gp: 80 })],
+		[18, new game.pf2e.Coins({ gp: 140 })],
+		[19, new game.pf2e.Coins({ gp: 200 })],
+		[20, new game.pf2e.Coins({ gp: 300 })],
+	]);
+
+	FORMULA_PRICE = new Map<number, CoinsPF2e>([
+		[0, new game.pf2e.Coins({ sp: 5 })],
+		[1, new game.pf2e.Coins({ gp: 1 })],
+		[2, new game.pf2e.Coins({ gp: 2 })],
+		[3, new game.pf2e.Coins({ gp: 3 })],
+		[4, new game.pf2e.Coins({ gp: 5 })],
+		[5, new game.pf2e.Coins({ gp: 8 })],
+		[6, new game.pf2e.Coins({ gp: 13 })],
+		[7, new game.pf2e.Coins({ gp: 18 })],
+		[8, new game.pf2e.Coins({ gp: 25 })],
+		[9, new game.pf2e.Coins({ gp: 35 })],
+		[10, new game.pf2e.Coins({ gp: 50 })],
+		[11, new game.pf2e.Coins({ gp: 70 })],
+		[12, new game.pf2e.Coins({ gp: 100 })],
+		[13, new game.pf2e.Coins({ gp: 150 })],
+		[14, new game.pf2e.Coins({ gp: 225 })],
+		[15, new game.pf2e.Coins({ gp: 325 })],
+		[16, new game.pf2e.Coins({ gp: 500 })],
+		[17, new game.pf2e.Coins({ gp: 750 })],
+		[18, new game.pf2e.Coins({ gp: 1200 })],
+		[19, new game.pf2e.Coins({ gp: 2000 })],
+		[20, new game.pf2e.Coins({ gp: 3500 })],
+	]);
+});
+
+export let HEROIC_CRAFTING_SPENDING_LIMIT: Map<number, { hour: CoinsPF2e; day: CoinsPF2e; week: CoinsPF2e }>;
+
+export let HEROIC_CRAFTING_GATHERED_INCOME: Map<number, CoinsPF2e>;
 
 export const LEVEL_BASED_DC = new Map<number, number>([
 	[-1, 13],
@@ -81,26 +255,4 @@ export const LEVEL_BASED_DC = new Map<number, number>([
 	[25, 50],
 ]);
 
-export const FORMULA_PRICE = new Map<number, number>([
-	[0, 50],
-	[1, 100],
-	[2, 200],
-	[3, 300],
-	[4, 500],
-	[5, 800],
-	[6, 1300],
-	[7, 1800],
-	[8, 2500],
-	[9, 3500],
-	[10, 5000],
-	[11, 7000],
-	[12, 10000],
-	[13, 15000],
-	[14, 22500],
-	[15, 32500],
-	[16, 50000],
-	[17, 75000],
-	[18, 120000],
-	[19, 200000],
-	[20, 350000],
-]); // prices are in CP
+export let FORMULA_PRICE: Map<number, CoinsPF2e>; // prices are in CP

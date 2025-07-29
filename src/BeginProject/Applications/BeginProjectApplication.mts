@@ -7,14 +7,15 @@ import {
 	TreasurePF2e,
 	WeaponPF2e,
 } from "../../../types/src/module/item";
-import { Coins } from "../../../types/src/module/item/physical";
+import { Coins, CoinsPF2e } from "../../../types/src/module/item/physical";
 import {
 	ApplicationClosingOptions,
 	ApplicationRenderOptions,
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/_module.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
-import { coinsToCoinString, coinsToCopperValue, copperValueToCoins } from "../../Helper/currency.mjs";
+import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../../Helper/constants.mjs";
+import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
 import { calculateDC } from "../../Helper/dc.mjs";
 import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
 import { BeginProjectUpdateDetailsOptions, ProjectItemDetails } from "../types.mjs";
@@ -186,21 +187,17 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 	private scaleStartingValue() {
 		const curValue = this.getCurrentStartingValue();
-		const curValueCopper = coinsToCopperValue(curValue);
 		const maxStartingValue = this.getMaxStartingValue();
-		const maxStartingValueCopper = coinsToCopperValue(maxStartingValue);
-		const scalingFactor = maxStartingValueCopper / curValueCopper;
+		const scalingFactor = maxStartingValue.copperValue / curValue.copperValue;
 		if (scalingFactor >= 1) {
 			this.updateStartingValueText();
 			return;
 		}
 
-		const scaleCoins = (coins: Coins) => copperValueToCoins(Math.floor(coinsToCopperValue(coins) * scalingFactor));
-
 		const breakdown = this.getCurrentStartingValueBreakdown();
 		const newBreakdown = {
-			currency: scaleCoins(breakdown.currency ?? {}),
-			trove: scaleCoins(breakdown.generic ?? {}),
+			currency: CoinsPF2eUtility.multCoins(scalingFactor, breakdown.currency ?? {}),
+			trove: CoinsPF2eUtility.multCoins(scalingFactor, breakdown.generic ?? {}),
 		};
 		this.setInputs(newBreakdown);
 		this.updateStartingValueText();
@@ -219,32 +216,26 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		const curValue = this.getCurrentStartingValue();
 
 		const maxStartingValue = this.getMaxStartingValue();
-		const maxStartingValueCopper = coinsToCopperValue(maxStartingValue);
-		const key = (materialData.item == "trove" ? "generic" : materialData.item) as "currency" | "generic";
-		const breakdownData = breakdown[key] ?? {};
-		const breakdownCopper = coinsToCopperValue(breakdownData);
+		const key = (materialData.item === "trove" ? "generic" : materialData.item) as "currency" | "generic";
+		const breakdownData = new game.pf2e.Coins(breakdown[key] ?? {});
 
-		const preMaterialContribution = coinsToCopperValue(curValue) - breakdownCopper;
-		const remainingBudgetCopper = maxStartingValueCopper - preMaterialContribution;
+		const preMaterialContribution = CoinsPF2eUtility.subCoins(curValue, breakdownData);
+		const remainingBudgetCopper = CoinsPF2eUtility.subCoins(maxStartingValue, preMaterialContribution);
 
-		let maxSpendCopper = 0;
+		let maxSpend: CoinsPF2e;
 		switch (key) {
 			case "currency":
-				maxSpendCopper = Math.min(this.actor.inventory.coins.copperValue, remainingBudgetCopper);
+				maxSpend = CoinsPF2eUtility.minCoins(this.actor.inventory.coins, remainingBudgetCopper);
 				break;
 			case "generic":
-				maxSpendCopper = Math.min(
-					(await MaterialTrove.getValue(this.actor)).copperValue,
-					remainingBudgetCopper
-				);
+				maxSpend = CoinsPF2eUtility.minCoins(await MaterialTrove.getValue(this.actor), remainingBudgetCopper);
 				break;
 			default:
-				maxSpendCopper = maxStartingValueCopper;
+				maxSpend = maxStartingValue;
 				break;
 		}
-		if (breakdownCopper <= maxSpendCopper) return;
+		if (breakdownData.copperValue <= maxSpend.copperValue) return;
 
-		const maxSpend = copperValueToCoins(maxSpendCopper);
 		for (const input of inputs) {
 			const name = input.name.toLowerCase();
 			if (name.endsWith("pp")) {
@@ -346,7 +337,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		return result;
 	}
 
-	private getCurrentStartingValue(): Coins {
+	private getCurrentStartingValue(): CoinsPF2e {
 		const inputs = this.element.querySelectorAll<HTMLInputElement>(
 			".begin-project-start-summary .money-group input"
 		);
@@ -377,7 +368,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 					break;
 			}
 		}
-		return coins;
+		return new game.pf2e.Coins(coins);
 	}
 
 	override async _prepareContext(options: ApplicationRenderOptions) {
@@ -396,7 +387,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		return foundry.utils.mergeObject(data, {
 			buttons,
 			includeIsFormula: this.includeIsFormula,
-			hasMaterialTrove: !!MaterialTrove.getMaterialTrove(this.actor),
+			hasMaterialTrove: !!(await MaterialTrove.getMaterialTrove(this.actor)),
 		});
 	}
 
@@ -444,10 +435,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			ui.notifications.info("Coins cannot be crafted");
 			return null;
 		}
-		if (
-			item.slug &&
-			["material-trove", "generic-crafting-material", "generic-salvage-material"].includes(item.slug)
-		) {
+		if (item.slug && [MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, SALVAGE_MATERIAL_SLUG].includes(item.slug)) {
 			ui.notifications.info(`${item.name} cannot be crafted`);
 			return null;
 		}
@@ -612,17 +600,17 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		);
 
 		if (!startingValueSpan || !startingMaxSpan) return;
-		startingValueSpan.textContent = coinsToCoinString(this.getCurrentStartingValue());
+		startingValueSpan.textContent = this.getCurrentStartingValue().toString();
 		const maxStartingValue = this.getMaxStartingValue();
-		startingMaxSpan.textContent = coinsToCoinString(maxStartingValue);
+		startingMaxSpan.textContent = maxStartingValue.toString();
 	}
 
-	private getMaxStartingValue(): Coins {
-		if (!this.item) return {};
+	private getMaxStartingValue(): CoinsPF2e {
+		if (!this.item) return new game.pf2e.Coins();
 		const batchSizeInput = this.element.querySelector<HTMLInputElement>(".summary-batch-size");
 		const batchSize = batchSizeInput ? Number.parseInt(batchSizeInput.value) || 1 : 1;
-		const maxStartingValueCopper = Math.floor(this.item.price.value.copperValue / 2) * batchSize;
-		return copperValueToCoins(maxStartingValueCopper);
+		const maxStartingValue = CoinsPF2eUtility.multCoins(batchSize / 2, this.item.price.value);
+		return maxStartingValue;
 	}
 }
 

@@ -1,10 +1,10 @@
-import { Coins } from "../../types/src/module/item/physical";
+import { CoinsPF2e } from "../../types/src/module/item/physical";
 
 export type ProjectCraftDetails = {
 	projectId: string;
 	materialsSpent: {
-		generic?: Coins;
-		currency?: Coins;
+		generic?: CoinsPF2e;
+		currency?: CoinsPF2e;
 		treasure?: TreasureMaterialSpent[];
 	};
 	duration: ProjectCraftDuration;
@@ -13,7 +13,7 @@ export type ProjectCraftDetails = {
 
 export type TreasureMaterialSpent = {
 	uuid: string;
-	value: Coins;
+	value: CoinsPF2e;
 	quantity?: number;
 	postUseOperation: TreasurePostUseOperation;
 };

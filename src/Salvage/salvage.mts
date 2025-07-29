@@ -5,13 +5,12 @@ import { CheckRoll } from "../../types/src/module/system/check";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { StatisticRollParameters } from "../../types/src/module/system/statistic";
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
-import { copperValueToCoins, copperValueToCoinString, coinsToCopperValue } from "../Helper/currency.mjs";
-import { LEVEL_BASED_DC } from "../Helper/constants.mjs";
+import { CoinsPF2eUtility } from "../Helper/currency.mjs";
+import { LEVEL_BASED_DC, SALVAGE_MATERIAL_SLUG, SALVAGE_MATERIAL_UUID } from "../Helper/constants.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { SalvageApplication } from "./Applications/SalvageApplication.mjs";
 import { SalvageApplicationResult } from "./Applications/types.mjs";
-
-const SALVAGE_MATERIAL_UUID = "Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.R8QxNha74tYOrccl";
+import { CoinsPF2e } from "../../types/src/module/item/physical";
 
 export async function salvage(actor: ActorPF2e, item: PhysicalItemPF2e, lockItem = false) {
 	const salvageDetails = await SalvageApplication.GetSalvageDetails({ actor: actor, item: item, lockItem: lockItem });
@@ -37,25 +36,25 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 		_event: Event | null
 	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
-			let incomeCopperValue;
+			let incomeValue;
 			switch (outcome) {
 				case "criticalSuccess":
 				case "success":
-					incomeCopperValue = salvageDetails.income.success;
+					incomeValue = salvageDetails.income.success;
 					break;
 				case "failure":
 				case "criticalFailure":
-					incomeCopperValue = salvageDetails.income.failure;
+					incomeValue = salvageDetails.income.failure;
 					break;
 				default:
-					incomeCopperValue = 0;
+					incomeValue = new game.pf2e.Coins();
 					break;
 			}
 
 			const fullDuration =
-				incomeCopperValue == 0
+				incomeValue.copperValue === 0
 					? Infinity
-					: Math.ceil(coinsToCopperValue(salvageDetails.max) / incomeCopperValue);
+					: Math.ceil(salvageDetails.max.copperValue / incomeValue.copperValue);
 			const flavor = await foundry.applications.handlebars.renderTemplate(
 				"modules/pf2e-heroic-crafting/templates/chat/salvage/result.hbs",
 				{
@@ -64,10 +63,7 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 						rollData: salvageItem.getRollData(),
 					}),
 					salvage: {
-						income: {
-							copperValue: incomeCopperValue,
-							string: copperValueToCoinString(incomeCopperValue),
-						},
+						income: incomeValue,
 						duration: { given: salvageDetails.duration, full: fullDuration },
 						max: salvageDetails.max,
 					},
@@ -176,34 +172,29 @@ async function gainSalvageMaterials(data: DOMStringMap) {
 	if (!item) return;
 	if (!item.actor) return;
 
-	const salvageMaxCoins = {
-		pp: Number.parseInt(data.salvageMaxPp as string),
-		gp: Number.parseInt(data.salvageMaxGp as string),
-		sp: Number.parseInt(data.salvageMaxSp as string),
-		cp: Number.parseInt(data.salvageMaxCp as string),
-	};
+	const salvageMaxCoins = game.pf2e.Coins.fromString(data.salvageMax ?? "");
 	const duration = Number.parseInt(data.duration as string);
-	const income = Number.parseInt(data.salvageIncome as string);
-	const totalIncome = duration * income;
+	const income = game.pf2e.Coins.fromString(data.salvageIncome ?? "");
+	const totalIncome = CoinsPF2eUtility.multCoins(duration, income);
 
-	const salvageMaxCopper = coinsToCopperValue(salvageMaxCoins);
-	const remainingSalvagePrice = Math.max(salvageMaxCopper - totalIncome, 0);
-	if (item.slug != "generic-salvage-material") {
+	const remainingSalvagePrice = CoinsPF2eUtility.maxCoins(
+		CoinsPF2eUtility.subCoins(salvageMaxCoins, totalIncome),
+		new game.pf2e.Coins()
+	);
+	if (item.slug != SALVAGE_MATERIAL_SLUG) {
 		await createSalvage(item, remainingSalvagePrice);
-	} else if (remainingSalvagePrice > 0) {
-		await item.update({ "system.price.value": copperValueToCoins(remainingSalvagePrice) });
+	} else if (remainingSalvagePrice.copperValue > 0) {
+		await item.update({ "system.price.value": remainingSalvagePrice });
 	} else {
 		ui.notifications.info(`${item.name} fully salvaged`);
 		await item.delete();
 	}
 
-	await MaterialTrove.addValue(item.actor, copperValueToCoins(Math.min(salvageMaxCopper, totalIncome)));
+	await MaterialTrove.addValue(item.actor, CoinsPF2eUtility.minCoins(salvageMaxCoins, totalIncome));
 }
 
-export async function createSalvage(item: PhysicalItemPF2e, priceCopperValue?: number) {
-	if (!priceCopperValue) {
-		priceCopperValue = Math.floor(item.price.value.copperValue / 2); // Use default salvage value of 50%
-	}
+export async function createSalvage(item: PhysicalItemPF2e, priceValue?: CoinsPF2e) {
+	priceValue ??= CoinsPF2eUtility.multCoins(1 / 2, item.price.value); // Use default salvage value of 50%
 	const genericSalvage = (await fromUuid(SALVAGE_MATERIAL_UUID)) as TreasurePF2e;
 	const genericSalvageClone = genericSalvage.clone({
 		system: {
@@ -211,10 +202,10 @@ export async function createSalvage(item: PhysicalItemPF2e, priceCopperValue?: n
 			bulk: item.system.bulk,
 			containerId: item.container,
 			equipped: item.system.equipped,
-			price: { value: copperValueToCoins(priceCopperValue) },
+			price: { value: priceValue },
 		},
 	});
-	if (priceCopperValue > 0) {
+	if (priceValue.copperValue > 0) {
 		await Item.implementation.create(genericSalvageClone.toObject(), { parent: item.actor });
 	} else {
 		ui.notifications.info(`${item.name} fully salvaged`);
@@ -231,7 +222,7 @@ async function gainSavvyTeardownMaterials(data: DOMStringMap) {
 	const item = (await fromUuid(data.itemUuid as string)) as PhysicalItemPF2e;
 	if (!item) return;
 	if (!item.actor) return;
-	const income = Number.parseInt(data.salvageIncome as string);
+	const income = game.pf2e.Coins.fromString(data.salvageIncome ?? "");
 
 	if (item.quantity > 1) {
 		await item.update({ "system.quantity": item.quantity - 1 });
@@ -239,5 +230,5 @@ async function gainSavvyTeardownMaterials(data: DOMStringMap) {
 		await item.delete();
 	}
 
-	await MaterialTrove.addValue(item.actor, copperValueToCoins(income));
+	await MaterialTrove.addValue(item.actor, income);
 }

@@ -1,13 +1,13 @@
 import { ActorPF2e } from "../../../types/src/module/actor";
-import { Coins, PhysicalItemPF2e } from "../../../types/src/module/item/physical";
+import { CoinsPF2e, PhysicalItemPF2e } from "../../../types/src/module/item/physical";
 
 export type SalvageApplicationResult = {
 	savvyTeardown: boolean;
-	max: Coins;
+	max: CoinsPF2e;
 	duration: number;
 	income: {
-		success: number;
-		failure: number;
+		success: CoinsPF2e;
+		failure: CoinsPF2e;
 	};
 	actor: ActorPF2e;
 	item: PhysicalItemPF2e;

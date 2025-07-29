@@ -1,11 +1,9 @@
+{{log this}}
 <div class="pf2e chat-card"
      data-salvage-results
      data-item-uuid="{{item.uuid}}"
-     data-salvage-max-PP="{{salvage.max.pp}}"
-     data-salvage-max-GP="{{salvage.max.gp}}"
-     data-salvage-max-SP="{{salvage.max.sp}}"
-     data-salvage-max-CP="{{salvage.max.cp}}"
-     data-salvage-income="{{salvage.income.copperValue}}">
+     data-salvage-max="{{salvage.max}}"
+     data-salvage-income="{{salvage.income}}">
     <div class="card-content">
         <div style="display: flex; align-items: center; margin-bottom: 3px;">
             <img src="{{item.img}}"
@@ -14,9 +12,9 @@
         </div>
         <hr>
         {{#if savvyTeardown}}
-            <p><strong>Materials gained</strong> {{salvage.income.string}}</p>
+            <p><strong>Materials gained</strong> {{salvage.income}}</p>
         {{else}}
-            <p><strong>Materials gained per hour</strong> {{salvage.income.string}}</p>
+            <p><strong>Materials gained per hour</strong> {{salvage.income}}</p>
         {{/if}}
     </div>
     <hr>

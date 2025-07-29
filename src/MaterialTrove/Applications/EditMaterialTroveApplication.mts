@@ -1,37 +1,32 @@
-import { Coins } from "../../../types/src/module/item/physical";
+import { Coins, CoinsPF2e } from "../../../types/src/module/item/physical";
 import {
 	ApplicationClosingOptions,
 	ApplicationRenderOptions,
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/_module.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
-import {
-	coinsToCoinString,
-	coinsToCopperValue,
-	copperValueToCoins,
-	copperValueToCoinString,
-} from "../../Helper/currency.mjs";
+import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
 import { EditMaterialTroveApplicationResult } from "./types.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(ApplicationV2) {
-	CraftingMaterialsCopperValue: number;
+	CraftingMaterialsCopperValue: CoinsPF2e;
 	addSubChosen: "add" | "sub";
-	curEditValue: Coins;
-	curAddSubValue: Coins;
+	curEditValue: CoinsPF2e;
+	curAddSubValue: CoinsPF2e;
 	result?: EditMaterialTroveApplicationResult;
 	callback?: (result: EditMaterialTroveApplicationResult | undefined) => void;
 
 	constructor(
-		CraftingMaterialsCopperValue: number,
+		CraftingMaterialsCopperValue: Coins,
 		callback: (result: EditMaterialTroveApplicationResult | undefined) => void
 	) {
 		super();
-		this.CraftingMaterialsCopperValue = CraftingMaterialsCopperValue;
+		this.CraftingMaterialsCopperValue = new game.pf2e.Coins(CraftingMaterialsCopperValue);
 		this.addSubChosen = "add";
-		this.curEditValue = {};
-		this.curAddSubValue = {};
+		this.curEditValue = new game.pf2e.Coins();
+		this.curAddSubValue = new game.pf2e.Coins();
 		if (callback) {
 			this.callback = callback;
 		}
@@ -141,16 +136,16 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		switch (this.tabGroups.primary) {
 			case "add-sub":
 				this.result = {
-					newMaterialCopperValue:
-						this.addSubChosen == "add"
-							? this.CraftingMaterialsCopperValue + coinsToCopperValue(this.curAddSubValue ?? {})
-							: this.CraftingMaterialsCopperValue - coinsToCopperValue(this.curAddSubValue ?? {}),
+					newMaterialTroveValue:
+						this.addSubChosen === "add"
+							? CoinsPF2eUtility.addCoins(this.CraftingMaterialsCopperValue, this.curAddSubValue ?? {})
+							: CoinsPF2eUtility.subCoins(this.CraftingMaterialsCopperValue, this.curAddSubValue ?? {}),
 					useActorCoins: formData.object.addSubUseCoins as boolean,
 				};
 				break;
 			case "edit":
 				this.result = {
-					newMaterialCopperValue: coinsToCopperValue(this.curEditValue),
+					newMaterialTroveValue: new game.pf2e.Coins(this.curEditValue),
 					useActorCoins: formData.object.editUseCoins as boolean,
 				};
 				break;
@@ -190,23 +185,22 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 
 	private static EditCurValue(this: EditMaterialTroveApplication, denomination: keyof Coins, value: number) {
 		this.curEditValue[denomination] = value;
-		const curValue = coinsToCoinString(this.curEditValue);
+		const curValue = this.curEditValue;
 		const newMaterialDiv = this.element.querySelector("#edit-material-trove-edit-new-materials");
-		if (newMaterialDiv) newMaterialDiv.textContent = curValue;
+		if (newMaterialDiv) newMaterialDiv.textContent = curValue.toString();
 	}
 
 	private static AddSubCurValue(this: EditMaterialTroveApplication, denomination?: keyof Coins, value?: number) {
-		if (denomination && value != 0) this.curAddSubValue[denomination] = value;
-		const copperValue =
-			this.addSubChosen == "add"
-				? this.CraftingMaterialsCopperValue + coinsToCopperValue(this.curAddSubValue)
-				: this.CraftingMaterialsCopperValue - coinsToCopperValue(this.curAddSubValue);
-		const curValue = copperValueToCoinString(copperValue);
+		if (denomination && value && value !== 0) this.curAddSubValue[denomination] = value;
+		const curValue =
+			this.addSubChosen === "add"
+				? CoinsPF2eUtility.addCoins(this.CraftingMaterialsCopperValue, this.curAddSubValue ?? {})
+				: CoinsPF2eUtility.subCoins(this.CraftingMaterialsCopperValue, this.curAddSubValue ?? {});
 		const newMaterialDiv = this.element.querySelector("#edit-material-trove-add-sub-new-materials");
-		if (newMaterialDiv) newMaterialDiv.textContent = curValue;
+		if (newMaterialDiv) newMaterialDiv.textContent = curValue.toString();
 	}
 
-	static async EditMaterialTrove(curValue: number) {
+	static async EditMaterialTrove(curValue: Coins) {
 		return new Promise<EditMaterialTroveApplicationResult | undefined>((resolve) => {
 			const app = new EditMaterialTroveApplication(curValue, resolve);
 			app.render(true);
@@ -233,7 +227,7 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 			Record<keyof typeof fields, { action: string; denomination: keyof Coins; tab: string }>
 		> = {};
 		for (const key of Object.keys(fields) as Array<keyof typeof fields>) {
-			if (key == "addSubUseCoins") continue;
+			if (key === "addSubUseCoins") continue;
 
 			const denomination = key.slice(key.length - 2).toLowerCase() as keyof Coins;
 			const tab = key.slice(0, key.length - 2);
@@ -246,16 +240,16 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 
 		const buttons = [{ type: "submit", icon: "fa-solid fa-treasure-chest", label: "Update Material Trove" }];
 		const craftingMaterials = {
-			curValue: copperValueToCoinString(this.CraftingMaterialsCopperValue),
-			coins: copperValueToCoins(this.CraftingMaterialsCopperValue),
+			curValue: this.CraftingMaterialsCopperValue.toString(),
+			coins: this.CraftingMaterialsCopperValue,
 		};
-		this.curEditValue = { ...craftingMaterials.coins };
-		this.curAddSubValue = {
+		this.curEditValue = new game.pf2e.Coins({ ...craftingMaterials.coins });
+		this.curAddSubValue = new game.pf2e.Coins({
 			cp: 0,
 			sp: 0,
 			gp: 0,
 			pp: 0,
-		};
+		});
 		return foundry.utils.mergeObject(data, {
 			buttons,
 			rootId: this.id,

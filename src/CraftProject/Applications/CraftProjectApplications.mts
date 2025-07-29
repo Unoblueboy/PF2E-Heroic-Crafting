@@ -1,6 +1,6 @@
 import { ActorPF2e } from "../../../types/src/module/actor";
-import { ContainerPF2e, PhysicalItemPF2e } from "../../../types/src/module/item";
-import { Coins } from "../../../types/src/module/item/physical";
+import { PhysicalItemPF2e } from "../../../types/src/module/item";
+import { Coins, CoinsPF2e } from "../../../types/src/module/item/physical";
 import {
 	ApplicationClosingOptions,
 	ApplicationRenderOptions,
@@ -8,14 +8,14 @@ import {
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
 import { ProjectItemDetails } from "../../BeginProject/types.mjs";
-import { FORMULA_PRICE, HEROIC_CRAFTING_SPENDING_LIMIT } from "../../Helper/constants.mjs";
 import {
-	coinsToCoinString,
-	coinsToCopperValue,
-	copperValueToCoins,
-	copperValueToCoinString,
-	multCoins,
-} from "../../Helper/currency.mjs";
+	CRAFTING_MATERIAL_SLUG,
+	FORMULA_PRICE,
+	HEROIC_CRAFTING_SPENDING_LIMIT,
+	MATERIAL_TROVE_SLUG,
+	SALVAGE_MATERIAL_SLUG,
+} from "../../Helper/constants.mjs";
+import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
 import { fractionToPercent } from "../../Helper/generics.mjs";
 import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
 import {
@@ -90,11 +90,11 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 		const treasureMaterials: TreasureMaterialSpent[] = [];
 		for (const uuid of treasureUuids) {
-			const coins: Coins = CraftProjectApplication.getCoins(_formData, uuid);
+			const coins: CoinsPF2e = CraftProjectApplication.getCoins(_formData, uuid);
 			const quantity = Number.parseInt((_formData.object[`${uuid}-quantity`] as string) ?? "") || 0;
 			const postUseOperation = _formData.object[`${uuid}-post-use-operation`] as TreasurePostUseOperation;
 
-			if (coinsToCopperValue(coins) == 0 || quantity == 0) continue;
+			if (coins.copperValue === 0 || quantity === 0) continue;
 
 			treasureMaterials.push({
 				uuid: uuid,
@@ -104,9 +104,9 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			});
 		}
 
-		const currencyCoins: Coins = CraftProjectApplication.getCoins(_formData, "currency");
+		const currencyCoins: CoinsPF2e = CraftProjectApplication.getCoins(_formData, "currency");
 
-		const troveCoins: Coins = CraftProjectApplication.getCoins(_formData, "trove");
+		const troveCoins: CoinsPF2e = CraftProjectApplication.getCoins(_formData, "trove");
 
 		const result: ProjectCraftDetails = {
 			projectId: this.projectId,
@@ -114,8 +114,8 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			duration: _formData.object[`duration`] as ProjectCraftDuration,
 		};
 
-		if (coinsToCopperValue(currencyCoins) > 0) result.materialsSpent.currency = currencyCoins;
-		if (coinsToCopperValue(troveCoins) > 0) result.materialsSpent.generic = troveCoins;
+		if (currencyCoins.copperValue > 0) result.materialsSpent.currency = currencyCoins;
+		if (troveCoins.copperValue > 0) result.materialsSpent.generic = troveCoins;
 		if (treasureMaterials.length > 0) result.materialsSpent.treasure = treasureMaterials;
 
 		this.result = result;
@@ -135,7 +135,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		if (_formData.object[`${prefix}-cp`]) {
 			coins.cp = Number.parseInt((_formData.object[`${prefix}-cp`] as string) ?? "") || 0;
 		}
-		return coins;
+		return new game.pf2e.Coins(coins);
 	}
 
 	static async getCraftDetails(
@@ -160,11 +160,15 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 		const craftDurationSelect = _event.currentTarget as HTMLSelectElement;
 		const craftDuration = craftDurationSelect.value as ProjectCraftDuration;
-		const singleCraftMax = HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[craftDuration] ?? 0;
-		materialMaxSpan.textContent = copperValueToCoinString(singleCraftMax * this.itemDetails.batchSize);
-		materialValueSpan.textContent = "0 gp";
+		const singleCraftMax =
+			HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[craftDuration] ?? new game.pf2e.Coins();
+		materialMaxSpan.textContent = CoinsPF2eUtility.multCoins(this.itemDetails.batchSize, singleCraftMax).toString();
+		materialValueSpan.textContent = new game.pf2e.Coins().toString();
 		CraftProjectApplication.resetElements(materialSummaryDiv);
-		CraftProjectApplication.updateCurrencyMaterials(materialSummaryDiv, craftDuration == ProjectCraftDuration.HOUR);
+		CraftProjectApplication.updateCurrencyMaterials(
+			materialSummaryDiv,
+			craftDuration === ProjectCraftDuration.HOUR
+		);
 		await CraftProjectApplication.UpdateProgressBar(this.element, this.itemDetails);
 		const craftProjectButton = this.element.querySelector<HTMLButtonElement>(
 			".footer-button-panel .craft-project-button"
@@ -203,7 +207,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		if (!materialValueSpan) return;
 
 		const newCurCostsTotal = newCurCosts.total;
-		materialValueSpan.textContent = copperValueToCoinString(newCurCostsTotal);
+		materialValueSpan.textContent = newCurCostsTotal.toString();
 
 		await CraftProjectApplication.UpdateProgressBar(this.element, this.itemDetails, newCurCostsTotal);
 
@@ -211,54 +215,52 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			".footer-button-panel .craft-project-button"
 		);
 		if (craftProjectButton) {
-			craftProjectButton.disabled = newCurCosts.total == 0;
+			craftProjectButton.disabled = newCurCosts.total.copperValue === 0;
 		}
 	}
 
 	private static async UpdateProgressBar(
 		baseElement: HTMLElement,
 		itemDetails: ProjectItemDetails,
-		materialCost?: number
+		materialCost?: CoinsPF2e
 	) {
 		const projectMax = await getProjectMax(itemDetails);
-		const projectMaxCopper = coinsToCopperValue(projectMax);
-		const projectValue = itemDetails.value;
-		const projectValueCopper = coinsToCopperValue(projectValue);
-		materialCost ??= 0;
+		const projectValue = new game.pf2e.Coins(itemDetails.value);
+		materialCost ??= new game.pf2e.Coins();
 
 		const bands = [
-			Math.clamp(projectValueCopper - materialCost, 0, projectMaxCopper),
-			Math.clamp(projectValueCopper, 0, projectMaxCopper),
-			Math.clamp(projectValueCopper + Math.floor(materialCost / 2), 0, projectMaxCopper),
-			Math.clamp(projectValueCopper + 2 * materialCost, 0, projectMaxCopper),
+			Math.clamp(projectValue.copperValue - materialCost.copperValue, 0, projectMax.copperValue),
+			Math.clamp(projectValue.copperValue, 0, projectMax.copperValue),
+			Math.clamp(projectValue.copperValue + Math.floor(materialCost.copperValue / 2), 0, projectMax.copperValue),
+			Math.clamp(projectValue.copperValue + 2 * materialCost.copperValue, 0, projectMax.copperValue),
 		];
 
 		const progressBar = baseElement.querySelector<HTMLDivElement>(".project-summary .progress-bar");
 		const invisibleBar = progressBar?.querySelector<HTMLDivElement>(".internal-bar.invisible-bar");
 		if (invisibleBar) {
-			invisibleBar.style = `width:${fractionToPercent(bands[0], projectMaxCopper)}`;
+			invisibleBar.style = `width:${fractionToPercent(bands[0], projectMax.copperValue)}`;
 		}
 		const criticalFailureBar = progressBar?.querySelector<HTMLDivElement>(".internal-bar.criticalFailure-bar");
 		if (criticalFailureBar) {
-			criticalFailureBar.style = `width:${fractionToPercent(bands[1] - bands[0], projectMaxCopper)}`;
+			criticalFailureBar.style = `width:${fractionToPercent(bands[1] - bands[0], projectMax.copperValue)}`;
 		}
 		const failureBar = progressBar?.querySelector<HTMLDivElement>(".internal-bar.failure-bar");
 		if (failureBar) {
-			failureBar.style = `width:${fractionToPercent(bands[2] - bands[1], projectMaxCopper)}`;
+			failureBar.style = `width:${fractionToPercent(bands[2] - bands[1], projectMax.copperValue)}`;
 		}
 		const successBar = progressBar?.querySelector<HTMLDivElement>(".internal-bar.success-bar");
 		if (successBar) {
-			successBar.style = `width:${fractionToPercent(bands[3] - bands[2], projectMaxCopper)}`;
+			successBar.style = `width:${fractionToPercent(bands[3] - bands[2], projectMax.copperValue)}`;
 		}
 	}
 
 	private static async EnforceMax(
 		this: CraftProjectApplication,
-		curValues: { perItem: Record<string, Coins & { quantity?: number }>; total: number },
+		curValues: { perItem: Record<string, Coins & { quantity?: number }>; total: CoinsPF2e },
 		inputs: NodeListOf<HTMLInputElement>,
 		materialData: Record<string, string | undefined>
 	) {
-		const isBasic = materialData.type == "basic";
+		const isBasic = materialData.type === "basic";
 
 		if (isBasic) {
 			CraftProjectApplication.EnforceBasicMax.bind(this)(curValues, inputs, materialData);
@@ -269,7 +271,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 	private static async EnforceBasicMax(
 		this: CraftProjectApplication,
-		curValues: { perItem: Record<string, Coins & { quantity?: number }>; total: number },
+		curValues: { perItem: Record<string, Coins & { quantity?: number }>; total: CoinsPF2e },
 		inputs: NodeListOf<HTMLInputElement>,
 		materialData: Record<string, string | undefined>
 	) {
@@ -279,29 +281,30 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		if (!craftDurationSelect) return;
 
 		const craftDuration = craftDurationSelect.value as ProjectCraftDuration;
-		const singleSpendingLimit = HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[craftDuration] ?? 0;
-		const spendingLimit = singleSpendingLimit * this.itemDetails.batchSize;
-		const key = materialData.item;
-		const moneyGroupData = curValues.perItem[key ?? ""];
-		const moneyGroupCopper = coinsToCopperValue(moneyGroupData);
+		const singleSpendingLimit =
+			HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[craftDuration] ?? new game.pf2e.Coins();
+		const spendingLimit = singleSpendingLimit.scale(this.itemDetails.batchSize);
+		const moneyGroupCoins = new game.pf2e.Coins(curValues.perItem[materialData.item ?? ""]);
 
-		const preMaterialContribution = curValues.total - moneyGroupCopper;
-		const remainingBudgetCopper = spendingLimit - preMaterialContribution;
-		let maxSpendCopper = 0;
+		const preMaterialContribution = CoinsPF2eUtility.subCoins(curValues.total, moneyGroupCoins);
+		const remainingBudget = CoinsPF2eUtility.subCoins(spendingLimit, preMaterialContribution);
+		let maxSpend;
 		switch (materialData.item) {
 			case "currency":
-				maxSpendCopper = Math.min(this.actor.inventory.coins.copperValue, remainingBudgetCopper);
+				maxSpend = CoinsPF2eUtility.minCoins(this.actor.inventory.coins, remainingBudget);
 				break;
 			case "trove":
-				maxSpendCopper = Math.min(this.materialTrove?.value?.copperValue ?? 0, remainingBudgetCopper);
+				maxSpend = CoinsPF2eUtility.minCoins(
+					this.materialTrove?.value ?? new game.pf2e.Coins(),
+					remainingBudget
+				);
 				break;
 			default:
-				maxSpendCopper = spendingLimit;
+				maxSpend = spendingLimit;
 				break;
 		}
-		if (moneyGroupCopper <= maxSpendCopper) return;
+		if (moneyGroupCoins.copperValue <= maxSpend.copperValue) return;
 
-		const maxSpend = copperValueToCoins(maxSpendCopper);
 		for (const input of inputs) {
 			const name = input.name.toLowerCase();
 			if (name.endsWith("pp")) {
@@ -318,7 +321,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 	private static async EnforceAdvancedMax(
 		this: CraftProjectApplication,
-		curValues: { perItem: Record<string, Coins & { quantity?: number }>; total: number },
+		curValues: { perItem: Record<string, Coins & { quantity?: number }>; total: CoinsPF2e },
 		inputs: NodeListOf<HTMLInputElement>,
 		materialData: Record<string, string | undefined>
 	) {
@@ -328,37 +331,39 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		if (!craftDurationSelect) return;
 
 		const craftDuration = craftDurationSelect.value as ProjectCraftDuration;
-		const singleSpendingLimit = HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[craftDuration] ?? 0;
-		const spendingLimit = singleSpendingLimit * this.itemDetails.batchSize;
+		const singleSpendingLimit =
+			HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[craftDuration] ?? new game.pf2e.Coins();
+		const spendingLimit = singleSpendingLimit.scale(this.itemDetails.batchSize);
 		const uuid = materialData.uuid;
 		if (!uuid) return;
 
 		const item = (await foundry.utils.fromUuid(uuid)) as PhysicalItemPF2e;
 		const moneyGroupData = curValues.perItem[uuid ?? ""];
-		const moneyGroupCopper = coinsToCopperValue(moneyGroupData) * (moneyGroupData.quantity ?? 1);
+		const moneyGroupCoins = CoinsPF2eUtility.multCoins(moneyGroupData.quantity ?? 1, moneyGroupData);
 
-		const preMaterialContribution = curValues.total - moneyGroupCopper;
-		const remainingBudgetCopper = spendingLimit - preMaterialContribution;
-		const maxSpendCopper = Math.min(
-			item.price.value.copperValue * (moneyGroupData.quantity ?? 1),
-			remainingBudgetCopper
+		const preMaterialContribution = CoinsPF2eUtility.subCoins(curValues.total, moneyGroupCoins);
+		const remainingBudget = CoinsPF2eUtility.subCoins(spendingLimit, preMaterialContribution);
+		const maxSpendTotal = CoinsPF2eUtility.minCoins(
+			item.price.value.scale(moneyGroupData.quantity ?? 1),
+			remainingBudget
 		);
 
-		if (moneyGroupCopper <= maxSpendCopper && (moneyGroupData.quantity ?? 0) <= item.quantity) return;
+		if (moneyGroupCoins.copperValue <= maxSpendTotal.copperValue && (moneyGroupData.quantity ?? 0) <= item.quantity)
+			return;
 
 		const quantity = Math.min(moneyGroupData.quantity ?? 1, item.quantity);
-		const finalSpendCopper = Math.min(moneyGroupCopper, maxSpendCopper);
-		const maxSpend: Coins = quantity == 0 ? {} : copperValueToCoins(Math.floor(finalSpendCopper / quantity));
+		const finalSpend = CoinsPF2eUtility.minCoins(moneyGroupCoins, maxSpendTotal);
+		const maxSpendPer: Coins = quantity === 0 ? {} : CoinsPF2eUtility.multCoins(1 / quantity, finalSpend);
 		for (const input of inputs) {
 			const name = input.name.toLowerCase();
 			if (name.endsWith("pp")) {
-				input.value = `${maxSpend.pp ?? 0}`;
+				input.value = `${maxSpendPer.pp ?? 0}`;
 			} else if (name.endsWith("gp")) {
-				input.value = `${maxSpend.gp ?? 0}`;
+				input.value = `${maxSpendPer.gp ?? 0}`;
 			} else if (name.endsWith("sp")) {
-				input.value = `${maxSpend.sp ?? 0}`;
+				input.value = `${maxSpendPer.sp ?? 0}`;
 			} else if (name.endsWith("cp")) {
-				input.value = `${maxSpend.cp ?? 0}`;
+				input.value = `${maxSpendPer.cp ?? 0}`;
 			} else if (name.endsWith("quantity")) {
 				input.value = `${quantity}`;
 			}
@@ -391,9 +396,10 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			}
 		}
 
-		let total = 0;
+		let total = new game.pf2e.Coins();
 		for (const data of Object.values(itemData)) {
-			total += coinsToCopperValue(data) * (data.quantity ?? 1);
+			const coinData = new game.pf2e.Coins(data);
+			total = total.plus(coinData.scale(data.quantity ?? 1));
 		}
 
 		return {
@@ -431,12 +437,12 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		const data = await super._prepareContext(options);
 		const item = (await foundry.utils.fromUuid(this.itemDetails.itemData.uuid)) as PhysicalItemPF2e;
 
-		const projectCur = this.itemDetails.value;
+		const projectCur = new game.pf2e.Coins(this.itemDetails.value);
 		const projectMax = await getProjectMax(this.itemDetails);
 		const project = {
-			cur: coinsToCoinString(projectCur),
-			max: coinsToCoinString(projectMax),
-			percent: fractionToPercent(coinsToCopperValue(projectCur), coinsToCopperValue(projectMax)),
+			cur: projectCur,
+			max: projectMax,
+			percent: fractionToPercent(projectCur.copperValue, projectMax.copperValue),
 		};
 
 		const materials: {
@@ -450,9 +456,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 				.filter(
 					(troveItem) =>
 						!!troveItem.slug &&
-						!["material-trove", "generic-crafting-material", "generic-salvage-material"].includes(
-							troveItem.slug
-						)
+						![MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, SALVAGE_MATERIAL_SLUG].includes(troveItem.slug)
 				)
 				.forEach((troveItem) =>
 					materials.push({
@@ -464,9 +468,11 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 				);
 		}
 
-		const spendingLimitCopperValue =
-			(HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.day ?? 0) * this.itemDetails.batchSize;
-		const spendingLimit = copperValueToCoins(spendingLimitCopperValue);
+		const spendingLimitCoins = CoinsPF2eUtility.multCoins(
+			this.itemDetails.batchSize,
+			HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.day ?? new game.pf2e.Coins()
+		);
+		const spendingLimit = spendingLimitCoins;
 		const buttons = [
 			{
 				type: "submit",
@@ -492,7 +498,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			buttons,
 			project,
 			materials,
-			spendingLimit: coinsToCoinString(spendingLimit),
+			spendingLimit: spendingLimit,
 			hasMaterialTrove: !!this.materialTrove,
 		});
 	}
@@ -514,9 +520,9 @@ export function getItemDetails(actor: ActorPF2e, projectId: string) {
 	return itemDetails;
 }
 
-export async function getProjectMax(itemDetails: ProjectItemDetails, item?: PhysicalItemPF2e): Promise<Coins> {
+export async function getProjectMax(itemDetails: ProjectItemDetails, item?: PhysicalItemPF2e): Promise<CoinsPF2e> {
 	item ??= (await foundry.utils.fromUuid(itemDetails.itemData.uuid)) as PhysicalItemPF2e;
 	return itemDetails.itemData.isFormula
-		? copperValueToCoins(FORMULA_PRICE.get(item.level) ?? 0)
-		: multCoins(itemDetails.batchSize, item.price.value);
+		? FORMULA_PRICE.get(item.level) ?? new game.pf2e.Coins()
+		: CoinsPF2eUtility.multCoins(itemDetails.batchSize, item.price.value);
 }
