@@ -17,7 +17,7 @@ import {
 	multCoins,
 } from "../../Helper/currency.mjs";
 import { fractionToPercent } from "../../Helper/generics.mjs";
-import { getCurrentMaterialTroveValue, getMaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
+import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
 import {
 	ProjectCraftDetails,
 	ProjectCraftDuration,
@@ -37,17 +37,20 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	actor: ActorPF2e;
 	projectId: string;
 	itemDetails: ProjectItemDetails;
-	materialTrove?: PhysicalItemPF2e;
+	materialTrove?: MaterialTrove;
 	result?: ProjectCraftDetails;
 	callback: (result?: ProjectCraftDetails) => void;
 
-	constructor(options: CraftProjectApplicationOptions) {
+	private constructor(options: CraftProjectApplicationOptions) {
 		super(options as object);
 		this.actor = options.actor;
 		this.projectId = options.projectId;
 		this.itemDetails = getItemDetails(this.actor, this.projectId);
-		this.materialTrove = getMaterialTrove(this.actor, false);
 		this.callback = options.callback;
+	}
+
+	private async initializeData() {
+		this.materialTrove = await MaterialTrove.getMaterialTrove(this.actor);
 	}
 
 	static override readonly DEFAULT_OPTIONS = {
@@ -141,7 +144,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		return new Promise<ProjectCraftDetails | undefined>((resolve) => {
 			const applicationOptions: CraftProjectApplicationOptions = Object.assign(options, { callback: resolve });
 			const app = new CraftProjectApplication(applicationOptions);
-			app.render(true);
+			app.initializeData().then(() => app.render(true));
 		});
 	}
 
@@ -290,7 +293,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 				maxSpendCopper = Math.min(this.actor.inventory.coins.copperValue, remainingBudgetCopper);
 				break;
 			case "trove":
-				maxSpendCopper = Math.min(await getCurrentMaterialTroveValue(this.actor), remainingBudgetCopper);
+				maxSpendCopper = Math.min(this.materialTrove?.value?.copperValue ?? 0, remainingBudgetCopper);
 				break;
 			default:
 				maxSpendCopper = spendingLimit;
@@ -345,7 +348,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 		const quantity = Math.min(moneyGroupData.quantity ?? 1, item.quantity);
 		const finalSpendCopper = Math.min(moneyGroupCopper, maxSpendCopper);
-		const maxSpend = quantity == 0 ? {} : copperValueToCoins(Math.floor(finalSpendCopper / quantity));
+		const maxSpend: Coins = quantity == 0 ? {} : copperValueToCoins(Math.floor(finalSpendCopper / quantity));
 		for (const input of inputs) {
 			const name = input.name.toLowerCase();
 			if (name.endsWith("pp")) {
@@ -443,7 +446,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			quantity: number;
 		}[] = [];
 		if (this.materialTrove) {
-			(this.materialTrove as ContainerPF2e).contents
+			this.materialTrove.contents
 				.filter(
 					(troveItem) =>
 						!!troveItem.slug &&

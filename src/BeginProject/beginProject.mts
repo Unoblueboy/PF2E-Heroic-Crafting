@@ -1,7 +1,6 @@
 import { ActorPF2e } from "../../types/src/module/actor";
 import { Coins } from "../../types/src/module/item/physical";
-import { coinsToCopperValue } from "../Helper/currency.mjs";
-import { addMaterialTroveValue } from "../MaterialTrove/materialTrove.mjs";
+import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { BeginProjectApplication } from "./Applications/BeginProjectApplication.mjs";
 import { ProjectItemDetails } from "./types.mjs";
 
@@ -32,6 +31,6 @@ async function handleStartingValues(actor: ActorPF2e, startingValues: { currency
 		actor.inventory.removeCoins(startingValues.currency);
 	}
 	if (startingValues.generic) {
-		addMaterialTroveValue(actor, -coinsToCopperValue(startingValues.generic));
+		MaterialTrove.subtractValue(actor, startingValues.generic);
 	}
 }

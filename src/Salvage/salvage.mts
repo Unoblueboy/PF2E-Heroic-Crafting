@@ -7,7 +7,7 @@ import { StatisticRollParameters } from "../../types/src/module/system/statistic
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { copperValueToCoins, copperValueToCoinString, coinsToCopperValue } from "../Helper/currency.mjs";
 import { LEVEL_BASED_DC } from "../Helper/constants.mjs";
-import { addMaterialTroveValue } from "../MaterialTrove/materialTrove.mjs";
+import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { SalvageApplication } from "./Applications/SalvageApplication.mjs";
 import { SalvageApplicationResult } from "./Applications/types.mjs";
 
@@ -197,7 +197,7 @@ async function gainSalvageMaterials(data: DOMStringMap) {
 		await item.delete();
 	}
 
-	await addMaterialTroveValue(item.actor, Math.min(salvageMaxCopper, totalIncome));
+	await MaterialTrove.addValue(item.actor, copperValueToCoins(Math.min(salvageMaxCopper, totalIncome)));
 }
 
 export async function createSalvage(item: PhysicalItemPF2e, priceCopperValue?: number) {
@@ -239,5 +239,5 @@ async function gainSavvyTeardownMaterials(data: DOMStringMap) {
 		await item.delete();
 	}
 
-	await addMaterialTroveValue(item.actor, income);
+	await MaterialTrove.addValue(item.actor, copperValueToCoins(income));
 }

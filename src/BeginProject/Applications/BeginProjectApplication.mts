@@ -16,7 +16,7 @@ import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/app
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
 import { coinsToCoinString, coinsToCopperValue, copperValueToCoins } from "../../Helper/currency.mjs";
 import { calculateDC } from "../../Helper/dc.mjs";
-import { getCurrentMaterialTroveValue, getMaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
+import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
 import { BeginProjectUpdateDetailsOptions, ProjectItemDetails } from "../types.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -233,7 +233,10 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 				maxSpendCopper = Math.min(this.actor.inventory.coins.copperValue, remainingBudgetCopper);
 				break;
 			case "generic":
-				maxSpendCopper = Math.min(await getCurrentMaterialTroveValue(this.actor), remainingBudgetCopper);
+				maxSpendCopper = Math.min(
+					(await MaterialTrove.getValue(this.actor)).copperValue,
+					remainingBudgetCopper
+				);
 				break;
 			default:
 				maxSpendCopper = maxStartingValueCopper;
@@ -393,7 +396,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		return foundry.utils.mergeObject(data, {
 			buttons,
 			includeIsFormula: this.includeIsFormula,
-			hasMaterialTrove: !!getMaterialTrove(this.actor),
+			hasMaterialTrove: !!MaterialTrove.getMaterialTrove(this.actor),
 		});
 	}
 

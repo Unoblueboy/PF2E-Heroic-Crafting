@@ -18,7 +18,7 @@ import {
 	subCoins,
 } from "../Helper/currency.mjs";
 import { Either, fractionToPercent } from "../Helper/generics.mjs";
-import { addMaterialTroveValue } from "../MaterialTrove/materialTrove.mjs";
+import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { CraftProjectApplication, getItemDetails, getProjectMax } from "./Applications/CraftProjectApplications.mjs";
 import {
 	ProjectCraftDetails,
@@ -223,8 +223,7 @@ async function deleteItem(item: PhysicalItemPF2e<ActorPF2e<TokenDocumentPF2e<Sce
 async function useMaterialSpent(actor: ActorPF2e, craftDetails: ProjectCraftDetails): Promise<void> {
 	const materialsSpent = craftDetails.materialsSpent;
 	if (materialsSpent.generic) {
-		const genericCraftingCost = coinsToCopperValue(materialsSpent.generic);
-		await addMaterialTroveValue(actor, -genericCraftingCost);
+		await MaterialTrove.subtractValue(actor, materialsSpent.generic);
 	}
 	if (materialsSpent.currency) {
 		await actor.inventory.removeCoins(materialsSpent.currency);

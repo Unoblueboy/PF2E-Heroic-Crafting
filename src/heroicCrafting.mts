@@ -1,5 +1,5 @@
 import { salvage, salvageChatButtonListener } from "./Salvage/salvage.mjs";
-import { editMaterialTrove } from "./MaterialTrove/materialTrove.mjs";
+import { editMaterialTrove, MaterialTrove } from "./MaterialTrove/materialTrove.mjs";
 import { ChatMessagePF2e } from "../types/src/module/chat-message";
 import { beginProject } from "./BeginProject/beginProject.mjs";
 import { reverseEngineer } from "./ReverseEngineer/reverseEngineer.mjs";
@@ -12,6 +12,7 @@ Hooks.on("init", () => {
 		beginProject,
 		reverseEngineer,
 		craftProject,
+		MaterialTrove,
 	};
 });
 
