@@ -1,4 +1,4 @@
-import { ActorPF2e } from "../../../types/src/module/actor";
+import { CharacterPF2e } from "../../../types/src/module/actor";
 import { CoinsPF2e, PhysicalItemPF2e } from "../../../types/src/module/item/physical";
 
 export type SalvageApplicationResult = {
@@ -9,12 +9,12 @@ export type SalvageApplicationResult = {
 		success: CoinsPF2e;
 		failure: CoinsPF2e;
 	};
-	actor: ActorPF2e;
+	actor: CharacterPF2e;
 	item: PhysicalItemPF2e;
 };
 
 export type SalvageApplicationOptions = {
-	actor?: ActorPF2e;
+	actor?: CharacterPF2e;
 	item?: PhysicalItemPF2e;
 	lockItem?: boolean;
 	callback?: (result: SalvageApplicationResult | undefined) => void;

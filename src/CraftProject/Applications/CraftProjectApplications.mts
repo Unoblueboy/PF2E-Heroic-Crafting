@@ -1,4 +1,4 @@
-import { ActorPF2e } from "../../../types/src/module/actor";
+import { CharacterPF2e } from "../../../types/src/module/actor";
 import { PhysicalItemPF2e } from "../../../types/src/module/item";
 import { Coins, CoinsPF2e } from "../../../types/src/module/item/physical";
 import {
@@ -28,13 +28,13 @@ import {
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 type CraftProjectApplicationOptions = {
-	actor: ActorPF2e;
+	actor: CharacterPF2e;
 	projectId: string;
 	callback: (result: ProjectCraftDetails | undefined) => void;
 };
 
 export class CraftProjectApplication extends HandlebarsApplicationMixin(ApplicationV2) {
-	actor: ActorPF2e;
+	actor: CharacterPF2e;
 	projectId: string;
 	itemDetails: ProjectItemDetails;
 	materialTrove?: MaterialTrove;
@@ -514,7 +514,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 }
 
-export function getItemDetails(actor: ActorPF2e, projectId: string) {
+export function getItemDetails(actor: CharacterPF2e, projectId: string) {
 	const projects = actor.flags["pf2eHeroicCrafting"].projects as Record<string, ProjectItemDetails>;
 	const itemDetails = projects[projectId];
 	return itemDetails;

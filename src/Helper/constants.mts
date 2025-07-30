@@ -8,6 +8,8 @@ export const MATERIAL_TROVE_SLUG = "material-trove";
 export const CRAFTING_MATERIAL_SLUG = "generic-crafting-material";
 export const SALVAGE_MATERIAL_SLUG = "generic-salvage-material";
 
+export const RARITIES: readonly ["common", "uncommon", "rare", "unique"] = ["common", "uncommon", "rare", "unique"];
+
 Hooks.on("ready", () => {
 	HEROIC_CRAFTING_SPENDING_LIMIT = new Map<number, { hour: CoinsPF2e; day: CoinsPF2e; week: CoinsPF2e }>([
 		[
@@ -255,4 +257,4 @@ export const LEVEL_BASED_DC = new Map<number, number>([
 	[25, 50],
 ]);
 
-export let FORMULA_PRICE: Map<number, CoinsPF2e>; // prices are in CP
+export let FORMULA_PRICE: Map<number, CoinsPF2e>;

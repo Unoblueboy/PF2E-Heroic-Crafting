@@ -1,4 +1,4 @@
-import { ActorPF2e } from "../../types/src/module/actor";
+import { CharacterPF2e } from "../../types/src/module/actor";
 import { ChatMessagePF2e } from "../../types/src/module/chat-message";
 import { PhysicalItemPF2e, TreasurePF2e } from "../../types/src/module/item";
 import { CheckRoll } from "../../types/src/module/system/check";
@@ -12,7 +12,7 @@ import { SalvageApplication } from "./Applications/SalvageApplication.mjs";
 import { SalvageApplicationResult } from "./Applications/types.mjs";
 import { CoinsPF2e } from "../../types/src/module/item/physical";
 
-export async function salvage(actor: ActorPF2e, item: PhysicalItemPF2e, lockItem = false) {
+export async function salvage(actor: CharacterPF2e, item: PhysicalItemPF2e, lockItem = false) {
 	const salvageDetails = await SalvageApplication.GetSalvageDetails({ actor: actor, item: item, lockItem: lockItem });
 
 	if (!salvageDetails) {
@@ -190,7 +190,7 @@ async function gainSalvageMaterials(data: DOMStringMap) {
 		await item.delete();
 	}
 
-	await MaterialTrove.addValue(item.actor, CoinsPF2eUtility.minCoins(salvageMaxCoins, totalIncome));
+	await MaterialTrove.addValue(item.actor as CharacterPF2e, CoinsPF2eUtility.minCoins(salvageMaxCoins, totalIncome));
 }
 
 export async function createSalvage(item: PhysicalItemPF2e, priceValue?: CoinsPF2e) {
@@ -230,5 +230,5 @@ async function gainSavvyTeardownMaterials(data: DOMStringMap) {
 		await item.delete();
 	}
 
-	await MaterialTrove.addValue(item.actor, income);
+	await MaterialTrove.addValue(item.actor as CharacterPF2e, income);
 }

@@ -1,4 +1,4 @@
-import { ActorPF2e } from "../../../types/src/module/actor";
+import { CharacterPF2e } from "../../../types/src/module/actor";
 import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../../types/src/module/item";
 import { Coins, CoinsPF2e } from "../../../types/src/module/item/physical";
 import {
@@ -21,7 +21,7 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	result?: SalvageApplicationResult;
 	item?: PhysicalItemPF2e;
-	actor?: ActorPF2e;
+	actor?: CharacterPF2e;
 	callback?: (result: SalvageApplicationResult | undefined) => void;
 	lockItem?: boolean;
 
@@ -200,7 +200,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		if (!item) return;
 
 		if (!this.lockItem || (this.lockItem && !this.item)) {
-			this.actor ||= item.parent as ActorPF2e;
+			this.actor ||= item.parent as CharacterPF2e;
 			this.item = item;
 		}
 		this.updateDetails({ useDefaultSalvageMax: true });

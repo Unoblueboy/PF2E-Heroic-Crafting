@@ -1,4 +1,4 @@
-import { ActorPF2e } from "../../types/src/module/actor";
+import { CharacterPF2e } from "../../types/src/module/actor";
 import { ContainerPF2e, TreasurePF2e } from "../../types/src/module/item";
 import { Coins, CoinsPF2e, PhysicalItemPF2e } from "../../types/src/module/item/physical";
 import { TreasureSource } from "../../types/src/module/item/treasure/data";
@@ -16,7 +16,7 @@ import { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";
 async function useActorCoins(
 	result: EditMaterialTroveApplicationResult,
 	craftingMaterials: CoinsPF2e,
-	actor: ActorPF2e
+	actor: CharacterPF2e
 ) {
 	if (result.useActorCoins) {
 		const coinsToMoveCopper = result.newMaterialTroveValue.copperValue - craftingMaterials.copperValue;
@@ -33,7 +33,7 @@ async function useActorCoins(
 	return true;
 }
 
-export async function editMaterialTrove(actor: ActorPF2e) {
+export async function editMaterialTrove(actor: CharacterPF2e) {
 	if (!actor) {
 		ui.notifications.error("An actor must be selected");
 		return;
@@ -59,7 +59,7 @@ export async function editMaterialTrove(actor: ActorPF2e) {
 export class MaterialTrove {
 	static readonly troves: Map<string, MaterialTrove> = new Map();
 
-	private readonly actor: ActorPF2e;
+	private readonly actor: CharacterPF2e;
 	private readonly materialTrove: ContainerPF2e;
 	private readonly genericCraftingMaterials: {
 		negligible?: TreasurePF2e;
@@ -67,7 +67,7 @@ export class MaterialTrove {
 	};
 	value: CoinsPF2e;
 	contents: Collection<string, PhysicalItemPF2e>;
-	private constructor(actor: ActorPF2e, materialTrove: ContainerPF2e) {
+	private constructor(actor: CharacterPF2e, materialTrove: ContainerPF2e) {
 		this.actor = actor;
 		this.materialTrove = materialTrove;
 		this.genericCraftingMaterials = {};
@@ -76,7 +76,9 @@ export class MaterialTrove {
 	}
 
 	private async initializeGenericCraftingMaterials(): Promise<void> {
-		const craftingMaterials = this.actor.items.filter((x) => x?.slug === CRAFTING_MATERIAL_SLUG) as TreasurePF2e[];
+		const craftingMaterials: TreasurePF2e<CharacterPF2e>[] = this.actor.items.filter(
+			(x) => x?.slug === CRAFTING_MATERIAL_SLUG
+		);
 		const deleteIds = [];
 		for (const craftingMaterial of craftingMaterials) {
 			this.value = this.value.plus(craftingMaterial.price.value.scale(craftingMaterial.quantity));
@@ -91,7 +93,7 @@ export class MaterialTrove {
 		await this.actor.deleteEmbeddedDocuments("Item", deleteIds);
 	}
 
-	private static async newMaterialTrove(actor: ActorPF2e, materialTrove: ContainerPF2e): Promise<MaterialTrove> {
+	private static async newMaterialTrove(actor: CharacterPF2e, materialTrove: ContainerPF2e): Promise<MaterialTrove> {
 		const trove = new MaterialTrove(actor, materialTrove);
 		await trove.initializeGenericCraftingMaterials();
 		await trove.setValue(trove.value);
@@ -99,7 +101,7 @@ export class MaterialTrove {
 	}
 
 	static async getMaterialTrove(
-		actor: ActorPF2e,
+		actor: CharacterPF2e,
 		notifyOnFailure: boolean = true
 	): Promise<MaterialTrove | undefined> {
 		const materialTroves = actor.items.filter((x) => x?.slug === MATERIAL_TROVE_SLUG);
@@ -122,30 +124,30 @@ export class MaterialTrove {
 
 		if (this.troves.has(actor.uuid)) return this.troves.get(actor.uuid);
 
-		const trove = await this.newMaterialTrove(actor, materialTroves[0] as ContainerPF2e);
+		const trove = await this.newMaterialTrove(actor, materialTroves[0] as ContainerPF2e<CharacterPF2e>);
 		this.troves.set(actor.uuid, trove);
 		return trove;
 	}
 
-	static removeMaterialTrove(actor: ActorPF2e): void {
+	static removeMaterialTrove(actor: CharacterPF2e): void {
 		this.troves.delete(actor.uuid);
 	}
 
-	static async getValue(actor: ActorPF2e): Promise<CoinsPF2e> {
+	static async getValue(actor: CharacterPF2e): Promise<CoinsPF2e> {
 		const materialTrove = await MaterialTrove.getMaterialTrove(actor);
 		if (!materialTrove) return new game.pf2e.Coins();
 
 		return materialTrove.value;
 	}
 
-	static async addValue(actor: ActorPF2e, value: Coins) {
+	static async addValue(actor: CharacterPF2e, value: Coins) {
 		const materialTrove = await MaterialTrove.getMaterialTrove(actor);
 		if (!materialTrove) return;
 
 		materialTrove.add(value);
 	}
 
-	static async subtractValue(actor: ActorPF2e, value: Coins) {
+	static async subtractValue(actor: CharacterPF2e, value: Coins) {
 		const materialTrove = await MaterialTrove.getMaterialTrove(actor);
 		if (!materialTrove) return;
 
@@ -185,7 +187,10 @@ export class MaterialTrove {
 			{ create: [], update: [], delete: [] }
 		);
 
-		for (const item of (await this.actor.createEmbeddedDocuments("Item", operations.create)) as TreasurePF2e[]) {
+		for (const item of (await this.actor.createEmbeddedDocuments(
+			"Item",
+			operations.create
+		)) as TreasurePF2e<CharacterPF2e>[]) {
 			if (item.system.bulk.value === 0.1) {
 				this.genericCraftingMaterials.light = item;
 			} else {
@@ -193,7 +198,10 @@ export class MaterialTrove {
 			}
 		}
 		await this.actor.updateEmbeddedDocuments("Item", operations.update);
-		for (const item of (await this.actor.deleteEmbeddedDocuments("Item", operations.delete)) as TreasurePF2e[]) {
+		for (const item of (await this.actor.deleteEmbeddedDocuments(
+			"Item",
+			operations.delete
+		)) as TreasurePF2e<CharacterPF2e>[]) {
 			if (item.system.bulk.value === 0.1) {
 				this.genericCraftingMaterials.light = undefined;
 			} else {

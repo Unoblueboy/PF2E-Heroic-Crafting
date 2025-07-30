@@ -1,4 +1,4 @@
-import { ActorPF2e } from "../../../types/src/module/actor";
+import { CharacterPF2e } from "../../../types/src/module/actor";
 import {
 	ConsumablePF2e,
 	ItemPF2e,
@@ -28,7 +28,7 @@ type StartingItemDetails = {
 };
 
 type BeginProjectApplicationOptions = {
-	actor: ActorPF2e;
+	actor: CharacterPF2e;
 	callback: (result: [ProjectItemDetails, StartingItemDetails] | undefined) => void;
 	itemSettings?: {
 		formula?: {
@@ -42,7 +42,7 @@ type BeginProjectApplicationOptions = {
 };
 
 export class BeginProjectApplication extends HandlebarsApplicationMixin(ApplicationV2) {
-	actor: ActorPF2e;
+	actor: CharacterPF2e;
 	callback: (result: [ProjectItemDetails, StartingItemDetails] | undefined) => void;
 	includeIsFormula: boolean;
 	isFormulaDefaultValue: boolean;

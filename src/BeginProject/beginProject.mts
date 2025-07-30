@@ -1,11 +1,12 @@
-import { ActorPF2e } from "../../types/src/module/actor";
+import { CharacterPF2e } from "../../types/src/module/actor";
 import { Coins } from "../../types/src/module/item/physical";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
+import { Projects } from "../Projects/projects.mjs";
 import { BeginProjectApplication } from "./Applications/BeginProjectApplication.mjs";
 import { ProjectItemDetails } from "./types.mjs";
 
 export async function beginProject(
-	actor?: ActorPF2e,
+	actor?: CharacterPF2e,
 	details?: [ProjectItemDetails, { currency?: Coins; generic?: Coins }]
 ): Promise<boolean> {
 	if (!actor) {
@@ -21,12 +22,12 @@ export async function beginProject(
 	const startingValues = details[1];
 
 	handleStartingValues(actor, startingValues);
-	const randomId = foundry.utils.randomID();
-	actor.update({ [`flags.pf2eHeroicCrafting.projects.${randomId}`]: itemDetails });
+	const projects = Projects.getProjects(actor);
+	await projects?.addProject(itemDetails);
 	return true;
 }
 
-async function handleStartingValues(actor: ActorPF2e, startingValues: { currency?: Coins; generic?: Coins }) {
+async function handleStartingValues(actor: CharacterPF2e, startingValues: { currency?: Coins; generic?: Coins }) {
 	if (startingValues.currency) {
 		actor.inventory.removeCoins(startingValues.currency);
 	}

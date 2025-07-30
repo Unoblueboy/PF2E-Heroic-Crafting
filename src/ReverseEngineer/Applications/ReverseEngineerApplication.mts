@@ -1,4 +1,4 @@
-import { ActorPF2e } from "../../../types/src/module/actor";
+import { CharacterPF2e } from "../../../types/src/module/actor";
 import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../../types/src/module/item";
 import {
 	ApplicationClosingOptions,
@@ -11,11 +11,11 @@ import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } fr
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 export class ReverseEngineerApplication extends HandlebarsApplicationMixin(ApplicationV2) {
-	actor: ActorPF2e;
+	actor: CharacterPF2e;
 	result?: { uuid: string };
 	item?: PhysicalItemPF2e;
 	callback: (result: { uuid: string } | undefined) => void;
-	constructor(options: { actor: ActorPF2e; callback: (result: { uuid: string } | undefined) => void }) {
+	constructor(options: { actor: CharacterPF2e; callback: (result: { uuid: string } | undefined) => void }) {
 		super(options as object);
 		this.actor = options.actor;
 		this.callback = options.callback;
@@ -53,7 +53,7 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 		this.result = { uuid: this.item.uuid };
 	}
 
-	static async GetItemUuid(actor: ActorPF2e): Promise<{ uuid: string } | undefined> {
+	static async GetItemUuid(actor: CharacterPF2e): Promise<{ uuid: string } | undefined> {
 		return new Promise<{ uuid: string } | undefined>((resolve) => {
 			const app = new ReverseEngineerApplication({ actor, callback: resolve });
 			app.render(true);

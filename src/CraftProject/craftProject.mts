@@ -1,18 +1,15 @@
-import { ActorPF2e, CharacterPF2e } from "../../types/src/module/actor";
+import { CharacterPF2e } from "../../types/src/module/actor";
 import { ChatMessagePF2e } from "../../types/src/module/chat-message";
-import { Rarity } from "../../types/src/module/data";
-import { PhysicalItemPF2e, SpellPF2e } from "../../types/src/module/item";
+import { PhysicalItemPF2e } from "../../types/src/module/item";
 import { CoinsPF2e } from "../../types/src/module/item/physical";
-import { TokenDocumentPF2e, ScenePF2e } from "../../types/src/module/scene";
 import { CheckRoll } from "../../types/src/module/system/check";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
-import { ItemUUID } from "../../types/types/foundry/common/documents/_module.mjs";
-import { ProjectItemDetails } from "../BeginProject/types.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
-import { Either, fractionToPercent } from "../Helper/generics.mjs";
+import { fractionToPercent } from "../Helper/generics.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
-import { CraftProjectApplication, getItemDetails, getProjectMax } from "./Applications/CraftProjectApplications.mjs";
+import { Projects } from "../Projects/projects.mjs";
+import { CraftProjectApplication } from "./Applications/CraftProjectApplications.mjs";
 import {
 	ProjectCraftDetails,
 	ProjectCraftDuration,
@@ -20,16 +17,19 @@ import {
 	TreasurePostUseOperation,
 } from "./types.mjs";
 
-export async function craftProject(actor: ActorPF2e, projectId?: string) {
+export async function craftProject(actor: CharacterPF2e, projectId?: string) {
 	if (!actor) return;
 	if (!projectId) return;
+	const projects = Projects.getProjects(actor);
+	if (!projects) return;
+	const project = projects.getProject(projectId);
+	if (!project) return;
 
 	const craftDetails = await CraftProjectApplication.getCraftDetails({ actor, projectId });
 	if (!craftDetails) return;
 
-	const itemDetails = getItemDetails(actor, projectId);
 	const totalSpent = await getTotalMaterialSpent(craftDetails);
-	const item = (await foundry.utils.fromUuid(itemDetails.itemData.uuid)) as PhysicalItemPF2e;
+	const item = (await foundry.utils.fromUuid(project.itemData.uuid)) as PhysicalItemPF2e;
 
 	async function getStatisticRollCallback(
 		_roll: Rolled<CheckRoll>,
@@ -38,29 +38,23 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 		_event: Event | null
 	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
-			const materials = await getMaterialsSpent();
+			if (!project) return; // this should never happen
+			const materials = await getMaterialsSpent(craftDetails);
 
-			const baseItemLink = item.link;
-			const craftItemLink = itemDetails.itemData.spellUuid
-				? baseItemLink.replace(
-						/(?<={).*(?=})/,
-						await getWandOrScrollName(item, { spellUuid: itemDetails.itemData.spellUuid })
-				  )
-				: baseItemLink;
-			const projectMax = await getProjectMax(itemDetails, item);
-			const projectCur = new game.pf2e.Coins(itemDetails.value);
+			const projectMax = await project.max;
+			const projectCur = project.value;
 			const flavor = await foundry.applications.handlebars.renderTemplate(
 				"modules/pf2e-heroic-crafting/templates/chat/craftProject/result.hbs",
 				{
 					item: item,
 					actorUuid: actor.uuid,
 					project: {
-						id: projectId,
-						max: projectMax,
+						id: project.id,
+						max: await project.max,
 						cur: projectCur,
 						percent: fractionToPercent(projectCur.copperValue, projectMax.copperValue),
 					},
-					itemLink: await foundry.applications.ux.TextEditor.enrichHTML(craftItemLink, {
+					itemLink: await foundry.applications.ux.TextEditor.enrichHTML(await project.itemLink, {
 						rollData: item.getRollData(),
 					}),
 					craftDetails: JSON.stringify(craftDetails),
@@ -79,7 +73,7 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 	}
 
 	actor.skills?.crafting?.check?.roll({
-		dc: { value: itemDetails.dc, visible: true },
+		dc: { value: project.dc, visible: true },
 		extraRollOptions: ["action:craft-projct", "action:craft", "specialty"],
 		extraRollNotes: [
 			{
@@ -106,44 +100,44 @@ export async function craftProject(actor: ActorPF2e, projectId?: string) {
 		createMessage: false,
 		callback: getStatisticRollCallback,
 	});
+}
 
-	async function getMaterialsSpent() {
-		if (!craftDetails) return [];
-		const materials = [];
-		if (craftDetails.materialsSpent.generic) {
-			materials.push({
-				item: {
-					name: "Generic Crafting Material",
-					img: "icons/tools/fasteners/nails-steel-brown.webp",
-				},
-				spent: craftDetails.materialsSpent.generic,
-			});
-		}
-		if (craftDetails.materialsSpent.currency) {
-			materials.push({
-				item: {
-					name: "Currency",
-					img: "systems/pf2e/icons/equipment/treasure/currency/gold-pieces.webp",
-				},
-				spent: craftDetails.materialsSpent.currency,
-			});
-		}
-
-		for (const treasureSpent of craftDetails.materialsSpent.treasure ?? []) {
-			const treasure = await foundry.utils.fromUuid<PhysicalItemPF2e>(treasureSpent.uuid);
-			if (!treasure) continue;
-
-			materials.push({
-				item: {
-					name: treasure.name,
-					img: treasure.img,
-				},
-				quantity: treasureSpent.quantity,
-				spent: treasureSpent.value,
-			});
-		}
-		return materials;
+async function getMaterialsSpent(craftDetails?: ProjectCraftDetails) {
+	if (!craftDetails) return [];
+	const materials = [];
+	if (craftDetails.materialsSpent.generic) {
+		materials.push({
+			item: {
+				name: "Generic Crafting Material",
+				img: "icons/tools/fasteners/nails-steel-brown.webp",
+			},
+			spent: craftDetails.materialsSpent.generic,
+		});
 	}
+	if (craftDetails.materialsSpent.currency) {
+		materials.push({
+			item: {
+				name: "Currency",
+				img: "systems/pf2e/icons/equipment/treasure/currency/gold-pieces.webp",
+			},
+			spent: craftDetails.materialsSpent.currency,
+		});
+	}
+
+	for (const treasureSpent of craftDetails.materialsSpent.treasure ?? []) {
+		const treasure = await foundry.utils.fromUuid<PhysicalItemPF2e>(treasureSpent.uuid);
+		if (!treasure) continue;
+
+		materials.push({
+			item: {
+				name: treasure.name,
+				img: treasure.img,
+			},
+			quantity: treasureSpent.quantity,
+			spent: treasureSpent.value,
+		});
+	}
+	return materials;
 }
 
 async function getTotalMaterialSpent(craftDetails: ProjectCraftDetails): Promise<CoinsPF2e> {
@@ -203,7 +197,7 @@ async function decreaseTreasureValue(item: PhysicalItemPF2e, material: TreasureM
 	}
 }
 
-async function deleteItem(item: PhysicalItemPF2e<ActorPF2e<TokenDocumentPF2e<ScenePF2e | null> | null> | null>) {
+async function deleteItem(item: PhysicalItemPF2e) {
 	if (item.quantity > 1) {
 		await item.update({ "system.quantity": item.quantity - 1 });
 	} else {
@@ -211,7 +205,7 @@ async function deleteItem(item: PhysicalItemPF2e<ActorPF2e<TokenDocumentPF2e<Sce
 	}
 }
 
-async function useMaterialSpent(actor: ActorPF2e, craftDetails: ProjectCraftDetails): Promise<void> {
+async function useMaterialSpent(actor: CharacterPF2e, craftDetails: ProjectCraftDetails): Promise<void> {
 	const materialsSpent = craftDetails.materialsSpent;
 	if (materialsSpent.generic) {
 		await MaterialTrove.subtractValue(actor, materialsSpent.generic);
@@ -242,11 +236,12 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 
 	const actorUuid = generalDiv.dataset.actorUuid;
 	if (!actorUuid) return;
-	const actor = (await foundry.utils.fromUuid(actorUuid ?? "")) as ActorPF2e;
+	const actor = (await foundry.utils.fromUuid(actorUuid ?? "")) as CharacterPF2e;
 
 	const projectId = generalDiv.dataset.projectId as string;
 	const outcome = button.dataset.outcome as DegreeOfSuccessString;
-	const itemDetails = getItemDetails(actor, projectId);
+	const project = Projects.getProject(actor, projectId);
+	if (!project) return;
 
 	await useMaterialSpent(actor, craftDetails);
 
@@ -254,28 +249,27 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	let newProjectTotal: CoinsPF2e = new game.pf2e.Coins();
 	switch (outcome) {
 		case "criticalFailure":
-			newProjectTotal = CoinsPF2eUtility.subCoins(itemDetails.value, totalSpent);
+			newProjectTotal = CoinsPF2eUtility.subCoins(project.value, totalSpent);
 			break;
 		case "failure":
-			newProjectTotal = CoinsPF2eUtility.addCoins(itemDetails.value, CoinsPF2eUtility.multCoins(0.5, totalSpent));
+			newProjectTotal = CoinsPF2eUtility.addCoins(project.value, CoinsPF2eUtility.multCoins(0.5, totalSpent));
 			break;
 		case "criticalSuccess":
 		case "success":
-			newProjectTotal = CoinsPF2eUtility.addCoins(itemDetails.value, CoinsPF2eUtility.multCoins(2, totalSpent));
+			newProjectTotal = CoinsPF2eUtility.addCoins(project.value, CoinsPF2eUtility.multCoins(2, totalSpent));
 			break;
 		default:
 			break;
 	}
 
-	const item = (await foundry.utils.fromUuid(itemDetails.itemData.uuid)) as PhysicalItemPF2e;
-	const projectMax = await getProjectMax(itemDetails, item);
+	const projectMax = await project.max;
 	if (newProjectTotal.copperValue < 0) {
-		actor.update({ [`flags.pf2eHeroicCrafting.projects.-=${projectId}`]: null });
-		ui.notifications.info("Project Destroyed lol, git gud");
+		await Projects.deleteProject(actor, projectId);
 	} else if (newProjectTotal.copperValue >= projectMax.copperValue) {
-		await finishProject(item, itemDetails, actor as CharacterPF2e, projectId);
+		await project.createItem();
+		await project.delete();
 	} else {
-		actor.update({ [`flags.pf2eHeroicCrafting.projects.${projectId}.value`]: newProjectTotal });
+		await project.setValue(newProjectTotal);
 	}
 
 	const projectProgressPercent = fractionToPercent(newProjectTotal.copperValue, projectMax.copperValue);
@@ -302,78 +296,4 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	});
 	const flavorHtml = generalDiv.closest("span.flavor-text")?.innerHTML;
 	if (flavorHtml) message.update({ flavor: flavorHtml });
-}
-
-async function finishProject(
-	item: PhysicalItemPF2e,
-	itemDetails: ProjectItemDetails,
-	actor: CharacterPF2e,
-	projectId: string
-) {
-	if (itemDetails.itemData.isFormula) {
-		const formulas = actor.system.crafting?.formulas;
-		if (!formulas) {
-			return;
-		}
-		const uuid = itemDetails.itemData.uuid as ItemUUID;
-		formulas.push({ uuid: uuid });
-		actor.update({ "system.crafting.formulas": formulas });
-		const newFormula = (await foundry.utils.fromUuid(uuid)) as PhysicalItemPF2e;
-		ui.notifications.info(`Project Done, ${newFormula.name} Formula Created`);
-	} else {
-		const clone = item.clone();
-		if (itemDetails.itemData.spellUuid) {
-			const spell = (await foundry.utils.fromUuid(itemDetails.itemData.spellUuid)) as SpellPF2e;
-			const spellObject = spell.toObject();
-			spellObject.system.location.heightenedLevel = itemDetails.itemData.heightenedLevel;
-			const description = clone.system.description.value;
-			clone.updateSource({
-				name: await getWandOrScrollName(item, { spell }),
-				"system.spell": spellObject,
-				"system.description.value": `<p>${spell.link}</p><hr />${description}`,
-				"system.traits.value": [...item.traits.union(spell.traits)],
-				"system.traits.rarity": getWandOrScrollRarity(item, spell),
-			});
-		}
-		clone.updateSource({ "system.quantity": itemDetails.batchSize });
-		const newItem = await Item.implementation.create(clone.toObject(), { parent: actor });
-		ui.notifications.info(`Project Done, ${newItem!.name} Created`);
-	}
-	actor.update({ [`flags.pf2eHeroicCrafting.projects.-=${projectId}`]: null });
-}
-
-async function getWandOrScrollName(
-	item: PhysicalItemPF2e,
-	spellOptions: Either<
-		{
-			spell: SpellPF2e;
-		},
-		{
-			spellUuid: string;
-		}
-	>
-): Promise<string> {
-	const itemSlug = item.slug;
-	const spell = spellOptions.spell ?? ((await foundry.utils.fromUuid(spellOptions.spellUuid)) as SpellPF2e);
-	const spellName = spell.name;
-	if (itemSlug?.startsWith("magic-wand")) {
-		const rank = (item.level - 1) / 2;
-		return `Wand of ${spell.name} (Rank ${rank})`;
-	}
-	if (itemSlug?.startsWith("scroll-of")) {
-		const rank = (item.level + 1) / 2;
-		return `Scroll of ${spell.name} (Rank ${rank})`;
-	}
-
-	return item.name + ` (${spellName})`;
-}
-
-const RARITIES: readonly ["common", "uncommon", "rare", "unique"] = ["common", "uncommon", "rare", "unique"];
-function getWandOrScrollRarity(item: PhysicalItemPF2e, spell: SpellPF2e): Rarity {
-	const itemRarity = item.rarity;
-	const itemRarityIndex = RARITIES.indexOf(itemRarity);
-	const spellRarity = spell.rarity;
-	const spellRarityIndex = RARITIES.indexOf(spellRarity);
-	const rarityIndex = Math.max(itemRarityIndex, spellRarityIndex);
-	return RARITIES[rarityIndex];
 }
