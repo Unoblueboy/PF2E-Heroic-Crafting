@@ -7,15 +7,9 @@ import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-s
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 import { fractionToPercent } from "../Helper/generics.mjs";
-import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { Projects } from "../Projects/projects.mjs";
 import { CraftProjectApplication } from "./Applications/CraftProjectApplications.mjs";
-import {
-	ProjectCraftDetails,
-	ProjectCraftDuration,
-	TreasureMaterialSpent,
-	TreasurePostUseOperation,
-} from "./types.mjs";
+import { ProjectCraftDetails, ProjectCraftDuration } from "./types.mjs";
 
 export async function craftProject(actor: CharacterPF2e, projectId?: string) {
 	if (!actor) return;
@@ -140,7 +134,7 @@ async function getMaterialsSpent(craftDetails?: ProjectCraftDetails) {
 	return materials;
 }
 
-async function getTotalMaterialSpent(craftDetails: ProjectCraftDetails): Promise<CoinsPF2e> {
+export async function getTotalMaterialSpent(craftDetails: ProjectCraftDetails): Promise<CoinsPF2e> {
 	const materialsSpent = craftDetails.materialsSpent;
 	let totalSpent = new game.pf2e.Coins();
 	if (materialsSpent.generic) {
@@ -156,144 +150,4 @@ async function getTotalMaterialSpent(craftDetails: ProjectCraftDetails): Promise
 	}
 
 	return totalSpent;
-}
-
-async function updateSpentTreasure(item: PhysicalItemPF2e, material: TreasureMaterialSpent) {
-	switch (material.postUseOperation) {
-		case TreasurePostUseOperation.DELETE:
-			await deleteItem(item);
-			break;
-		case TreasurePostUseOperation.DECREASE_VALUE:
-			await decreaseTreasureValue(item, material);
-			break;
-		case TreasurePostUseOperation.NOTHING:
-		default:
-			break;
-	}
-}
-
-async function decreaseTreasureValue(item: PhysicalItemPF2e, material: TreasureMaterialSpent) {
-	const basePrice = item.price.value;
-	const materialSpent = material.value;
-	const newPrice = CoinsPF2eUtility.maxCoins(
-		CoinsPF2eUtility.subCoins(basePrice, materialSpent),
-		new game.pf2e.Coins()
-	);
-
-	const baseQuantity = item.quantity;
-	const quantitySpent = material.quantity ?? 1;
-	if (newPrice.copperValue === 0 && baseQuantity === quantitySpent) {
-		await item.delete();
-	} else if (newPrice.copperValue != 0 && baseQuantity === quantitySpent) {
-		await item.update({ "system.price.value": newPrice });
-	} else if (newPrice.copperValue === 0 && baseQuantity != quantitySpent) {
-		await item.update({ "system.quantity": baseQuantity - quantitySpent });
-	} else {
-		await item.update({ "system.quantity": baseQuantity - quantitySpent });
-		const clone = item.clone({
-			system: { price: { value: newPrice }, quantity: quantitySpent },
-		});
-		await Item.implementation.create(clone.toObject(), { parent: item.actor });
-	}
-}
-
-async function deleteItem(item: PhysicalItemPF2e) {
-	if (item.quantity > 1) {
-		await item.update({ "system.quantity": item.quantity - 1 });
-	} else {
-		await item.delete();
-	}
-}
-
-async function useMaterialSpent(actor: CharacterPF2e, craftDetails: ProjectCraftDetails): Promise<void> {
-	const materialsSpent = craftDetails.materialsSpent;
-	if (materialsSpent.generic) {
-		await MaterialTrove.subtractValue(actor, materialsSpent.generic);
-	}
-	if (materialsSpent.currency) {
-		await actor.inventory.removeCoins(materialsSpent.currency);
-	}
-	for (const material of materialsSpent.treasure ?? []) {
-		const item = await foundry.utils.fromUuid<PhysicalItemPF2e>(material.uuid);
-		if (!item) continue;
-		await updateSpentTreasure(item, material);
-	}
-}
-
-export async function craftProjectChatButtonListener(message: ChatMessagePF2e, html: HTMLElement, _data: unknown) {
-	const craftProjectResults = html.querySelector("[data-craft-project-results]");
-	if (craftProjectResults) craftProjectResults.addEventListener("click", (e: Event) => updateProject(e, message));
-}
-
-async function updateProject(event: Event, message: ChatMessagePF2e) {
-	if ((event.target as HTMLElement)?.tagName != "BUTTON") return;
-	const button = event.target as HTMLButtonElement;
-	const generalDiv = event.currentTarget as HTMLElement;
-
-	const craftDetailsString = generalDiv.dataset["craftDetails"];
-	if (!craftDetailsString) return;
-	const craftDetails = JSON.parse(craftDetailsString ?? "") as ProjectCraftDetails;
-
-	const actorUuid = generalDiv.dataset.actorUuid;
-	if (!actorUuid) return;
-	const actor = (await foundry.utils.fromUuid(actorUuid ?? "")) as CharacterPF2e;
-
-	const projectId = generalDiv.dataset.projectId as string;
-	const outcome = button.dataset.outcome as DegreeOfSuccessString;
-	const project = Projects.getProject(actor, projectId);
-	if (!project) return;
-
-	await useMaterialSpent(actor, craftDetails);
-
-	const totalSpent = await getTotalMaterialSpent(craftDetails);
-	let newProjectTotal: CoinsPF2e = new game.pf2e.Coins();
-	switch (outcome) {
-		case "criticalFailure":
-			newProjectTotal = CoinsPF2eUtility.subCoins(project.value, totalSpent);
-			break;
-		case "failure":
-			newProjectTotal = CoinsPF2eUtility.addCoins(project.value, CoinsPF2eUtility.multCoins(0.5, totalSpent));
-			break;
-		case "criticalSuccess":
-		case "success":
-			newProjectTotal = CoinsPF2eUtility.addCoins(project.value, CoinsPF2eUtility.multCoins(2, totalSpent));
-			break;
-		default:
-			break;
-	}
-
-	const projectMax = await project.max;
-	if (newProjectTotal.copperValue < 0) {
-		await Projects.deleteProject(actor, projectId);
-	} else if (newProjectTotal.copperValue >= projectMax.copperValue) {
-		await project.createItem();
-		await project.delete();
-	} else {
-		await project.setValue(newProjectTotal);
-	}
-
-	const projectProgressPercent = fractionToPercent(newProjectTotal.copperValue, projectMax.copperValue);
-	const internalBar = generalDiv.querySelector<HTMLDivElement>(".project-progress .progress-bar .internal-bar");
-	if (internalBar) {
-		internalBar.style = `width:${projectProgressPercent};`;
-	}
-	const internalBarSpan = generalDiv.querySelector<HTMLSpanElement>(
-		".project-progress .progress-bar .internal-bar span"
-	);
-	if (internalBarSpan) {
-		internalBarSpan.textContent = projectProgressPercent;
-	}
-
-	const curValueSpan = generalDiv.querySelector<HTMLSpanElement>(
-		".project-progress .project-progress-line .project-cur-value"
-	);
-	if (curValueSpan) {
-		curValueSpan.textContent = newProjectTotal.toString();
-	}
-
-	generalDiv.querySelectorAll<HTMLButtonElement>(".card-buttons button").forEach((button) => {
-		button.disabled = true;
-	});
-	const flavorHtml = generalDiv.closest("span.flavor-text")?.innerHTML;
-	if (flavorHtml) message.update({ flavor: flavorHtml });
 }

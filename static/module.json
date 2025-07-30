@@ -8,6 +8,13 @@
 	},
 	"esmodules": ["scripts/heroicCrafting.mjs"],
 	"styles": ["styles/style.css"],
+	"languages": [
+		{
+			"lang": "en",
+			"name": "English",
+			"path": "lang/en.json"
+		}
+	],
 	"description": "<p>Heroic Crafting, new and improved</p>",
 	"authors": [
 		{
@@ -23,6 +30,16 @@
 				"manifest": "https://github.com/foundryvtt/pf2e/releases/latest/download/system.json",
 				"compatibility": {
 					"minimum": "7.1.1"
+				}
+			}
+		],
+		"requires": [
+			{
+				"id": "lib-wrapper",
+				"type": "module",
+				"compatibility": {
+					"minimum": "1.13.3.0",
+					"verified": "1.13.3.0"
 				}
 			}
 		]
