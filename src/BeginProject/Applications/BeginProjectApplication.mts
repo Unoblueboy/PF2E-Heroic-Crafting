@@ -39,6 +39,7 @@ type BeginProjectApplicationOptions = {
 	};
 };
 
+// TODO: refactor to update on actor update
 export class BeginProjectApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	actor: CharacterPF2e;
 	callback: (result: BeginProjectFullDetails | undefined) => void;

@@ -10,6 +10,7 @@ import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } fr
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
+// TODO: refactor to update on actor update
 export class ReverseEngineerApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	actor: CharacterPF2e;
 	result?: { uuid: string };

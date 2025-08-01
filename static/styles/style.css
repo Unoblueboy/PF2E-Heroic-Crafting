@@ -426,10 +426,12 @@
 	}
 }
 
-.craft-project-dialog {
+.craft-project-dialog:not(.minimized, .maximizing, .minimizing) {
 	min-width: 400px;
 	min-height: 290px;
+}
 
+.craft-project-dialog {
 	.item-summary {
 		flex: 0;
 
@@ -645,7 +647,12 @@
 	}
 }
 
-.heroic-crafting-menu {
+section.heroic-crafting-menu:not(.minimized, .maximizing, .minimizing) {
+	min-width: 650px;
+	min-height: 150px;
+}
+
+section.heroic-crafting-menu {
 	section.window-content {
 		padding-left: 0;
 		padding-right: 0;
@@ -675,6 +682,69 @@
 			}
 		}
 
+		div.charcter-summary {
+			display: flex;
+			justify-content: space-between;
+			padding: 0 16px 8px;
+			--row-size: 1.8em;
+			--image-max: calc(var(--row-size) * 2);
+			.chracter-info {
+				display: grid;
+				align-items: center;
+				grid-template-rows: repeat(2, var(--row-size));
+				grid-template-areas:
+					"image name"
+					"image level";
+				column-gap: 0.5rem;
+				img {
+					max-width: var(--image-max);
+					max-height: var(--image-max);
+					grid-area: image;
+					border-radius: 2px;
+					box-shadow: 0 0 0 1px #918c88, 0 0 0 2px #e1d8cf, 0 0 0 3px #a98f39,
+						inset 0 0 8px rgba(0, 0, 0, 0.5), 0 0 8px black;
+
+					&:hover {
+						cursor: pointer;
+					}
+				}
+
+				h3 {
+					grid-area: name;
+					margin: 0;
+				}
+				span {
+					grid-area: level;
+				}
+			}
+
+			.money-info {
+				display: grid;
+				grid-template-rows: repeat(2, var(--row-size));
+				grid-template-columns: max-content 10rem;
+				grid-template-areas:
+					"coinage-label coinage-value"
+					"materials-label materials-value";
+				column-gap: 0.5rem;
+				align-items: center;
+
+				.total-coinage-label {
+					grid-area: coinage-label;
+				}
+				.total-coinage-value {
+					grid-area: coinage-value;
+					justify-self: end;
+				}
+				.crafting-materials-label {
+					grid-area: materials-label;
+				}
+				.crafting-materials-value {
+					grid-area: materials-value;
+					justify-self: end;
+				}
+			}
+		}
+
 		section.tab.begin-project {
 			--formula-list-border-color: var(--color-light-4);
 			color: var(--color-light-3);
@@ -700,28 +770,39 @@
 					align-items: center;
 					justify-items: center;
 					border: 1px solid var(--formula-list-border-color);
-					padding: 0 0.25rem;
+					padding: 0;
+				}
+
+				.formula-header .formula-header-name,
+				.formula-item .formula-item-name {
+					grid-area: name;
+					justify-self: start;
+					padding-left: 0.25rem;
+				}
+
+				.formula-header .formula-header-dc,
+				.formula-item .formula-item-dc {
+					grid-area: dc;
+				}
+
+				.formula-header .formula-header-price,
+				.formula-item .formula-item-price {
+					grid-area: price;
+				}
+
+				.formula-header .formula-header-quantity,
+				.formula-item .formula-item-quantity {
+					grid-area: quantity;
+				}
+
+				.formula-header .formula-header-button,
+				.formula-item .formula-item-button {
+					grid-area: button;
+					margin-right: 0.25rem;
 				}
 
 				.formula-header {
 					background-color: rgba(96, 88, 86, 0.25);
-
-					.formula-header-name {
-						grid-area: name;
-						justify-self: start;
-					}
-					.formula-header-dc {
-						grid-area: dc;
-					}
-					.formula-header-price {
-						grid-area: price;
-					}
-					.formula-header-quantity {
-						grid-area: quantity;
-					}
-					.formula-header-button {
-						grid-area: button;
-					}
 				}
 
 				.formula-item {
@@ -730,8 +811,6 @@
 					border-left: 1px solid var(--formula-list-border-color);
 					border-right: 1px solid var(--formula-list-border-color);
 					.formula-item-name {
-						padding-left: 0.25rem;
-						grid-area: name;
 						align-items: center;
 						display: flex;
 						flex-wrap: nowrap;
@@ -743,18 +822,17 @@
 							height: 32px;
 						}
 					}
-					.formula-item-dc {
-						grid-area: dc;
+
+					.formula-item-summary {
+						grid-column: name / button;
+						border-top: 1px solid var(--formula-list-border-color);
+						border-bottom: 1px solid var(--formula-list-border-color);
+						padding: 0.5rem;
 					}
-					.formula-item-price {
-						grid-area: price;
-					}
-					.formula-item-quantity {
-						grid-area: quantity;
-					}
-					.formula-item-button {
-						grid-area: button;
-					}
+				}
+
+				.formula-item:last-child .formula-item-summary {
+					border-bottom: none;
 				}
 
 				li:last-child {
@@ -792,7 +870,7 @@
 					align-items: center;
 					justify-items: center;
 					border: 1px solid var(--project-list-border-color);
-					padding: 0 0.25rem;
+					padding: 0;
 				}
 
 				.project-header {
@@ -830,6 +908,8 @@
 					grid-area: buttons;
 					display: flex;
 					column-gap: 3px;
+					align-items: center;
+					padding-right: 0.25rem;
 				}
 
 				.project-item {
@@ -865,6 +945,17 @@
 							justify-self: end;
 						}
 					}
+
+					.project-item-summary {
+						grid-column: name / buttons;
+						border-top: 1px solid var(--project-list-border-color);
+						border-bottom: 1px solid var(--project-list-border-color);
+						padding: 0.5rem;
+					}
+				}
+
+				.project-item:last-child .project-item-summary {
+					border-bottom: none;
 				}
 
 				li:last-child {

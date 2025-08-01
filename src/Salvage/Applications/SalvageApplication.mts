@@ -18,6 +18,7 @@ import {
 import { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
+// TODO: refactor to update on actor update
 export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	result?: SalvageApplicationResult;
 	item?: PhysicalItemPF2e;

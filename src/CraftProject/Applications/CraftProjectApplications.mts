@@ -33,6 +33,7 @@ type CraftProjectApplicationOptions = {
 	callback: (result: ProjectCraftDetails | undefined) => void;
 };
 
+// TODO: refactor to update on actor update
 export class CraftProjectApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	actor: CharacterPF2e;
 	projectId: string;

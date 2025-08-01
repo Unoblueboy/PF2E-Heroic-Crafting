@@ -100,7 +100,7 @@ class ProjectFactory {
 	}
 }
 
-type ProjectContextData = {
+export type ProjectContextData = {
 	name: string;
 	img: string;
 	id: string;
@@ -142,6 +142,10 @@ export abstract class AProject implements ProjectItemDetails {
 		return this.baseItem.then((item) =>
 			this.itemData.isFormula ? "icons/sundries/documents/blueprint-magical.webp" : item.img
 		);
+	}
+
+	get description(): Promise<string> {
+		return this.baseItem.then((item) => item.description);
 	}
 
 	abstract createItem(): Promise<PhysicalItemPF2e | undefined>;
@@ -240,6 +244,12 @@ class ProjectWithSpell extends Project {
 	get itemRarity(): Promise<string> {
 		return Promise.all([this.baseItem, this.baseSpell]).then(([item, spell]) =>
 			this.getSpellItemRarity(item, spell)
+		);
+	}
+
+	get description(): Promise<string> {
+		return Promise.all([this.baseItem, this.baseSpell]).then(
+			([item, spell]) => `<p>${spell.link}</p><hr />${item.description}`
 		);
 	}
 

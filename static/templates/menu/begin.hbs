@@ -38,7 +38,7 @@
                         data-is-formula>
                         <div class="formula-item-name">
                             <img src="{{formula.item.img}}">
-                            <span>{{formula.item.name}}</span>
+                            <a data-action="toggle-summary">{{formula.item.name}}</a>
                         </div>
                         <div class="formula-item-dc">
                             {{formula.dc}}
@@ -51,6 +51,8 @@
                         </div>
                         <button class="formula-item-button"><i class="fa-fw fa-solid fa-drafting-compass"
                                inert></i>Begin</button>
+                        <div class="formula-item-summary"
+                             hidden></div>
                     </li>
                 {{/each}}
             {{/each}}

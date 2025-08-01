@@ -10,6 +10,7 @@ import { EditMaterialTroveApplicationResult } from "./types.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
+// TODO: refactor to take actor as a construct parameter, and update on actor update
 export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	CraftingMaterialsCopperValue: CoinsPF2e;
 	addSubChosen: "add" | "sub";
