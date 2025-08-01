@@ -6,13 +6,13 @@ import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-s
 import { StatisticRollParameters } from "../../types/src/module/system/statistic";
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
-import { LEVEL_BASED_DC, SALVAGE_MATERIAL_SLUG, SALVAGE_MATERIAL_UUID } from "../Helper/constants.mjs";
-import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
+import { SALVAGE_MATERIAL_UUID } from "../Helper/constants.mjs";
 import { SalvageApplication } from "./Applications/SalvageApplication.mjs";
 import { SalvageApplicationResult } from "./Applications/types.mjs";
 import { CoinsPF2e } from "../../types/src/module/item/physical";
+import { calculateDC } from "../Helper/dc.mjs";
 
-export async function salvage(actor: CharacterPF2e, item: PhysicalItemPF2e, lockItem = false) {
+export async function salvage(actor: CharacterPF2e, item?: PhysicalItemPF2e, lockItem = false) {
 	const salvageDetails = await SalvageApplication.GetSalvageDetails({ actor: actor, item: item, lockItem: lockItem });
 
 	if (!salvageDetails) {
@@ -26,8 +26,7 @@ export async function salvage(actor: CharacterPF2e, item: PhysicalItemPF2e, lock
 
 async function getStatisticRollParameters(salvageDetails: SalvageApplicationResult): Promise<StatisticRollParameters> {
 	const salvageItem = salvageDetails.item;
-	const salvageItemLevel = salvageItem.level;
-	const baseDC = LEVEL_BASED_DC.get(salvageItemLevel) ?? 0;
+	const baseDC = calculateDC(salvageItem.level, salvageItem.rarity) ?? 0;
 
 	async function getStatisticRollCallback(
 		_roll: Rolled<CheckRoll>,
@@ -137,62 +136,6 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 	}
 }
 
-export function salvageChatButtonListener(message: ChatMessagePF2e, html: HTMLElement, _data: unknown) {
-	const salvageResults = html.querySelector("[data-salvage-results]");
-	if (salvageResults) salvageResults.addEventListener("click", (e: Event) => gainMaterials(e, message));
-}
-
-async function gainMaterials(event: Event, message: ChatMessagePF2e) {
-	if ((event.target as HTMLElement)?.tagName != "BUTTON") return;
-	const button = event.target as HTMLButtonElement;
-	const generalDiv = event.currentTarget as HTMLElement;
-	const data = foundry.utils.mergeObject(generalDiv.dataset, button.dataset);
-
-	switch (data.action) {
-		case "gain-salvage-materials":
-			await gainSalvageMaterials(data);
-			break;
-		case "gain-savvy-teardown-materials":
-			await gainSavvyTeardownMaterials(data);
-			break;
-
-		default:
-			break;
-	}
-
-	generalDiv.querySelectorAll<HTMLButtonElement>(".card-buttons button").forEach((button) => {
-		button.disabled = true;
-	});
-	const flavorHtml = generalDiv.closest("span.flavor-text")?.innerHTML;
-	if (flavorHtml) message.update({ flavor: flavorHtml });
-}
-
-async function gainSalvageMaterials(data: DOMStringMap) {
-	const item = (await fromUuid(data.itemUuid as string)) as PhysicalItemPF2e;
-	if (!item) return;
-	if (!item.actor) return;
-
-	const salvageMaxCoins = game.pf2e.Coins.fromString(data.salvageMax ?? "");
-	const duration = Number.parseInt(data.duration as string);
-	const income = game.pf2e.Coins.fromString(data.salvageIncome ?? "");
-	const totalIncome = CoinsPF2eUtility.multCoins(duration, income);
-
-	const remainingSalvagePrice = CoinsPF2eUtility.maxCoins(
-		CoinsPF2eUtility.subCoins(salvageMaxCoins, totalIncome),
-		new game.pf2e.Coins()
-	);
-	if (item.slug != SALVAGE_MATERIAL_SLUG) {
-		await createSalvage(item, remainingSalvagePrice);
-	} else if (remainingSalvagePrice.copperValue > 0) {
-		await item.update({ "system.price.value": remainingSalvagePrice });
-	} else {
-		ui.notifications.info(`${item.name} fully salvaged`);
-		await item.delete();
-	}
-
-	await MaterialTrove.addValue(item.actor as CharacterPF2e, CoinsPF2eUtility.minCoins(salvageMaxCoins, totalIncome));
-}
-
 export async function createSalvage(item: PhysicalItemPF2e, priceValue?: CoinsPF2e) {
 	priceValue ??= CoinsPF2eUtility.multCoins(1 / 2, item.price.value); // Use default salvage value of 50%
 	const genericSalvage = (await fromUuid(SALVAGE_MATERIAL_UUID)) as TreasurePF2e;
@@ -203,6 +146,9 @@ export async function createSalvage(item: PhysicalItemPF2e, priceValue?: CoinsPF
 			containerId: item.container,
 			equipped: item.system.equipped,
 			price: { value: priceValue },
+			traits: {
+				rarity: item.rarity,
+			},
 		},
 	});
 	if (priceValue.copperValue > 0) {
@@ -216,19 +162,4 @@ export async function createSalvage(item: PhysicalItemPF2e, priceValue?: CoinsPF
 	} else {
 		await item.delete();
 	}
-}
-
-async function gainSavvyTeardownMaterials(data: DOMStringMap) {
-	const item = (await fromUuid(data.itemUuid as string)) as PhysicalItemPF2e;
-	if (!item) return;
-	if (!item.actor) return;
-	const income = game.pf2e.Coins.fromString(data.salvageIncome ?? "");
-
-	if (item.quantity > 1) {
-		await item.update({ "system.quantity": item.quantity - 1 });
-	} else {
-		await item.delete();
-	}
-
-	await MaterialTrove.addValue(item.actor as CharacterPF2e, income);
 }

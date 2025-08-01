@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"target": "es2023",
+		"target": "es2024",
 		"module": "commonjs" /* Specify what module code is generated. */,
 		"rootDir": "./src" /* Specify the root folder within your source files. */,
 		"outDir": "./build/scripts" /* Specify an output folder for all emitted files. */,

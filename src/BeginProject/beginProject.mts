@@ -1,27 +1,42 @@
 import { CharacterPF2e } from "../../types/src/module/actor";
-import { Coins } from "../../types/src/module/item/physical";
+import { Coins, PhysicalItemPF2e } from "../../types/src/module/item/physical";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { Projects } from "../Projects/projects.mjs";
 import { BeginProjectApplication } from "./Applications/BeginProjectApplication.mjs";
-import { ProjectItemDetails } from "./types.mjs";
+import { BeginProjectDetails, BeginProjectDetailsType } from "./types.mjs";
 
-export async function beginProject(
-	actor?: CharacterPF2e,
-	details?: [ProjectItemDetails, { currency?: Coins; generic?: Coins }]
-): Promise<boolean> {
+export async function beginProject(actor?: CharacterPF2e, details?: BeginProjectDetails): Promise<boolean> {
 	if (!actor) {
 		ui.notifications.error("An actor must be selected");
 		return false;
 	}
 
-	details ??= await BeginProjectApplication.GetItemDetails({ actor });
-	if (!details) {
+	switch (details?.type) {
+		case BeginProjectDetailsType.FULL:
+			break;
+		case BeginProjectDetailsType.PARTIAL: {
+			const item = details.item ?? (await foundry.utils.fromUuid<PhysicalItemPF2e>(details.itemUuid));
+			if (!item) return false;
+			details = await BeginProjectApplication.GetItemDetails({
+				actor,
+				itemSettings: {
+					lockItem: true,
+					item: item,
+				},
+			});
+			break;
+		}
+		default:
+			details = await BeginProjectApplication.GetItemDetails({ actor });
+			break;
+	}
+	if (details?.type !== BeginProjectDetailsType.FULL) {
 		return false;
 	}
-	const itemDetails = details[0];
-	const startingValues = details[1];
 
-	handleStartingValues(actor, startingValues);
+	const { itemDetails, startingValue } = details;
+
+	handleStartingValues(actor, startingValue);
 	const projects = Projects.getProjects(actor);
 	await projects?.addProject(itemDetails);
 	return true;

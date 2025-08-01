@@ -76,7 +76,7 @@ export class MaterialTrove {
 	}
 
 	private async initializeGenericCraftingMaterials(): Promise<void> {
-		const craftingMaterials: TreasurePF2e<CharacterPF2e>[] = this.actor.items.filter(
+		const craftingMaterials: TreasurePF2e<CharacterPF2e>[] = this.actor.itemTypes.treasure.filter(
 			(x) => x?.slug === CRAFTING_MATERIAL_SLUG
 		);
 		const deleteIds = [];
@@ -104,7 +104,7 @@ export class MaterialTrove {
 		actor: CharacterPF2e,
 		notifyOnFailure: boolean = true
 	): Promise<MaterialTrove | undefined> {
-		const materialTroves = actor.items.filter((x) => x?.slug === MATERIAL_TROVE_SLUG);
+		const materialTroves = actor.itemTypes.backpack.filter((x) => x?.slug === MATERIAL_TROVE_SLUG);
 
 		if (materialTroves.length === 0) {
 			if (notifyOnFailure)

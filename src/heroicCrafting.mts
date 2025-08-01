@@ -1,5 +1,6 @@
-import { salvage, salvageChatButtonListener } from "./Salvage/salvage.mjs";
-import { editMaterialTrove, MaterialTrove } from "./MaterialTrove/materialTrove.mjs";
+import { salvage } from "./Salvage/salvage.mjs";
+import { salvageChatButtonListener } from "./Salvage/chatListener.mjs";
+import { editMaterialTrove } from "./MaterialTrove/materialTrove.mjs";
 import { ChatMessagePF2e } from "../types/src/module/chat-message";
 import { beginProject } from "./BeginProject/beginProject.mjs";
 import { reverseEngineer } from "./ReverseEngineer/reverseEngineer.mjs";
@@ -7,6 +8,7 @@ import { craftProject } from "./CraftProject/craftProject.mjs";
 import { craftProjectChatButtonListener } from "./CraftProject/chatListener.mjs";
 import { ConsumablePF2e } from "../types/src/module/item";
 import { junkCollectorOnConsume } from "./Feats/junkCollector.mjs";
+import { HeroCraftingMenu } from "./Menu/HeroicCraftingMenu.mjs";
 
 Hooks.on("init", async () => {
 	game.pf2eHeroicCrafting = {
@@ -15,7 +17,7 @@ Hooks.on("init", async () => {
 		beginProject,
 		reverseEngineer,
 		craftProject,
-		MaterialTrove,
+		HeroCraftingMenu,
 	};
 
 	const { TestRuleElement } = await import("./RuleElement/testElement.mjs");

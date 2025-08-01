@@ -1,0 +1,56 @@
+{{log this}}
+<section class="tab {{tab.cssClass}}"
+         data-group="{{tab.group}}"
+         data-tab="{{tab.id}}">
+    <div data-action="salvage"><button class="custom-button"><i class="fa-fw fa-sharp fa-solid fa-recycle"
+               inert></i>Salvage an item</button></div>
+    <div class="seperator">
+        <div></div>
+        <span>OR</span>
+        <div></div>
+    </div>
+    {{#if (gt salvages.length 0)}}
+        <ol class="salvage-list">
+            <li class="salvage-header">
+                <div class="salvage-header-name">
+                    Name
+                </div>
+                <div class="salvage-header-level">
+                    Level
+                </div>
+                <div class="salvage-header-dc">
+                    DC
+                </div>
+                <div class="salvage-header-max">
+                    Salvage Max
+                </div>
+                <button class="salvage-header-button"
+                        style="opacity:0%"><i class="fa-fw fa-sharp fa-solid fa-recycle"
+                       inert></i>Salvage</button>
+            </li>
+            {{#each salvages as | salvage |}}
+                <li class="salvage-item"
+                    data-salvage-id="{{salvage.id}}"
+                    data-action="salvage">
+                    <div class="salvage-item-name">
+                        <img src="{{salvage.img}}">
+                        <span>{{salvage.name}}</span>
+                    </div>
+                    <div class="salvage-item-level">
+                        {{salvage.level}}
+                    </div>
+                    <div class="salvage-item-dc">
+                        {{salvage.dc}}
+                    </div>
+                    <div class="salvage-item-max">
+                        {{salvage.max}}
+                    </div>
+                    <button class="salvage-item-button"><i class="fa-fw fa-sharp fa-solid fa-recycle"
+                           inert></i>Salvage</button>
+                </li>
+            {{/each}}
+        </ol>
+    {{else}}
+        You have no ongoing salvages
+    {{/if}}
+</section>

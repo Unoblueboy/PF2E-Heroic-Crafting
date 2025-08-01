@@ -645,6 +645,327 @@
 	}
 }
 
+.heroic-crafting-menu {
+	section.window-content {
+		padding-left: 0;
+		padding-right: 0;
+		padding-bottom: 0;
+
+		section.tab {
+			padding-left: 1rem;
+			padding-right: 1rem;
+			padding-top: 0.75rem;
+			padding-bottom: 1rem;
+			overflow: hidden auto;
+		}
+
+		.seperator {
+			width: 100%;
+			display: flex;
+			align-items: center;
+			margin: 0.5rem 0;
+
+			div {
+				flex: 1;
+				border-top: 3px double var(--color-light-4);
+			}
+
+			span {
+				margin: 0 0.25em;
+			}
+		}
+
+		section.tab.begin-project {
+			--formula-list-border-color: var(--color-light-4);
+			color: var(--color-light-3);
+
+			.custom-button {
+				margin: auto;
+				width: 80%;
+				height: 2.25rem;
+			}
+
+			.formula-list {
+				list-style-type: none;
+				padding: 0;
+				margin-top: 0;
+				margin-bottom: 0;
+				.formula-header,
+				.formula-item {
+					display: grid;
+					margin: 0;
+					grid-template-areas: "name dc price quantity button";
+					grid-template-rows: 1fr;
+					grid-template-columns: 1fr 1.5rem 4.5rem 7rem max-content;
+					align-items: center;
+					justify-items: center;
+					border: 1px solid var(--formula-list-border-color);
+					padding: 0 0.25rem;
+				}
+
+				.formula-header {
+					background-color: rgba(96, 88, 86, 0.25);
+
+					.formula-header-name {
+						grid-area: name;
+						justify-self: start;
+					}
+					.formula-header-dc {
+						grid-area: dc;
+					}
+					.formula-header-price {
+						grid-area: price;
+					}
+					.formula-header-quantity {
+						grid-area: quantity;
+					}
+					.formula-header-button {
+						grid-area: button;
+					}
+				}
+
+				.formula-item {
+					border: none;
+
+					border-left: 1px solid var(--formula-list-border-color);
+					border-right: 1px solid var(--formula-list-border-color);
+					.formula-item-name {
+						padding-left: 0.25rem;
+						grid-area: name;
+						align-items: center;
+						display: flex;
+						flex-wrap: nowrap;
+						justify-content: start;
+						justify-self: start;
+
+						img {
+							width: 32px;
+							height: 32px;
+						}
+					}
+					.formula-item-dc {
+						grid-area: dc;
+					}
+					.formula-item-price {
+						grid-area: price;
+					}
+					.formula-item-quantity {
+						grid-area: quantity;
+					}
+					.formula-item-button {
+						grid-area: button;
+					}
+				}
+
+				li:last-child {
+					border-bottom: 1px solid var(--formula-list-border-color);
+				}
+
+				li:nth-child(odd) {
+					background-color: rgba(120, 100, 82, 0.1);
+				}
+			}
+		}
+
+		section.tab.craft-project {
+			--project-list-border-color: var(--color-light-4);
+			color: var(--color-light-3);
+
+			.custom-button {
+				margin: auto;
+				width: 80%;
+				height: 2.25rem;
+			}
+
+			.project-list {
+				list-style-type: none;
+				padding: 0;
+				margin-top: 0;
+				margin-bottom: 0;
+				.project-header,
+				.project-item {
+					display: grid;
+					margin: 0;
+					grid-template-areas: "name dc progress quantity buttons";
+					grid-template-rows: 1fr;
+					grid-template-columns: 1fr 1.5rem 11rem 4rem max-content;
+					align-items: center;
+					justify-items: center;
+					border: 1px solid var(--project-list-border-color);
+					padding: 0 0.25rem;
+				}
+
+				.project-header {
+					background-color: rgba(96, 88, 86, 0.25);
+				}
+
+				.project-header .project-header-name,
+				.project-item .project-item-name {
+					padding-left: 0.25rem;
+					grid-area: name;
+					align-items: center;
+					display: flex;
+					flex-wrap: nowrap;
+					justify-content: start;
+					justify-self: start;
+				}
+
+				.project-header .project-header-dc,
+				.project-item .project-item-dc {
+					grid-area: dc;
+				}
+
+				.project-header .project-header-progress,
+				.project-item .project-item-progress {
+					grid-area: progress;
+				}
+
+				.project-header .project-header-quantity,
+				.project-item .project-item-quantity {
+					grid-area: quantity;
+				}
+
+				.project-header .project-header-buttons,
+				.project-item .project-item-buttons {
+					grid-area: buttons;
+					display: flex;
+					column-gap: 3px;
+				}
+
+				.project-item {
+					border: none;
+					border-left: 1px solid var(--project-list-border-color);
+					border-right: 1px solid var(--project-list-border-color);
+					.project-item-name {
+						img {
+							width: 32px;
+							height: 32px;
+						}
+					}
+
+					.project-item-progress {
+						display: grid;
+						grid-template-areas: "value sep max";
+						grid-template-rows: 1fr;
+						grid-template-columns: 1fr 0.5rem 1fr;
+						align-items: center;
+						width: 100%;
+						padding: 0 1rem;
+
+						.project-item-progress-value {
+							grid-area: value;
+							justify-self: start;
+						}
+						.project-item-progress-sep {
+							grid-area: sep;
+							justify-self: center;
+						}
+						.project-item-progress-max {
+							grid-area: max;
+							justify-self: end;
+						}
+					}
+				}
+
+				li:last-child {
+					border-bottom: 1px solid var(--project-list-border-color);
+				}
+
+				li:nth-child(odd) {
+					background-color: rgba(120, 100, 82, 0.1);
+				}
+			}
+		}
+
+		section.tab.salvage {
+			--salvage-list-border-color: var(--color-light-4);
+			color: var(--color-light-3);
+
+			.custom-button {
+				margin: auto;
+				width: 80%;
+				height: 2.25rem;
+			}
+
+			.salvage-list {
+				list-style-type: none;
+				padding: 0;
+				margin-top: 0;
+				margin-bottom: 0;
+				.salvage-header,
+				.salvage-item {
+					display: grid;
+					margin: 0;
+					grid-template-areas: "name level dc max button";
+					grid-template-rows: 1fr;
+					grid-template-columns: 1fr 2.5rem 1.5rem 9rem max-content;
+					align-items: center;
+					justify-items: center;
+					border: 1px solid var(--salvage-list-border-color);
+					padding: 0 0.25rem;
+				}
+
+				.salvage-header {
+					background-color: rgba(96, 88, 86, 0.25);
+				}
+
+				.salvage-header .salvage-header-name,
+				.salvage-item .salvage-item-name {
+					padding-left: 0.25rem;
+					grid-area: name;
+					align-items: center;
+					display: flex;
+					flex-wrap: nowrap;
+					justify-content: start;
+					justify-self: start;
+				}
+
+				.salvage-header .salvage-header-level,
+				.salvage-item .salvage-item-level {
+					grid-area: level;
+				}
+
+				.salvage-header .salvage-header-dc,
+				.salvage-item .salvage-item-dc {
+					grid-area: dc;
+				}
+
+				.salvage-header .salvage-header-max,
+				.salvage-item .salvage-item-max {
+					grid-area: max;
+				}
+
+				.salvage-header .salvage-header-button,
+				.salvage-item .salvage-item-button {
+					grid-area: button;
+					display: flex;
+					column-gap: 3px;
+				}
+
+				.salvage-item {
+					border: none;
+					border-left: 1px solid var(--salvage-list-border-color);
+					border-right: 1px solid var(--salvage-list-border-color);
+					.salvage-item-name {
+						img {
+							width: 32px;
+							height: 32px;
+						}
+					}
+				}
+
+				li:last-child {
+					border-bottom: 1px solid var(--salvage-list-border-color);
+				}
+
+				li:nth-child(odd) {
+					background-color: rgba(120, 100, 82, 0.1);
+				}
+			}
+		}
+	}
+}
+
 .pf2e.chat-card {
 	.spent-materials-list {
 		display: flex;
@@ -713,6 +1034,42 @@
 			.seperator {
 				flex-grow: 1;
 				text-align: center;
+			}
+		}
+	}
+
+	&.salvage-result {
+		.card-content {
+			.item-summary {
+				display: flex;
+				align-items: center;
+				margin-bottom: 3px;
+
+				img {
+					height: 32px;
+					width: 32px;
+					margin-right: 3px;
+				}
+
+				span {
+					font-weight: 700;
+				}
+
+				span.common {
+					color: var(--color-rarity-common);
+				}
+
+				span.uncommon {
+					color: var(--color-rarity-uncommon);
+				}
+
+				span.rare {
+					color: var(--color-rarity-rare);
+				}
+
+				span.unique {
+					color: var(--color-rarity-unique);
+				}
 			}
 		}
 	}

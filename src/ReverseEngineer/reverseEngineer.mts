@@ -36,7 +36,7 @@ export async function reverseEngineer(actor: CharacterPF2e, item?: PhysicalItemP
 	});
 
 	if (!details) return;
-	details[0].itemData.uuid = item.sourceId;
+	details.itemDetails.itemData.uuid = item.sourceId;
 
 	if (!(await beginProject(actor, details))) return;
 	await createSalvage(item);

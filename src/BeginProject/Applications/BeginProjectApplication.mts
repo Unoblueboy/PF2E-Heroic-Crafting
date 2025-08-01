@@ -18,18 +18,16 @@ import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } fr
 import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
 import { calculateDC } from "../../Helper/dc.mjs";
 import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
-import { BeginProjectUpdateDetailsOptions, ProjectItemDetails } from "../types.mjs";
+import { BeginProjectStartingValues } from "../types.mjs";
+import { BeginProjectFullDetails } from "../types.mjs";
+import { BeginProjectDetailsType } from "../types.mjs";
+import { BeginProjectUpdateDetailsOptions } from "../types.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-type StartingItemDetails = {
-	currency?: Coins;
-	generic?: Coins;
-};
-
 type BeginProjectApplicationOptions = {
 	actor: CharacterPF2e;
-	callback: (result: [ProjectItemDetails, StartingItemDetails] | undefined) => void;
+	callback: (result: BeginProjectFullDetails | undefined) => void;
 	itemSettings?: {
 		formula?: {
 			defaultValue: boolean;
@@ -43,12 +41,12 @@ type BeginProjectApplicationOptions = {
 
 export class BeginProjectApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	actor: CharacterPF2e;
-	callback: (result: [ProjectItemDetails, StartingItemDetails] | undefined) => void;
+	callback: (result: BeginProjectFullDetails | undefined) => void;
 	includeIsFormula: boolean;
 	isFormulaDefaultValue: boolean;
 	lockItem: boolean;
 	checkFromInventory: boolean;
-	result?: [ProjectItemDetails, StartingItemDetails];
+	result?: BeginProjectFullDetails;
 	item?: PhysicalItemPF2e;
 	spell?: SpellPF2e;
 	constructor(options: BeginProjectApplicationOptions) {
@@ -100,8 +98,9 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		const isFormula = this.includeIsFormula
 			? (_formData.object["summary-is-formula"] as boolean)
 			: this.isFormulaDefaultValue;
-		this.result = [
-			{
+		this.result = {
+			type: BeginProjectDetailsType.FULL,
+			itemDetails: {
 				dc: _formData.object["summary-dc"] as number,
 				batchSize: _formData.object["summary-batch-size"] as number,
 				itemData: {
@@ -110,18 +109,18 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 				},
 				value: this.getCurrentStartingValue(),
 			},
-			this.getCurrentStartingValueBreakdown(),
-		];
+			startingValue: this.getCurrentStartingValueBreakdown(),
+		};
 
 		if (!this.spell) return;
-		this.result[0].itemData.spellUuid = this.spell.uuid;
-		this.result[0].itemData.heightenedLevel = getGenericScrollOrWandRank(this.item as ConsumablePF2e);
+		this.result.itemDetails.itemData.spellUuid = this.spell.uuid;
+		this.result.itemDetails.itemData.heightenedLevel = getGenericScrollOrWandRank(this.item as ConsumablePF2e);
 	}
 
 	static async GetItemDetails(
 		options: Omit<BeginProjectApplicationOptions, "callback">
-	): Promise<[ProjectItemDetails, StartingItemDetails] | undefined> {
-		return new Promise<[ProjectItemDetails, StartingItemDetails] | undefined>((resolve) => {
+	): Promise<BeginProjectFullDetails | undefined> {
+		return new Promise<BeginProjectFullDetails | undefined>((resolve) => {
 			const applicationOptions: BeginProjectApplicationOptions = Object.assign(options, { callback: resolve });
 			const app = new BeginProjectApplication(applicationOptions);
 			app.render(true);
@@ -258,7 +257,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		this.updateStartingValueText();
 	}
 
-	private setInputs(breakdown: StartingItemDetails) {
+	private setInputs(breakdown: BeginProjectStartingValues) {
 		const inputs = this.element.querySelectorAll<HTMLInputElement>(
 			".begin-project-start-summary .money-group input"
 		);
@@ -295,7 +294,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		}
 	}
 
-	private getCurrentStartingValueBreakdown(): StartingItemDetails {
+	private getCurrentStartingValueBreakdown(): BeginProjectStartingValues {
 		const inputs = this.element.querySelectorAll<HTMLInputElement>(
 			".begin-project-start-summary .money-group input"
 		);

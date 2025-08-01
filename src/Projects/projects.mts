@@ -80,6 +80,10 @@ export class Projects {
 	hasProject(id: string) {
 		return this.actorProjectsMap.has(id);
 	}
+
+	async getContextData() {
+		return Promise.all([...this.actorProjectsMap.values()].map(async (x) => await x.getContextData()));
+	}
 }
 
 class ProjectFactory {
@@ -95,6 +99,16 @@ class ProjectFactory {
 		return new Project(projectDetails, { id, actor: this.actor });
 	}
 }
+
+type ProjectContextData = {
+	name: string;
+	img: string;
+	id: string;
+	dc: number;
+	batchSize: number;
+	value: CoinsPF2e;
+	max: CoinsPF2e;
+};
 
 export abstract class AProject implements ProjectItemDetails {
 	id: string;
@@ -124,14 +138,41 @@ export abstract class AProject implements ProjectItemDetails {
 
 	abstract get max(): Promise<CoinsPF2e>;
 
+	get img(): Promise<string> {
+		return this.baseItem.then((item) =>
+			this.itemData.isFormula ? "icons/sundries/documents/blueprint-magical.webp" : item.img
+		);
+	}
+
 	abstract createItem(): Promise<PhysicalItemPF2e | undefined>;
 
 	async setValue(value: Coins) {
+		this.value = new game.pf2e.Coins(value);
 		this.actor.update({ [`flags.pf2eHeroicCrafting.projects.${this.id}.value`]: value });
+	}
+
+	async updateProject(details: ProjectItemDetails) {
+		this.dc = details.dc;
+		this.batchSize = details.batchSize;
+		this.value = new game.pf2e.Coins(details.value);
+		this.itemData = details.itemData;
+		this.actor.update({ [`flags.pf2eHeroicCrafting.projects.${this.id}`]: details });
 	}
 
 	async delete() {
 		Projects.deleteProject(this.actor, this.id);
+	}
+
+	async getContextData(): Promise<ProjectContextData> {
+		return {
+			name: await this.itemName,
+			img: await this.img,
+			id: this.id,
+			dc: this.dc,
+			batchSize: this.batchSize,
+			value: this.value,
+			max: await this.max,
+		};
 	}
 }
 
@@ -146,18 +187,18 @@ class Project extends AProject {
 
 	get max() {
 		return this.baseItem.then((item) => {
-			if (this.itemData.isFormula) return FORMULA_PRICE.get(this.actor.level) ?? new game.pf2e.Coins();
+			if (this.itemData.isFormula) return FORMULA_PRICE.get(item.level) ?? new game.pf2e.Coins();
 			return CoinsPF2eUtility.multCoins(this.batchSize, item.price.value);
 		});
 	}
 
 	protected getItemName(item: PhysicalItemPF2e): string {
-		if (this.itemData.isFormula) return `Formula ${item.name}`;
+		if (this.itemData.isFormula) return `Formula: ${item.name}`;
 		return item.name;
 	}
 
 	protected getItemLink(item: PhysicalItemPF2e): string {
-		if (this.itemData.isFormula) return `Formula ${item.link}`;
+		if (this.itemData.isFormula) return `Formula: ${item.link}`;
 		return item.link;
 	}
 
@@ -250,5 +291,10 @@ class ProjectWithSpell extends Project {
 		const spellRarityIndex = RARITIES.indexOf(spellRarity);
 		const rarityIndex = Math.max(itemRarityIndex, spellRarityIndex);
 		return RARITIES[rarityIndex];
+	}
+
+	override async updateProject(details: ProjectItemDetails) {
+		await super.updateProject(details);
+		this.baseSpellPromise = foundry.utils.fromUuid(this.itemData.spellUuid as string) as Promise<SpellPF2e>;
 	}
 }

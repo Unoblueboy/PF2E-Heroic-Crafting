@@ -177,7 +177,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		this.updateDetails();
 	}
 
-	static async GetSalvageDetails(options: SalvageApplicationOptions) {
+	static async GetSalvageDetails(options: Omit<SalvageApplicationOptions, "callback">) {
 		return new Promise<SalvageApplicationResult | undefined>((resolve, _reject) => {
 			const app = new SalvageApplication(
 				Object.assign(options, {

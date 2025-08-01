@@ -11,7 +11,7 @@ import { Projects } from "../Projects/projects.mjs";
 import { CraftProjectApplication } from "./Applications/CraftProjectApplications.mjs";
 import { ProjectCraftDetails, ProjectCraftDuration } from "./types.mjs";
 
-export async function craftProject(actor: CharacterPF2e, projectId?: string) {
+export async function craftProject(actor: CharacterPF2e, projectId: string) {
 	if (!actor) return;
 	if (!projectId) return;
 	const projects = Projects.getProjects(actor);

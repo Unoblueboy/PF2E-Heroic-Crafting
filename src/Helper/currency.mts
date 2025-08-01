@@ -26,9 +26,10 @@ export class CoinsPF2eUtility {
 		return new game.pf2e.Coins(coins1).plus(coins2);
 	}
 
+	/***  This does not allow negative coins, if the value decrease below 0, it is set to 0 */
 	static subCoins(coins1: Coins, coins2: Coins) {
 		const copperValue = this.coinsToCopperValue(coins1) - this.coinsToCopperValue(coins2);
-		return new game.pf2e.Coins(this.copperValueToCoins(copperValue));
+		return copperValue < 0 ? new game.pf2e.Coins() : new game.pf2e.Coins(this.copperValueToCoins(copperValue));
 	}
 
 	static multCoins(mult: number, coins: Coins) {

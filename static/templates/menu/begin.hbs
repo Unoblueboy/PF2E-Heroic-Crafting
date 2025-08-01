@@ -1,0 +1,61 @@
+<section class="tab {{tab.cssClass}}"
+         data-group="{{tab.group}}"
+         data-tab="{{tab.id}}">
+    <div data-action="begin-project"><button class="custom-button"><i class="fa-fw fa-solid fa-drafting-compass"
+               inert></i>Begin a Custom Project</button></div>
+    <div class="seperator">
+        <div></div>
+        <span>OR</span>
+        <div></div>
+    </div>
+    {{#if (gt formulaGroups.length 0)}}
+        <ol class="formula-list">
+            {{#each formulaGroups as | formulaGroup |}}
+                <li class="formula-header">
+                    <div class="formula-header-name">
+                        Level {{formulaGroup.level}}
+                    </div>
+                    <div class="formula-header-dc">
+                        DC
+                    </div>
+                    <div class="formula-header-price">
+                        Price
+                    </div>
+                    <div class="formula-header-quantity">
+                        Quantity <i class="fa-solid fa-info-circle"
+                           data-tooltip="Indicates the max number of this item that can be crafted at once."></i>
+                    </div>
+                    <button class="formula-header-button"
+                            style="opacity:0%"
+                            disabled><i class="fa-fw fa-solid fa-drafting-compass"
+                           inert></i>Begin</button>
+                </li>
+                {{#each formulaGroup.formulas as | formula |}}
+                    <li class="formula-item"
+                        data-formula-lvl="{{formula.item.level}}"
+                        data-item-uuid="{{formula.uuid}}"
+                        data-action="begin-project"
+                        data-is-formula>
+                        <div class="formula-item-name">
+                            <img src="{{formula.item.img}}">
+                            <span>{{formula.item.name}}</span>
+                        </div>
+                        <div class="formula-item-dc">
+                            {{formula.dc}}
+                        </div>
+                        <div class="formula-item-price">
+                            {{formula.item.price.value}}
+                        </div>
+                        <div class="formula-item-quantity">
+                            {{formula.batchSize}}
+                        </div>
+                        <button class="formula-item-button"><i class="fa-fw fa-solid fa-drafting-compass"
+                               inert></i>Begin</button>
+                    </li>
+                {{/each}}
+            {{/each}}
+        </ol>
+    {{else}}
+        You have no formulas
+    {{/if}}
+</section>

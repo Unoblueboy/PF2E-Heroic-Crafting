@@ -1,14 +1,13 @@
 {{log this}}
-<div class="pf2e chat-card"
+<div class="pf2e chat-card salvage-result"
      data-salvage-results
      data-item-uuid="{{item.uuid}}"
      data-salvage-max="{{salvage.max}}"
      data-salvage-income="{{salvage.income}}">
     <div class="card-content">
-        <div style="display: flex; align-items: center; margin-bottom: 3px;">
-            <img src="{{item.img}}"
-                 style="height:32px; width:32px; margin-right: 3px;">
-            <span>{{{item.name}}}</span>
+        <div class="item-summary">
+            <img src="{{item.img}}">
+            <span class="{{item.rarity}}">{{{item.name}}}</span>
         </div>
         <hr>
         {{#if savvyTeardown}}

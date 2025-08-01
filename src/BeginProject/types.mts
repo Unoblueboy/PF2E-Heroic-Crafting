@@ -1,4 +1,5 @@
-import { Coins } from "../../types/src/module/item/physical";
+import { Coins, PhysicalItemPF2e } from "../../types/src/module/item/physical";
+import { Either } from "../Helper/generics.mjs";
 
 export interface ProjectItemDetails {
 	dc: number;
@@ -18,3 +19,20 @@ export type EmbeddedSpell = {
 };
 
 export type BeginProjectUpdateDetailsOptions = { itemDropped?: boolean };
+export enum BeginProjectDetailsType {
+	FULL,
+	PARTIAL,
+}
+export type BeginProjectFullDetails = {
+	type: BeginProjectDetailsType.FULL;
+	itemDetails: ProjectItemDetails;
+	startingValue: BeginProjectStartingValues;
+};
+export type BeginProjectStartingValues = {
+	currency?: Coins;
+	generic?: Coins;
+};
+export type BeginProjectPartialDetails = {
+	type: BeginProjectDetailsType.PARTIAL;
+} & Either<{ itemUuid: string }, { item: PhysicalItemPF2e }>;
+export type BeginProjectDetails = BeginProjectFullDetails | BeginProjectPartialDetails;

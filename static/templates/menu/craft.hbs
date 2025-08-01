@@ -1,0 +1,62 @@
+<section class="tab {{tab.cssClass}}"
+         data-group="{{tab.group}}"
+         data-tab="{{tab.id}}">
+    {{#if (gt projects.length 0)}}
+        <ol class="project-list">
+            <li class="project-header">
+                <div class="project-header-name">
+                    Name
+                </div>
+                <div class="project-header-dc">
+                    DC
+                </div>
+                <div class="project-header-progress">
+                    Progress
+                </div>
+                <div class="project-header-quantity">
+                    Quantity
+                </div>
+                <div class="project-header-buttons"
+                     style="opacity:0%">
+                    <button class="project-header-edit-button"
+                            disabled><i class="fa-fw fa-solid fa-pencil"
+                           inert></i>Edit</button>
+                    <button class="project-header-craft-button"
+                            disabled><i class="fa-fw fa-solid fa-hammer"
+                           inert></i>Craft</button>
+                </div>
+            </li>
+            {{#each projects as | project |}}
+                <li class="project-item"
+                    data-project-id="{{project.id}}"
+                    data-action="craft-project">
+                    <div class="project-item-name">
+                        <img src="{{project.img}}">
+                        <span>{{project.name}}</span>
+                    </div>
+                    <div class="project-item-dc">
+                        {{project.dc}}
+                    </div>
+                    <div class="project-item-progress">
+                        <span class="project-item-progress-value">{{project.value}}</span>
+                        <span class="project-item-progress-sep">/</span>
+                        <span class="project-item-progress-max">{{project.max}}</span>
+                    </div>
+                    <div class="project-item-quantity">
+                        {{project.batchSize}}
+                    </div>
+                    <div class="project-item-buttons">
+                        <button class="project-header-edit-button"
+                                data-project-action="edit"><i class="fa-fw fa-solid fa-pencil"
+                               inert></i>Edit</button>
+                        <button class="project-header-craft-button"
+                                data-project-action="craft"><i class="fa-fw fa-solid fa-hammer"
+                               inert></i>Craft</button>
+                    </div>
+                </li>
+            {{/each}}
+        </ol>
+    {{else}}
+        You have no ongoing projects
+    {{/if}}
+</section>
