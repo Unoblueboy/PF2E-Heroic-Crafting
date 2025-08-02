@@ -4,7 +4,7 @@ import { SpellPF2e } from "../../types/src/module/item";
 import { Coins, CoinsPF2e, PhysicalItemPF2e } from "../../types/src/module/item/physical";
 import { ItemUUID } from "../../types/types/foundry/common/documents/_module.mjs";
 import { itemDataUuid, ProjectItemDetails } from "../BeginProject/types.mjs";
-import { FORMULA_PRICE, RARITIES } from "../Helper/constants.mjs";
+import { FORMULA_PRICE, MODULE_ID, RARITIES } from "../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 
 type PF2eHeroicCraftingFlags = {
@@ -12,7 +12,7 @@ type PF2eHeroicCraftingFlags = {
 };
 
 function getPF2eHeroicCraftingFlags(actor: CharacterPF2e) {
-	return actor.flags.pf2eHeroicCrafting as PF2eHeroicCraftingFlags | undefined;
+	return actor.flags[MODULE_ID] as PF2eHeroicCraftingFlags | undefined;
 }
 
 export class Projects {
@@ -69,11 +69,11 @@ export class Projects {
 	async addProject(projectDetails: ProjectItemDetails) {
 		const randomId = foundry.utils.randomID();
 		this.actorProjectsMap.set(randomId, this.projectFactory.createProduct(randomId, projectDetails));
-		await this.actor.update({ [`flags.pf2eHeroicCrafting.projects.${randomId}`]: projectDetails });
+		await this.actor.update({ [`flags.${MODULE_ID}.projects.${randomId}`]: projectDetails });
 	}
 
 	async deleteProject(id: string) {
-		await this.actor.update({ [`flags.pf2eHeroicCrafting.projects.-=${id}`]: null });
+		await this.actor.update({ [`flags.${MODULE_ID}.projects.-=${id}`]: null });
 		return this.actorProjectsMap.delete(id);
 	}
 
@@ -152,7 +152,7 @@ export abstract class AProject implements ProjectItemDetails {
 
 	async setValue(value: Coins) {
 		this.value = new game.pf2e.Coins(value);
-		this.actor.update({ [`flags.pf2eHeroicCrafting.projects.${this.id}.value`]: value });
+		this.actor.update({ [`flags.${MODULE_ID}.projects.${this.id}.value`]: value });
 	}
 
 	async updateProject(details: ProjectItemDetails) {
@@ -160,7 +160,7 @@ export abstract class AProject implements ProjectItemDetails {
 		this.batchSize = details.batchSize;
 		this.value = new game.pf2e.Coins(details.value);
 		this.itemData = details.itemData;
-		this.actor.update({ [`flags.pf2eHeroicCrafting.projects.${this.id}`]: details });
+		this.actor.update({ [`flags.${MODULE_ID}.projects.${this.id}`]: details });
 	}
 
 	async delete() {

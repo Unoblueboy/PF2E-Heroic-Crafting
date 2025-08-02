@@ -9,10 +9,10 @@
         <div></div>
     </div>
     {{#if (gt formulaGroups.length 0)}}
-        <ol class="formula-list">
+        <ol class="formula-list heroic-list">
             {{#each formulaGroups as | formulaGroup |}}
-                <li class="formula-header">
-                    <div class="formula-header-name">
+                <li class="formula-header heroic-header">
+                    <div class="formula-header-name heroic-header-name">
                         Level {{formulaGroup.level}}
                     </div>
                     <div class="formula-header-dc">
@@ -25,18 +25,17 @@
                         Quantity <i class="fa-solid fa-info-circle"
                            data-tooltip="Indicates the max number of this item that can be crafted at once."></i>
                     </div>
-                    <button class="formula-header-button"
-                            style="opacity:0%"
+                    <button class="formula-header-button heroic-button-group"
                             disabled><i class="fa-fw fa-solid fa-drafting-compass"
                            inert></i>Begin</button>
                 </li>
                 {{#each formulaGroup.formulas as | formula |}}
-                    <li class="formula-item"
+                    <li class="formula-item heroic-item"
                         data-formula-lvl="{{formula.item.level}}"
                         data-item-uuid="{{formula.uuid}}"
                         data-action="begin-project"
                         data-is-formula>
-                        <div class="formula-item-name">
+                        <div class="formula-item-name heroic-item-name">
                             <img src="{{formula.item.img}}">
                             <a data-action="toggle-summary">{{formula.item.name}}</a>
                         </div>
@@ -49,9 +48,10 @@
                         <div class="formula-item-quantity">
                             {{formula.batchSize}}
                         </div>
-                        <button class="formula-item-button"><i class="fa-fw fa-solid fa-drafting-compass"
+                        <button class="formula-item-button heroic-button-group"><i
+                               class="fa-fw fa-solid fa-drafting-compass"
                                inert></i>Begin</button>
-                        <div class="formula-item-summary"
+                        <div class="item-summary heroic-item-summary"
                              hidden></div>
                     </li>
                 {{/each}}

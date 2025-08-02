@@ -2,9 +2,9 @@
          data-group="{{tab.group}}"
          data-tab="{{tab.id}}">
     {{#if (gt projects.length 0)}}
-        <ol class="project-list">
-            <li class="project-header">
-                <div class="project-header-name">
+        <ol class="project-list heroic-list">
+            <li class="project-header heroic-header">
+                <div class="project-header-name heroic-header-name">
                     Name
                 </div>
                 <div class="project-header-dc">
@@ -16,20 +16,18 @@
                 <div class="project-header-quantity">
                     Quantity
                 </div>
-                <div class="project-header-buttons"
-                     style="opacity:0%">
+                <div class="project-header-buttons heroic-button-group">
                     <i class="fa-solid fa-fw fa-edit"></i>
-                    <button class="project-header-craft-button"
-                            disabled><i class="fa-fw fa-solid fa-hammer"
+                    <button disabled><i class="fa-fw fa-solid fa-hammer"
                            inert></i>Craft</button>
                     <i class="fa-solid fa-fw fa-trash"></i>
                 </div>
             </li>
             {{#each projects as | project |}}
-                <li class="project-item"
+                <li class="project-item heroic-item"
                     data-project-id="{{project.id}}"
                     data-action="craft-project">
-                    <div class="project-item-name">
+                    <div class="project-item-name heroic-item-name">
                         <img src="{{project.img}}">
                         <a data-action="toggle-summary">{{project.name}}</a>
                     </div>
@@ -44,14 +42,13 @@
                     <div class="project-item-quantity">
                         {{project.batchSize}}
                     </div>
-                    <div class="project-item-buttons">
+                    <div class="project-item-buttons heroic-button-group">
                         <a data-project-action="edit"><i class="fa-solid fa-fw fa-edit"></i></a>
-                        <button class="project-header-craft-button"
-                                data-project-action="craft"><i class="fa-fw fa-solid fa-hammer"
+                        <button data-project-action="craft"><i class="fa-fw fa-solid fa-hammer"
                                inert></i>Craft</button>
                         <a data-project-action="delete"><i class="fa-solid fa-fw fa-trash"></i></a>
                     </div>
-                    <div class="project-item-summary"
+                    <div class="project-item-summary heroic-item-summary"
                          hidden></div>
                 </li>
             {{/each}}

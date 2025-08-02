@@ -13,6 +13,7 @@ import {
 	FORMULA_PRICE,
 	HEROIC_CRAFTING_SPENDING_LIMIT,
 	MATERIAL_TROVE_SLUG,
+	MODULE_ID,
 	SALVAGE_MATERIAL_SLUG,
 } from "../../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
@@ -516,7 +517,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 }
 
 export function getItemDetails(actor: CharacterPF2e, projectId: string) {
-	const projects = actor.flags["pf2eHeroicCrafting"].projects as Record<string, ProjectItemDetails>;
+	const projects = actor.flags[MODULE_ID].projects as Record<string, ProjectItemDetails>;
 	const itemDetails = projects[projectId];
 	return itemDetails;
 }

@@ -19,6 +19,7 @@ export async function reverseEngineer(actor: CharacterPF2e, item?: PhysicalItemP
 	}
 
 	if (!item.sourceId) {
+		ui.notifications.info("Cannot reverse engineer an item without a sourceId");
 		return;
 	}
 

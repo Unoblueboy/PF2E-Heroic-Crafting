@@ -15,6 +15,7 @@
 			"path": "lang/en.json"
 		}
 	],
+	"socket": true,
 	"description": "<p>Heroic Crafting, new and improved</p>",
 	"authors": [
 		{

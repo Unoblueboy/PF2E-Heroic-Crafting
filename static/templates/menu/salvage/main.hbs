@@ -1,0 +1,14 @@
+<section class="tab {{tab.cssClass}}"
+         data-group="{{tab.group}}"
+         data-tab="{{tab.id}}">
+    <div data-action="salvage"><button class="custom-button"><i class="fa-fw fa-sharp fa-solid fa-recycle"
+               inert></i>Salvage an item</button></div>
+    <div class="seperator">
+        <div></div>
+        <span>OR</span>
+        <div></div>
+    </div>
+    {{> templates/generic/tab-navigation.hbs tabs=salvageTabs }}
+    {{> modules/pf2e-heroic-crafting/templates/menu/salvage/tabs/existing.hbs }}
+    {{> modules/pf2e-heroic-crafting/templates/menu/salvage/tabs/new.hbs }}
+</section>

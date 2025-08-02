@@ -205,19 +205,18 @@
 	}
 }
 
-.salvage-dialog,
-.begin-project-dialog,
-.reverse-engineer-dialog,
-.craft-project-dialog {
-	.footer-button-panel {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: nowrap;
-		gap: 1em;
+.salvage-dialog .footer-button-panel,
+.begin-project-dialog .footer-button-panel,
+.reverse-engineer-dialog .footer-button-panel,
+.craft-project-dialog .footer-button-panel,
+.forage-location-level-dialog .footer-button-panel {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	gap: 1em;
 
-		button {
-			flex: 1;
-		}
+	button {
+		flex: 1;
 	}
 }
 
@@ -647,12 +646,18 @@
 	}
 }
 
+.forage-location-level-dialog .footer-button-panel {
+	margin-top: 0.5rem;
+}
+
 section.heroic-crafting-menu:not(.minimized, .maximizing, .minimizing) {
 	min-width: 650px;
 	min-height: 150px;
 }
 
 section.heroic-crafting-menu {
+	--list-border-color: var(--color-light-4);
+	color: var(--color-light-3);
 	section.window-content {
 		padding-left: 0;
 		padding-right: 0;
@@ -721,10 +726,10 @@ section.heroic-crafting-menu {
 			.money-info {
 				display: grid;
 				grid-template-rows: repeat(2, var(--row-size));
-				grid-template-columns: max-content 10rem;
+				grid-template-columns: max-content max-content 10rem;
 				grid-template-areas:
-					"coinage-label coinage-value"
-					"materials-label materials-value";
+					". coinage-label coinage-value"
+					"materials-edit materials-label materials-value";
 				column-gap: 0.5rem;
 				align-items: center;
 
@@ -734,6 +739,9 @@ section.heroic-crafting-menu {
 				.total-coinage-value {
 					grid-area: coinage-value;
 					justify-self: end;
+				}
+				.crafting-materials-edit {
+					grid-area: materials-edit;
 				}
 				.crafting-materials-label {
 					grid-area: materials-label;
@@ -745,313 +753,253 @@ section.heroic-crafting-menu {
 			}
 		}
 
-		section.tab.begin-project {
-			--formula-list-border-color: var(--color-light-4);
-			color: var(--color-light-3);
+		section.tab.begin-project .custom-button,
+		section.tab.craft-project .custom-button,
+		section.tab.salvage .custom-button,
+		section.tab.reverse-engineer .custom-button {
+			margin: auto;
+			width: 80%;
+			height: 2.25rem;
+		}
 
-			.custom-button {
-				margin: auto;
-				width: 80%;
-				height: 2.25rem;
+		.heroic-list {
+			list-style-type: none;
+			padding: 0;
+			margin-top: 0;
+			margin-bottom: 0;
+			.heroic-header,
+			.heroic-item {
+				display: grid;
+				margin: 0;
+				align-items: center;
+				justify-items: center;
+				border: 1px solid var(--list-border-color);
+				padding: 0;
 			}
 
-			.formula-list {
-				list-style-type: none;
-				padding: 0;
-				margin-top: 0;
-				margin-bottom: 0;
-				.formula-header,
-				.formula-item {
-					display: grid;
-					margin: 0;
-					grid-template-areas: "name dc price quantity button";
-					grid-template-rows: 1fr;
-					grid-template-columns: 1fr 1.5rem 4.5rem 7rem max-content;
-					align-items: center;
-					justify-items: center;
-					border: 1px solid var(--formula-list-border-color);
-					padding: 0;
-				}
+			.heroic-header {
+				background-color: rgba(96, 88, 86, 0.25);
+			}
 
-				.formula-header .formula-header-name,
-				.formula-item .formula-item-name {
-					grid-area: name;
-					justify-self: start;
-					padding-left: 0.25rem;
-				}
+			.heroic-header .heroic-header-name,
+			.heroic-item .heroic-item-name {
+				padding-left: 0.25rem;
+				align-items: center;
+				display: flex;
+				flex-wrap: nowrap;
+				justify-content: start;
+				justify-self: start;
+			}
 
-				.formula-header .formula-header-dc,
-				.formula-item .formula-item-dc {
-					grid-area: dc;
-				}
+			.heroic-header .heroic-button-group,
+			.heroic-item .heroic-button-group {
+				display: flex;
+				column-gap: 3px;
+				align-items: center;
+				margin-right: 0.25rem;
+			}
 
-				.formula-header .formula-header-price,
-				.formula-item .formula-item-price {
-					grid-area: price;
-				}
+			.heroic-header .heroic-button-group {
+				opacity: 0%;
+			}
 
-				.formula-header .formula-header-quantity,
-				.formula-item .formula-item-quantity {
-					grid-area: quantity;
-				}
-
-				.formula-header .formula-header-button,
-				.formula-item .formula-item-button {
-					grid-area: button;
-					margin-right: 0.25rem;
-				}
-
-				.formula-header {
-					background-color: rgba(96, 88, 86, 0.25);
-				}
-
-				.formula-item {
-					border: none;
-
-					border-left: 1px solid var(--formula-list-border-color);
-					border-right: 1px solid var(--formula-list-border-color);
-					.formula-item-name {
-						align-items: center;
-						display: flex;
-						flex-wrap: nowrap;
-						justify-content: start;
-						justify-self: start;
-
-						img {
-							width: 32px;
-							height: 32px;
-						}
-					}
-
-					.formula-item-summary {
-						grid-column: name / button;
-						border-top: 1px solid var(--formula-list-border-color);
-						border-bottom: 1px solid var(--formula-list-border-color);
-						padding: 0.5rem;
+			.heroic-item {
+				border: none;
+				border-left: 1px solid var(--list-border-color);
+				border-right: 1px solid var(--list-border-color);
+				.heroic-item-name {
+					img {
+						width: 32px;
+						height: 32px;
 					}
 				}
-
-				.formula-item:last-child .formula-item-summary {
-					border-bottom: none;
+				.heroic-item-summary {
+					border-top: 1px solid var(--list-border-color);
+					border-bottom: 1px solid var(--list-border-color);
+					padding: 0.5rem;
+					width: 100%;
 				}
+			}
 
-				li:last-child {
-					border-bottom: 1px solid var(--formula-list-border-color);
-				}
+			.heroic-item:last-child .heroic-summary {
+				border-bottom: none;
+			}
 
-				li:nth-child(odd) {
-					background-color: rgba(120, 100, 82, 0.1);
-				}
+			li:last-child {
+				border-bottom: 1px solid var(--list-border-color);
+			}
+
+			li:nth-child(odd) {
+				background-color: rgba(120, 100, 82, 0.1);
 			}
 		}
 
-		section.tab.craft-project {
-			--project-list-border-color: var(--color-light-4);
-			color: var(--color-light-3);
-
-			.custom-button {
-				margin: auto;
-				width: 80%;
-				height: 2.25rem;
+		section.tab.begin-project .formula-list {
+			.formula-header,
+			.formula-item {
+				grid-template-areas: "name dc price quantity button";
+				grid-template-rows: 1fr;
+				grid-template-columns: 1fr 1.5rem 4.5rem 7rem max-content;
 			}
 
-			.project-list {
-				list-style-type: none;
-				padding: 0;
-				margin-top: 0;
-				margin-bottom: 0;
-				.project-header,
-				.project-item {
-					display: grid;
-					margin: 0;
-					grid-template-areas: "name dc progress quantity buttons";
-					grid-template-rows: 1fr;
-					grid-template-columns: 1fr 1.5rem 11rem 4rem max-content;
-					align-items: center;
-					justify-items: center;
-					border: 1px solid var(--project-list-border-color);
-					padding: 0;
-				}
+			.formula-header .formula-header-name,
+			.formula-item .formula-item-name {
+				grid-area: name;
+				justify-self: start;
+				padding-left: 0.25rem;
+			}
 
-				.project-header {
-					background-color: rgba(96, 88, 86, 0.25);
-				}
+			.formula-header .formula-header-dc,
+			.formula-item .formula-item-dc {
+				grid-area: dc;
+			}
 
-				.project-header .project-header-name,
-				.project-item .project-item-name {
-					padding-left: 0.25rem;
-					grid-area: name;
-					align-items: center;
-					display: flex;
-					flex-wrap: nowrap;
-					justify-content: start;
-					justify-self: start;
-				}
+			.formula-header .formula-header-price,
+			.formula-item .formula-item-price {
+				grid-area: price;
+			}
 
-				.project-header .project-header-dc,
-				.project-item .project-item-dc {
-					grid-area: dc;
-				}
+			.formula-header .formula-header-quantity,
+			.formula-item .formula-item-quantity {
+				grid-area: quantity;
+			}
 
-				.project-header .project-header-progress,
-				.project-item .project-item-progress {
-					grid-area: progress;
-				}
+			.formula-header .formula-header-button,
+			.formula-item .formula-item-button {
+				grid-area: button;
+			}
 
-				.project-header .project-header-quantity,
-				.project-item .project-item-quantity {
-					grid-area: quantity;
-				}
-
-				.project-header .project-header-buttons,
-				.project-item .project-item-buttons {
-					grid-area: buttons;
-					display: flex;
-					column-gap: 3px;
-					align-items: center;
-					padding-right: 0.25rem;
-				}
-
-				.project-item {
-					border: none;
-					border-left: 1px solid var(--project-list-border-color);
-					border-right: 1px solid var(--project-list-border-color);
-					.project-item-name {
-						img {
-							width: 32px;
-							height: 32px;
-						}
-					}
-
-					.project-item-progress {
-						display: grid;
-						grid-template-areas: "value sep max";
-						grid-template-rows: 1fr;
-						grid-template-columns: 1fr 0.5rem 1fr;
-						align-items: center;
-						width: 100%;
-						padding: 0 1rem;
-
-						.project-item-progress-value {
-							grid-area: value;
-							justify-self: start;
-						}
-						.project-item-progress-sep {
-							grid-area: sep;
-							justify-self: center;
-						}
-						.project-item-progress-max {
-							grid-area: max;
-							justify-self: end;
-						}
-					}
-
-					.project-item-summary {
-						grid-column: name / buttons;
-						border-top: 1px solid var(--project-list-border-color);
-						border-bottom: 1px solid var(--project-list-border-color);
-						padding: 0.5rem;
-					}
-				}
-
-				.project-item:last-child .project-item-summary {
-					border-bottom: none;
-				}
-
-				li:last-child {
-					border-bottom: 1px solid var(--project-list-border-color);
-				}
-
-				li:nth-child(odd) {
-					background-color: rgba(120, 100, 82, 0.1);
-				}
+			.formula-item .item-summary {
+				grid-column: name / button;
 			}
 		}
 
-		section.tab.salvage {
-			--salvage-list-border-color: var(--color-light-4);
-			color: var(--color-light-3);
-
-			.custom-button {
-				margin: auto;
-				width: 80%;
-				height: 2.25rem;
+		section.tab.craft-project .project-list {
+			.project-header,
+			.project-item {
+				grid-template-areas: "name dc progress quantity buttons";
+				grid-template-rows: 1fr;
+				grid-template-columns: 1fr 1.5rem 11rem 4rem max-content;
 			}
 
-			.salvage-list {
-				list-style-type: none;
-				padding: 0;
-				margin-top: 0;
-				margin-bottom: 0;
-				.salvage-header,
-				.salvage-item {
-					display: grid;
-					margin: 0;
-					grid-template-areas: "name level dc max button";
-					grid-template-rows: 1fr;
-					grid-template-columns: 1fr 2.5rem 1.5rem 9rem max-content;
-					align-items: center;
-					justify-items: center;
-					border: 1px solid var(--salvage-list-border-color);
-					padding: 0 0.25rem;
-				}
+			.project-header .project-header-name,
+			.project-item .project-item-name {
+				grid-area: name;
+			}
 
-				.salvage-header {
-					background-color: rgba(96, 88, 86, 0.25);
-				}
+			.project-header .project-header-dc,
+			.project-item .project-item-dc {
+				grid-area: dc;
+			}
 
-				.salvage-header .salvage-header-name,
-				.salvage-item .salvage-item-name {
-					padding-left: 0.25rem;
-					grid-area: name;
-					align-items: center;
-					display: flex;
-					flex-wrap: nowrap;
-					justify-content: start;
+			.project-header .project-header-progress,
+			.project-item .project-item-progress {
+				grid-area: progress;
+			}
+
+			.project-header .project-header-quantity,
+			.project-item .project-item-quantity {
+				grid-area: quantity;
+			}
+
+			.project-header .project-header-buttons,
+			.project-item .project-item-buttons {
+				grid-area: buttons;
+			}
+
+			.project-item .project-item-progress {
+				display: grid;
+				grid-template-areas: "value sep max";
+				grid-template-rows: 1fr;
+				grid-template-columns: 1fr 0.5rem 1fr;
+				align-items: center;
+				width: 100%;
+				padding: 0 1rem;
+
+				.project-item-progress-value {
+					grid-area: value;
 					justify-self: start;
 				}
-
-				.salvage-header .salvage-header-level,
-				.salvage-item .salvage-item-level {
-					grid-area: level;
+				.project-item-progress-sep {
+					grid-area: sep;
+					justify-self: center;
 				}
-
-				.salvage-header .salvage-header-dc,
-				.salvage-item .salvage-item-dc {
-					grid-area: dc;
-				}
-
-				.salvage-header .salvage-header-max,
-				.salvage-item .salvage-item-max {
+				.project-item-progress-max {
 					grid-area: max;
+					justify-self: end;
 				}
+			}
 
-				.salvage-header .salvage-header-button,
-				.salvage-item .salvage-item-button {
-					grid-area: button;
-					display: flex;
-					column-gap: 3px;
-				}
+			.project-item .project-item-summary {
+				grid-column: name / buttons;
+			}
+		}
 
-				.salvage-item {
-					border: none;
-					border-left: 1px solid var(--salvage-list-border-color);
-					border-right: 1px solid var(--salvage-list-border-color);
-					.salvage-item-name {
-						img {
-							width: 32px;
-							height: 32px;
-						}
-					}
-				}
+		section.tab.salvage .salvage-list {
+			.salvage-header,
+			.salvage-item {
+				grid-template-areas: "name level dc max button";
+				grid-template-rows: 1fr;
+				grid-template-columns: 1fr 2.5rem 1.5rem 9rem max-content;
+			}
 
-				li:last-child {
-					border-bottom: 1px solid var(--salvage-list-border-color);
-				}
+			.salvage-header .salvage-header-name,
+			.salvage-item .salvage-item-name {
+				grid-area: name;
+			}
 
-				li:nth-child(odd) {
-					background-color: rgba(120, 100, 82, 0.1);
-				}
+			.salvage-header .salvage-header-level,
+			.salvage-item .salvage-item-level {
+				grid-area: level;
+			}
+
+			.salvage-header .salvage-header-dc,
+			.salvage-item .salvage-item-dc {
+				grid-area: dc;
+			}
+
+			.salvage-header .salvage-header-max,
+			.salvage-item .salvage-item-max {
+				grid-area: max;
+			}
+
+			.salvage-header .salvage-header-button,
+			.salvage-item .salvage-item-button {
+				grid-area: button;
+			}
+		}
+
+		section.tab.salvage .item-list,
+		section.tab.reverse-engineer .item-list {
+			.item-header,
+			.item-item {
+				grid-template-areas: "name quantity bulk button";
+				grid-template-rows: 1fr;
+				grid-template-columns: 1fr 4rem 4rem max-content;
+			}
+
+			.item-header .item-header-name,
+			.item-item .item-item-name {
+				grid-area: name;
+			}
+
+			.item-header .item-header-quantity,
+			.item-item .item-item-quantity {
+				grid-area: quantity;
+			}
+
+			.item-header .item-header-bulk,
+			.item-item .item-item-bulk {
+				grid-area: bulk;
+			}
+
+			.item-header .item-header-button,
+			.item-item .item-item-button {
+				grid-area: button;
+			}
+
+			.item-item .item-summary {
+				grid-column: name / button;
 			}
 		}
 	}

@@ -2,6 +2,7 @@ import { CharacterPF2e } from "../../types/src/module/actor";
 import { CraftingFormula } from "../../types/src/module/actor/character/crafting";
 import { PhysicalItemPF2e, TreasurePF2e } from "../../types/src/module/item";
 import { CoinsPF2e } from "../../types/src/module/item/physical";
+import { ItemInstances } from "../../types/src/module/item/types";
 import {
 	ApplicationConfiguration,
 	ApplicationRenderOptions,
@@ -11,10 +12,11 @@ import { HandlebarsRenderOptions } from "../../types/types/foundry/client/applic
 import { beginProject } from "../BeginProject/beginProject.mjs";
 import { BeginProjectDetailsType } from "../BeginProject/types.mjs";
 import { craftProject } from "../CraftProject/craftProject.mjs";
-import { SALVAGE_MATERIAL_SLUG } from "../Helper/constants.mjs";
+import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../Helper/constants.mjs";
 import { calculateDC } from "../Helper/dc.mjs";
-import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
+import { editMaterialTrove, MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { ProjectContextData, Projects } from "../Projects/projects.mjs";
+import { reverseEngineer } from "../ReverseEngineer/reverseEngineer.mjs";
 import { salvage } from "../Salvage/salvage.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -23,6 +25,7 @@ enum HeroCraftingMenuTab {
 	BEGIN = "begin",
 	CRAFT = "craft",
 	SALVAGE = "salvage",
+	REVERSE_ENGINEER = "reverse-engineer",
 	OTHER = "other",
 }
 // Forage, Reverse Engineer
@@ -56,6 +59,15 @@ type HeroCraftingMenuBeginProjectContext = {
 	}[];
 };
 
+type HeroCraftingMenuSalvageData = {
+	id: string;
+	img: string;
+	level: number;
+	name: string;
+	dc: number;
+	max: CoinsPF2e;
+};
+
 export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) {
 	actor: CharacterPF2e;
 	constructor(options: HeroCraftingMenuOptions) {
@@ -73,6 +85,8 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			salvage: HeroCraftingMenu.salvage,
 			"open-actor-sheet": HeroCraftingMenu.openActorSheet,
 			"toggle-summary": HeroCraftingMenu.toggleSummary,
+			"reverse-engineer": HeroCraftingMenu.reverseEngineer,
+			"edit-material-trove": HeroCraftingMenu.editMaterialTrove,
 		},
 		position: { width: 700, height: 800 },
 	};
@@ -92,8 +106,12 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			classes: ["craft-project"],
 		},
 		[HeroCraftingMenuTab.SALVAGE]: {
-			template: "modules/pf2e-heroic-crafting/templates/menu/salvage.hbs",
+			template: "modules/pf2e-heroic-crafting/templates/menu/salvage/main.hbs",
 			classes: ["salvage"],
+		},
+		[HeroCraftingMenuTab.REVERSE_ENGINEER]: {
+			template: "modules/pf2e-heroic-crafting/templates/menu/reverse-engineer.hbs",
+			classes: ["reverse-engineer"],
 		},
 		[HeroCraftingMenuTab.OTHER]: { template: "modules/pf2e-heroic-crafting/templates/menu/other.hbs" },
 	};
@@ -104,16 +122,17 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 				{ id: HeroCraftingMenuTab.BEGIN, label: "Begin a Project" },
 				{ id: HeroCraftingMenuTab.CRAFT, label: "Craft a Project" },
 				{ id: HeroCraftingMenuTab.SALVAGE, label: "Salvage" },
+				{ id: HeroCraftingMenuTab.REVERSE_ENGINEER, label: "Reverse Engineer" },
 				{ id: HeroCraftingMenuTab.OTHER, label: "Other" },
 			],
 			initial: HeroCraftingMenuTab.BEGIN,
 		},
 		salvage: {
 			tabs: [
-				{ id: HeroCraftingMenuSalvageTab.EXISTING, label: "Salvage Existing" },
 				{ id: HeroCraftingMenuSalvageTab.NEW, label: "Salvage New" },
+				{ id: HeroCraftingMenuSalvageTab.EXISTING, label: "Salvage Existing" },
 			],
-			initial: HeroCraftingMenuSalvageTab.EXISTING,
+			initial: HeroCraftingMenuSalvageTab.NEW,
 		},
 	};
 
@@ -151,12 +170,12 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 
 	private static async salvage(this: HeroCraftingMenu, event: Event, target: HTMLElement) {
 		if (!(event.target instanceof HTMLButtonElement)) return;
-		const salvageId = target.dataset.salvageId;
-		if (!salvageId) {
+		const itemId = target.dataset.itemId;
+		if (!itemId) {
 			await salvage(this.actor);
 			return;
 		}
-		const item = this.actor.items.get<PhysicalItemPF2e<CharacterPF2e>>(salvageId);
+		const item = this.actor.items.get<PhysicalItemPF2e<CharacterPF2e>>(itemId);
 		if (!item) return;
 		salvage(this.actor, item, true);
 	}
@@ -167,17 +186,33 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 
 	private static async toggleSummary(this: HeroCraftingMenu, _event: Event, target: HTMLElement) {
 		if (target.closest<HTMLElement>("[data-item-uuid]")) {
-			await this.toggleFormulaSummary(target);
+			await this.toggleGeneralSummary(target);
 		} else if (target.closest<HTMLElement>("[data-project-id]")) {
 			await this.toggleProjectSummary(target);
 		}
 	}
 
-	async toggleFormulaSummary(target: HTMLElement) {
+	private static async reverseEngineer(this: HeroCraftingMenu, event: Event, target: HTMLElement) {
+		if (!(event.target instanceof HTMLButtonElement)) return;
+		const itemId = target.dataset.itemId;
+		if (!itemId) {
+			await reverseEngineer(this.actor);
+			return;
+		}
+		const item = this.actor.items.get<PhysicalItemPF2e<CharacterPF2e>>(itemId);
+		if (!item) return;
+		reverseEngineer(this.actor, item);
+	}
+
+	private static async editMaterialTrove(this: HeroCraftingMenu, _event: Event, _target: HTMLElement) {
+		await editMaterialTrove(this.actor);
+	}
+
+	async toggleGeneralSummary(target: HTMLElement) {
 		const parent = target.closest<HTMLElement>("[data-item-uuid]");
 		if (!parent) return;
 
-		const itemSummaryElement = parent.querySelector<HTMLElement>(".formula-item-summary");
+		const itemSummaryElement = parent.querySelector<HTMLElement>(".item-summary");
 		if (!itemSummaryElement) return;
 
 		if (!itemSummaryElement.hasAttribute("hidden")) {
@@ -263,7 +298,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 	override async _onRender(context: object, options: fa.ApplicationRenderOptions) {
 		await super._onRender(context, options);
 		new foundry.applications.ux.DragDrop.implementation({
-			dragSelector: "[data-is-formula]",
+			dragSelector: "[data-is-formula], [data-is-item]",
 			callbacks: {
 				dragstart: (event: DragEvent) => {
 					this.onDragStart(event);
@@ -291,6 +326,10 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			baseDragData.isFormula = true;
 			baseDragData.ability = targetElement.dataset.ability;
 			baseDragData.uuid = targetElement.dataset.itemUuid;
+		}
+
+		if (targetElement && "isItem" in targetElement.dataset) {
+			baseDragData.fromInventory = !!targetElement.dataset.fromInventory;
 		}
 
 		dataTransfer.setData("text/plain", JSON.stringify(baseDragData));
@@ -324,41 +363,13 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			case HeroCraftingMenuTab.SALVAGE:
 				context = foundry.utils.mergeObject(context, this.getSalvageContext());
 				break;
-
+			case HeroCraftingMenuTab.REVERSE_ENGINEER:
+				context = foundry.utils.mergeObject(context, this.getReverseEngineerContext());
+				break;
 			default:
 				break;
 		}
 		return context;
-	}
-
-	private getSalvageContext(): {
-		salvages: {
-			id: string;
-			img: string;
-			level: number;
-			name: string;
-			dc: number;
-			max: CoinsPF2e;
-		}[];
-		salvageTabs: Record<string, ApplicationTab>;
-	} {
-		const salvageItems = this.actor.itemTypes.treasure.filter(
-			(x: TreasurePF2e) => x.slug && x.slug === SALVAGE_MATERIAL_SLUG
-		);
-		const salvageData = salvageItems.map((x: TreasurePF2e) => {
-			return {
-				id: x.id,
-				img: x.img,
-				level: x.level,
-				name: x.name,
-				dc: calculateDC(x.level, x.rarity),
-				max: x.price.value,
-			};
-		});
-		return {
-			salvages: salvageData.toSorted((a, b) => a.level - b.level),
-			salvageTabs: this._prepareTabs("salvage"),
-		};
 	}
 
 	private async getCharacterSummaryContext(): Promise<HeroCraftingMenuCharacterSummaryContext> {
@@ -394,6 +405,65 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		};
 	}
 
+	private getSalvageContext(): {
+		salvages: HeroCraftingMenuSalvageData[];
+		salvageTabs: Record<string, ApplicationTab>;
+		itemGroups: { name: string; items: PhysicalItemPF2e[] }[];
+	} {
+		const salvageItems = this.actor.itemTypes.treasure.filter(
+			(x: TreasurePF2e) => x.slug && x.slug === SALVAGE_MATERIAL_SLUG
+		);
+		const itemGroups: { name: string; items: PhysicalItemPF2e[] }[] = this.getItemGroups();
+		const salvageData = salvageItems.map((x: TreasurePF2e) => {
+			return {
+				id: x.id,
+				img: x.img,
+				level: x.level,
+				name: x.name,
+				dc: calculateDC(x.level, x.rarity),
+				max: x.price.value,
+			};
+		});
+		return {
+			salvages: salvageData.toSorted((a, b) => a.level - b.level),
+			salvageTabs: this._prepareTabs("salvage"),
+			itemGroups,
+		};
+	}
+
+	private getItemGroups() {
+		type ItemType = keyof ItemInstances<CharacterPF2e>;
+		const itemGroups: { name: string; items: PhysicalItemPF2e[] }[] = [];
+
+		for (const itemType of [["weapon", "shield"], "armor", "equipment", "consumable", "treasure", "backpack"] as (
+			| ItemType
+			| ItemType[]
+		)[]) {
+			const allItems = Array.isArray(itemType)
+				? itemType.flatMap((it) => this.actor.itemTypes[it])
+				: this.actor.itemTypes[itemType];
+			const items = allItems.filter(
+				(item) =>
+					!(
+						item.slug &&
+						[MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG, CRAFTING_MATERIAL_SLUG].includes(item.slug)
+					)
+			);
+			if (items.length === 0) continue;
+			itemGroups.push({
+				name: itemType as string,
+				items: items,
+			});
+		}
+		return itemGroups;
+	}
+
+	private getReverseEngineerContext() {
+		return {
+			itemGroups: this.getItemGroups(),
+		};
+	}
+
 	override async _prepareContext(options: ApplicationRenderOptions) {
 		const data = await super._prepareContext(options);
 		console.log(data);
@@ -401,5 +471,13 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			tabs: this._prepareTabs("primary"),
 			rootId: this.id,
 		});
+	}
+
+	override async _preRender(context: object, options: ApplicationRenderOptions) {
+		await super._preRender(context, options);
+		await foundry.applications.handlebars.loadTemplates([
+			"modules/pf2e-heroic-crafting/templates/menu/salvage/tabs/existing.hbs",
+			"modules/pf2e-heroic-crafting/templates/menu/salvage/tabs/new.hbs",
+		]);
 	}
 }

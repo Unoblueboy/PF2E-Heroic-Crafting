@@ -1,0 +1,48 @@
+<section class="tab {{salvageTabs.existing.cssClass}}"
+         data-group="{{salvageTabs.existing.group}}"
+         data-tab="{{salvageTabs.existing.id}}">
+    {{#if (gt salvages.length 0)}}
+        <ol class="salvage-list heroic-list">
+            <li class="salvage-header heroic-header">
+                <div class="salvage-header-name heroic-header-name">
+                    Name
+                </div>
+                <div class="salvage-header-level">
+                    Level
+                </div>
+                <div class="salvage-header-dc">
+                    DC
+                </div>
+                <div class="salvage-header-max">
+                    Salvage Max
+                </div>
+                <button class="salvage-header-button heroic-button-group"><i class="fa-fw fa-sharp fa-solid fa-recycle"
+                       inert></i>Salvage</button>
+            </li>
+            {{#each salvages as | salvage |}}
+                <li class="salvage-item heroic-item"
+                    data-item-id="{{salvage.id}}"
+                    data-action="salvage">
+                    <div class="salvage-item-name heroic-item-name">
+                        <img src="{{salvage.img}}">
+                        <span>{{salvage.name}}</span>
+                    </div>
+                    <div class="salvage-item-level">
+                        {{salvage.level}}
+                    </div>
+                    <div class="salvage-item-dc">
+                        {{salvage.dc}}
+                    </div>
+                    <div class="salvage-item-max">
+                        {{salvage.max}}
+                    </div>
+                    <button class="salvage-item-button heroic-button-group"><i
+                           class="fa-fw fa-sharp fa-solid fa-recycle"
+                           inert></i>Salvage</button>
+                </li>
+            {{/each}}
+        </ol>
+    {{else}}
+        You have no ongoing salvages
+    {{/if}}
+</section>

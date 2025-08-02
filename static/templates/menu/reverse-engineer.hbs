@@ -1,0 +1,55 @@
+<section class="tab {{tab.cssClass}}"
+         data-group="{{tab.group}}"
+         data-tab="{{tab.id}}">
+    <div data-action="reverse-engineer"><button class="custom-button"><i class="fa-fw fa-solid fa-gear-complex"
+               inert></i>Reverse Engineer an item</button></div>
+    <div class="seperator">
+        <div></div>
+        <span>OR</span>
+        <div></div>
+    </div>
+    {{#if (gt itemGroups.length 0)}}
+        <ol class="item-list heroic-list">
+            {{#each itemGroups as | itemGroup |}}
+                <li class="item-header heroic-header">
+                    <div class="item-header-name heroic-header-name">
+                        {{itemGroup.name}}
+                    </div>
+                    <div class="item-header-quantity">
+                        Quantity
+                    </div>
+                    <div class="item-header-bulk">
+                        Bulk
+                    </div>
+                    <button class="item-header-button heroic-button-group"
+                            disabled><i class="fa-fw fa-solid fa-gear-complex"
+                           inert></i>Reverse Engineer</button>
+                </li>
+                {{#each itemGroup.items as | item |}}
+                    <li class="item-item heroic-item"
+                        data-item-uuid="{{item.uuid}}"
+                        data-item-id="{{item.id}}"
+                        data-action="reverse-engineer"
+                        data-is-item>
+                        <div class="item-item-name heroic-item-name">
+                            <img src="{{item.img}}">
+                            <a data-action="toggle-summary">{{item.name}}</a>
+                        </div>
+                        <div class="item-item-quantity">
+                            {{item.quantity}}
+                        </div>
+                        <div class="item-item-bulk">
+                            {{item.bulk}}
+                        </div>
+                        <button class="item-item-button heroic-button-group"><i class="fa-fw fa-solid fa-gear-complex"
+                               inert></i>Reverse Engineer</button>
+                        <div class="item-summary heroic-item-summary"
+                             hidden></div>
+                    </li>
+                {{/each}}
+            {{/each}}
+        </ol>
+    {{else}}
+        You have no items
+    {{/if}}
+</section>

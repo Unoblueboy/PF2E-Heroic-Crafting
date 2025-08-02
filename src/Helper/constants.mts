@@ -9,6 +9,7 @@ export const CRAFTING_MATERIAL_SLUG = "generic-crafting-material";
 export const SALVAGE_MATERIAL_SLUG = "generic-salvage-material";
 
 export const RARITIES: readonly ["common", "uncommon", "rare", "unique"] = ["common", "uncommon", "rare", "unique"];
+export const MODULE_ID = "pf2e-heroic-crafting";
 
 Hooks.on("ready", () => {
 	HEROIC_CRAFTING_SPENDING_LIMIT = new Map<number, { hour: CoinsPF2e; day: CoinsPF2e; week: CoinsPF2e }>([

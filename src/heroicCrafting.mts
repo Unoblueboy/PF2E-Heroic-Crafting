@@ -9,8 +9,9 @@ import { craftProjectChatButtonListener } from "./CraftProject/chatListener.mjs"
 import { ConsumablePF2e } from "../types/src/module/item";
 import { junkCollectorOnConsume } from "./Feats/junkCollector.mjs";
 import { HeroCraftingMenu } from "./Menu/HeroicCraftingMenu.mjs";
+import { forageCraftingResources } from "./Forage/forager.mjs";
 
-Hooks.on("init", async () => {
+Hooks.once("init", async () => {
 	game.pf2eHeroicCrafting = {
 		editMaterialTrove,
 		salvage,
@@ -18,6 +19,7 @@ Hooks.on("init", async () => {
 		reverseEngineer,
 		craftProject,
 		HeroCraftingMenu,
+		forageCraftingResources,
 	};
 
 	const { TestRuleElement } = await import("./RuleElement/testElement.mjs");
