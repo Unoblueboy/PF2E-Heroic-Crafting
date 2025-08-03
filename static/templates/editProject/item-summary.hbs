@@ -1,0 +1,29 @@
+<div class="edit-item-summary">
+	<div class="item-summary">
+		<img src="{{project.baseItem.img}}"
+			 class="item-icon">
+		<span class="item-name">{{project.baseItem.name}}</span>
+		<span class="item-level-spacer">Item</span>
+		<span class="item-level">{{project.baseItem.level}}</span>
+	</div>
+	{{#if project.baseSpell}}
+		<div class="spell-summary">
+			<svg class="embed-svg"
+				 width="32"
+				 height="32"
+				 xmlns="http://www.w3.org/2000/svg"
+				 style="flex: 0 0 auto;">
+				<polyline points="16 1 16 16 23 16"
+						  stroke="rgb(239, 230, 216)"
+						  stroke-width="2"
+						  stroke-linejoin="round"
+						  stroke-linecap="round"></polyline>
+			</svg>
+			<img src="{{project.baseSpell.img}}"
+				 class="spell-icon">
+			<span class="spell-name">{{project.baseSpell.name}}</span>
+			<span class="spell-rank-spacer">Spell</span>
+			<span class="spell-rank">{{project.spellRank}}</span>
+		</div>
+	{{/if}}
+</div>

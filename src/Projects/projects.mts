@@ -108,6 +108,9 @@ export type ProjectContextData = {
 	batchSize: number;
 	value: CoinsPF2e;
 	max: CoinsPF2e;
+	baseItem: PhysicalItemPF2e;
+	baseSpell?: SpellPF2e;
+	spellRank?: number;
 };
 
 export abstract class AProject implements ProjectItemDetails {
@@ -160,7 +163,7 @@ export abstract class AProject implements ProjectItemDetails {
 		this.batchSize = details.batchSize;
 		this.value = new game.pf2e.Coins(details.value);
 		this.itemData = details.itemData;
-		this.actor.update({ [`flags.${MODULE_ID}.projects.${this.id}`]: details });
+		await this.actor.update({ [`flags.${MODULE_ID}.projects.${this.id}`]: details });
 	}
 
 	async delete() {
@@ -176,6 +179,7 @@ export abstract class AProject implements ProjectItemDetails {
 			batchSize: this.batchSize,
 			value: this.value,
 			max: await this.max,
+			baseItem: await this.baseItem,
 		};
 	}
 }
@@ -306,5 +310,13 @@ class ProjectWithSpell extends Project {
 	override async updateProject(details: ProjectItemDetails) {
 		await super.updateProject(details);
 		this.baseSpellPromise = foundry.utils.fromUuid(this.itemData.spellUuid as string) as Promise<SpellPF2e>;
+	}
+
+	override async getContextData(): Promise<ProjectContextData> {
+		const data = await super.getContextData();
+		const baseSpell = await this.baseSpell;
+		data.baseSpell = baseSpell;
+		data.spellRank = this.itemData.heightenedLevel ?? baseSpell.rank;
+		return data;
 	}
 }

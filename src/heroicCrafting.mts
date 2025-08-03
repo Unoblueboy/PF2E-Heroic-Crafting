@@ -11,6 +11,7 @@ import { junkCollectorOnConsume } from "./Feats/junkCollector.mjs";
 import { HeroCraftingMenu } from "./Menu/HeroicCraftingMenu.mjs";
 import { forageCraftingResources, forageSocketListener } from "./Forage/forager.mjs";
 import { forageCraftingResourcesChatButtonListener } from "./Forage/chatListener.mjs";
+import { editProject } from "./EditProject/editProject.mjs";
 
 Hooks.once("init", async () => {
 	game.pf2eHeroicCrafting = {
@@ -21,6 +22,7 @@ Hooks.once("init", async () => {
 		craftProject,
 		HeroCraftingMenu,
 		forageCraftingResources,
+		editProject,
 	};
 
 	const { TestRuleElement } = await import("./RuleElement/testElement.mjs");

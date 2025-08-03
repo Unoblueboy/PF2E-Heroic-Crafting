@@ -1,0 +1,101 @@
+<div class="edit-project-summary">
+    <hr style="margin:0.5rem 0;">
+    <div class="edit-project-check-summary">
+        <h4>Crafting Summary</h4>
+        <div class="input-group">
+            <label for="{{partId}}-dc">DC</label>
+            <div class="input-fields">
+                <input class="dc"
+                       type="number"
+                       min="1"
+                       value="{{project.dc}}"
+                       step="1"
+                       name="dc"
+                       id="{{partId}}-dc"
+                       required>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="{{partId}}-batch-size">Batch Size</label>
+            <div class="input-fields batch-fields">
+                <button type="button"
+                        data-action="decrease-batch-size">-</button>
+                <input class="batch-size"
+                       type="number"
+                       min="1"
+                       value="{{project.batchSize}}"
+                       step="1"
+                       name="batch-size"
+                       id="{{partId}}-batch-size"
+                       required>
+                <button type="button"
+                        data-action="increase-batch-size">+</button>
+            </div>
+        </div>
+    </div>
+    <hr style="margin:0.5rem 0;">
+    <div class="begin-project-item-details-summary">
+        <h4>Project Value</h4>
+        <div class="total-starting">
+            <span class="starting-value">{{project.value}}</span>
+            <span class="seperator">/</span>
+            <span class="starting-max">{{project.max}}</span>
+        </div>
+        <div class="material-list">
+            <div class="basic-material currency">
+                <hr>
+                <div class="item-summary">
+                    <img src="systems/pf2e/icons/equipment/treasure/currency/gold-pieces.webp"
+                         class="item-icon">
+                    <span class="item-name">Currency</span>
+                </div>
+                <div class="money-group">
+                    <div class="input-group">
+                        <label for="{{partId}}-pp">Platinum</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="{{project.value.pp}}"
+                                   step="1"
+                                   name="pp"
+                                   id="{{partId}}-pp">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="{{partId}}-gp">Gold</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="{{project.value.gp}}"
+                                   step="1"
+                                   name="gp"
+                                   id="{{partId}}-gp">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="{{partId}}-sp">Silver</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="{{project.value.sp}}"
+                                   step="1"
+                                   name="sp"
+                                   id="{{partId}}-sp">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="{{partId}}-cp">Copper</label>
+                        <div class="input-fields">
+                            <input type="number"
+                                   min="0"
+                                   value="{{project.value.cp}}"
+                                   step="1"
+                                   name="cp"
+                                   id="{{partId}}-cp">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -11,7 +11,10 @@ import {
 import { HandlebarsRenderOptions } from "../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { beginProject } from "../BeginProject/beginProject.mjs";
 import { BeginProjectDetailsType } from "../BeginProject/types.mjs";
+import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { craftProject } from "../CraftProject/craftProject.mjs";
+import { editProject } from "../EditProject/editProject.mjs";
+import { forageCraftingResources } from "../Forage/forager.mjs";
 import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../Helper/constants.mjs";
 import { calculateDC } from "../Helper/dc.mjs";
 import { editMaterialTrove, MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
@@ -26,7 +29,7 @@ enum HeroCraftingMenuTab {
 	CRAFT = "craft",
 	SALVAGE = "salvage",
 	REVERSE_ENGINEER = "reverse-engineer",
-	OTHER = "other",
+	FORAGE = "forage",
 }
 // Forage, Reverse Engineer
 
@@ -41,11 +44,11 @@ enum HeroCraftingMenuPart {
 }
 
 type HeroCraftingMenuOptions = {
-	actor: CharacterPF2e;
+	actor: CharacterPF2eHeroicCrafting;
 };
 
 type HeroCraftingMenuCharacterSummaryContext = {
-	actor: CharacterPF2e;
+	actor: CharacterPF2eHeroicCrafting;
 	money: {
 		coinage: CoinsPF2e;
 		materials: CoinsPF2e | undefined;
@@ -69,7 +72,7 @@ type HeroCraftingMenuSalvageData = {
 };
 
 export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) {
-	actor: CharacterPF2e;
+	actor: CharacterPF2eHeroicCrafting;
 	constructor(options: HeroCraftingMenuOptions) {
 		super(options as object);
 		this.actor = options.actor;
@@ -87,6 +90,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			"toggle-summary": HeroCraftingMenu.toggleSummary,
 			"reverse-engineer": HeroCraftingMenu.reverseEngineer,
 			"edit-material-trove": HeroCraftingMenu.editMaterialTrove,
+			forage: HeroCraftingMenu.forageResources,
 		},
 		position: { width: 700, height: 800 },
 	};
@@ -113,7 +117,10 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			template: "modules/pf2e-heroic-crafting/templates/menu/reverse-engineer.hbs",
 			classes: ["reverse-engineer"],
 		},
-		[HeroCraftingMenuTab.OTHER]: { template: "modules/pf2e-heroic-crafting/templates/menu/other.hbs" },
+		[HeroCraftingMenuTab.FORAGE]: {
+			template: "modules/pf2e-heroic-crafting/templates/menu/forage.hbs",
+			classes: ["forage"],
+		},
 	};
 
 	static override readonly TABS = {
@@ -123,7 +130,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 				{ id: HeroCraftingMenuTab.CRAFT, label: "Craft a Project" },
 				{ id: HeroCraftingMenuTab.SALVAGE, label: "Salvage" },
 				{ id: HeroCraftingMenuTab.REVERSE_ENGINEER, label: "Reverse Engineer" },
-				{ id: HeroCraftingMenuTab.OTHER, label: "Other" },
+				{ id: HeroCraftingMenuTab.FORAGE, label: "Forage" },
 			],
 			initial: HeroCraftingMenuTab.BEGIN,
 		},
@@ -158,7 +165,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 				await craftProject(this.actor, projectId);
 				break;
 			case "edit":
-				// TODO: Add the ability to edit a project
+				await editProject(this.actor, projectId);
 				break;
 			case "delete":
 				await project?.delete();
@@ -175,7 +182,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			await salvage(this.actor);
 			return;
 		}
-		const item = this.actor.items.get<PhysicalItemPF2e<CharacterPF2e>>(itemId);
+		const item = this.actor.items.get<PhysicalItemPF2e<CharacterPF2eHeroicCrafting>>(itemId);
 		if (!item) return;
 		salvage(this.actor, item, true);
 	}
@@ -199,9 +206,13 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			await reverseEngineer(this.actor);
 			return;
 		}
-		const item = this.actor.items.get<PhysicalItemPF2e<CharacterPF2e>>(itemId);
+		const item = this.actor.items.get<PhysicalItemPF2e<CharacterPF2eHeroicCrafting>>(itemId);
 		if (!item) return;
 		reverseEngineer(this.actor, item);
+	}
+
+	private static async forageResources(this: HeroCraftingMenu, _event: Event, _target: HTMLElement) {
+		forageCraftingResources(this.actor);
 	}
 
 	private static async editMaterialTrove(this: HeroCraftingMenu, _event: Event, _target: HTMLElement) {
