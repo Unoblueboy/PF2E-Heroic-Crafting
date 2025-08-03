@@ -31,7 +31,6 @@ export async function forageCraftingResources(actor: CharacterPF2e) {
 		ui.notifications.info("A GM must be online for this function to run");
 		return;
 	}
-	// TODO: Handle case where GM runs this function
 
 	const dc = await ForageDcDialog.GetDc(locationLevel);
 	if (dc === undefined) return;

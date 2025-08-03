@@ -26,6 +26,7 @@ export class ForageLocationLevelDialog extends HandlebarsApplicationMixin(Applic
 		window: {
 			title: "Forage Crafting Resources: Location Level",
 			icon: "fa-solid fa-solid fa-leaf",
+			contentClasses: ["standard-form"],
 		},
 		form: {
 			handler: ForageLocationLevelDialog.handler,

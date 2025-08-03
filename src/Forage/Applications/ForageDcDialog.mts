@@ -30,6 +30,7 @@ export class ForageDcDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 		window: {
 			title: "Forage Crafting Resources: DC",
 			icon: "fa-solid fa-solid fa-leaf",
+			contentClasses: ["standard-form"],
 		},
 		form: {
 			handler: ForageDcDialog.handler,

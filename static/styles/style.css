@@ -209,7 +209,8 @@
 .begin-project-dialog .footer-button-panel,
 .reverse-engineer-dialog .footer-button-panel,
 .craft-project-dialog .footer-button-panel,
-.forage-location-level-dialog .footer-button-panel {
+.forage-location-level-dialog .footer-button-panel,
+.forage-dc-dialog .footer-button-panel {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
