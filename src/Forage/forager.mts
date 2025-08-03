@@ -1,7 +1,12 @@
 import { CharacterPF2e } from "../../types/src/module/actor";
+import { ChatMessagePF2e } from "../../types/src/module/chat-message";
+import { CheckRoll } from "../../types/src/module/system/check";
+import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
+import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
+import { HEROIC_CRAFTING_GATHERED_INCOME } from "../Helper/constants.mjs";
 import { ForageDcDialog } from "./Applications/ForageDcDialog.mjs";
 import { ForageLocationLevelDialog } from "./Applications/ForageLocationLevelDialog.mjs";
-import { ForageCraftingResourcesRequest, GetDCMessage, SocketMessage } from "./types.mjs";
+import { ForageCraftingResourcesRequest, GetDCMessage, RollCheckMessage, SocketMessage } from "./types.mjs";
 
 export async function forageCraftingResources(actor: CharacterPF2e) {
 	if (!actor) return;
@@ -11,7 +16,7 @@ export async function forageCraftingResources(actor: CharacterPF2e) {
 	}
 
 	const locationLevel = await ForageLocationLevelDialog.GetLocationLevel();
-	if (!locationLevel) return;
+	if (locationLevel === undefined) return;
 
 	if (!game.user.isGM && game.users.activeGM) {
 		game.socket.emit("module.pf2e-heroic-crafting", {
@@ -29,21 +34,26 @@ export async function forageCraftingResources(actor: CharacterPF2e) {
 	// TODO: Handle case where GM runs this function
 
 	const dc = await ForageDcDialog.GetDc(locationLevel);
-	if (!dc) return;
+	if (dc === undefined) return;
+
+	await rollForageCheck(actor, { dc, locationLevel });
 }
 
-game.socket.on("module.pf2e-heroic-crafting", (...[_message, userId]: [SocketMessage, string]) => {
-	switch (_message.request) {
+export async function forageSocketListener(message: SocketMessage, userId: string): Promise<void> {
+	switch (message.request) {
 		case ForageCraftingResourcesRequest.GET_DC:
-			getForageDc(_message, userId);
+			await getForageDcSocket(message, userId);
+			break;
+		case ForageCraftingResourcesRequest.ROLL_CHECK:
+			await rollForageCheckSocket(message, userId);
 			break;
 
 		default:
 			break;
 	}
-});
+}
 
-async function getForageDc(message: GetDCMessage, userId: string) {
+async function getForageDcSocket(message: GetDCMessage, userId: string) {
 	if (!game.user.isActiveGM) return;
 
 	const dc = await ForageDcDialog.GetDc(message.locationLevel);
@@ -54,5 +64,66 @@ async function getForageDc(message: GetDCMessage, userId: string) {
 		request: ForageCraftingResourcesRequest.ROLL_CHECK,
 		dc,
 		receiver: userId,
+	});
+}
+async function rollForageCheckSocket(message: RollCheckMessage, _userId: string) {
+	if (game.user.id !== message.receiver) return;
+	if (message.dc === undefined) return;
+	const actor = await foundry.utils.fromUuid<CharacterPF2e>(message.actorUuid);
+	if (!actor) return;
+
+	await rollForageCheck(actor, { dc: message.dc, locationLevel: message.locationLevel });
+}
+
+async function rollForageCheck(actor: CharacterPF2e, data: { dc: number; locationLevel: number }) {
+	async function getStatisticRollCallback(
+		_roll: Rolled<CheckRoll>,
+		_outcome: DegreeOfSuccessString | null | undefined,
+		message: ChatMessagePF2e,
+		_event: Event | null
+	) {
+		if (message instanceof CONFIG.ChatMessage.documentClass) {
+			const forage = ["success", "criticalSuccess"].includes(_outcome ?? "")
+				? new game.pf2e.Coins(HEROIC_CRAFTING_GATHERED_INCOME.get(actor.level))
+				: new game.pf2e.Coins();
+			const flavor = await foundry.applications.handlebars.renderTemplate(
+				"modules/pf2e-heroic-crafting/templates/chat/forage/result.hbs",
+				{
+					actor: actor,
+					locationLevel: data.locationLevel,
+					forage,
+				}
+			);
+			if (flavor) {
+				message.updateSource({ flavor: message.flavor + flavor });
+			}
+			ChatMessage.create(message.toObject());
+		} else {
+			console.error("PF2E Heroic Crafting | Unable to amend chat message with craft result.", message);
+		}
+	}
+
+	actor.skills.survival.check.roll({
+		dc: { value: data.dc, visible: false },
+		extraRollOptions: ["action:craft-projct", "action:craft", "specialty"],
+		extraRollNotes: [
+			{
+				selector: "survival",
+				text: "<strong>Success</strong> Add the amount listed on Table 2: Gathered Income for the location's level to your Material Trove each day. If you are a master in Survival, instead add twice as much..",
+				outcome: ["success", "criticalSuccess"],
+			},
+			{
+				selector: "survival",
+				text: "<strong>Failure</strong> You find no materials.",
+				outcome: ["failure", "criticalFailure"],
+			},
+		],
+		label: await foundry.applications.handlebars.renderTemplate("systems/pf2e/templates/chat/action/header.hbs", {
+			subtitle: "Survival Check",
+			title: "Forage Crafting Resources",
+		}),
+		traits: ["downtime"],
+		createMessage: false,
+		callback: getStatisticRollCallback,
 	});
 }

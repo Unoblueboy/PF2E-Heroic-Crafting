@@ -9,7 +9,8 @@ import { craftProjectChatButtonListener } from "./CraftProject/chatListener.mjs"
 import { ConsumablePF2e } from "../types/src/module/item";
 import { junkCollectorOnConsume } from "./Feats/junkCollector.mjs";
 import { HeroCraftingMenu } from "./Menu/HeroicCraftingMenu.mjs";
-import { forageCraftingResources } from "./Forage/forager.mjs";
+import { forageCraftingResources, forageSocketListener } from "./Forage/forager.mjs";
+import { forageCraftingResourcesChatButtonListener } from "./Forage/chatListener.mjs";
 
 Hooks.once("init", async () => {
 	game.pf2eHeroicCrafting = {
@@ -24,6 +25,9 @@ Hooks.once("init", async () => {
 
 	const { TestRuleElement } = await import("./RuleElement/testElement.mjs");
 	game.pf2e.RuleElements.custom.Test = TestRuleElement;
+
+	const { CharacterPF2eHeroicCrafting } = await import("./character.mjs");
+	CONFIG.PF2E.Actor.documentClasses.character = CharacterPF2eHeroicCrafting;
 });
 
 Hooks.once("ready", () => {
@@ -37,11 +41,14 @@ Hooks.once("ready", () => {
 		},
 		"MIXED"
 	);
+
+	game.socket.on("module.pf2e-heroic-crafting", forageSocketListener);
 });
 
 Hooks.on("renderChatMessageHTML", (message, html, data) => {
 	salvageChatButtonListener(message as ChatMessagePF2e, html as HTMLElement, data);
 	craftProjectChatButtonListener(message as ChatMessagePF2e, html as HTMLElement, data);
+	forageCraftingResourcesChatButtonListener(message as ChatMessagePF2e, html as HTMLElement, data);
 });
 // https://github.com/Cerapter/pf2e-heroic-crafting-automation/tree/05a6b3ba592eaa3df92a87b5f3525182746cb13e/scripts/rule-elements
 // https://github.com/foundryvtt/pf2e/blob/v13-dev/src/module/rules/rule-element/base.ts

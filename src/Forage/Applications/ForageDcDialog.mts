@@ -4,6 +4,7 @@ import {
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
+import { LEVEL_BASED_DC } from "../../Helper/constants.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -80,6 +81,7 @@ export class ForageDcDialog extends HandlebarsApplicationMixin(ApplicationV2) {
 	override async _prepareContext(options: ApplicationRenderOptions) {
 		const data = await super._prepareContext(options);
 		const fields = ForageDcDialog.SCHEMA.fields;
+		fields.dcInput.initial = LEVEL_BASED_DC.get(this.locationLevel) ?? 14;
 
 		const buttons = [
 			{

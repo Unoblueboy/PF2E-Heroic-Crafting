@@ -216,7 +216,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		if (!this.actor) return;
 		const spendingLimitForLevel = HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level);
 		if (!spendingLimitForLevel) return;
-		const baseIncomeValue = HEROIC_CRAFTING_GATHERED_INCOME.get(this.item.level);
+		const baseIncomeValue = new game.pf2e.Coins(HEROIC_CRAFTING_GATHERED_INCOME.get(this.item.level));
 		if (!baseIncomeValue) return;
 
 		this.extractDragDropDiv();
@@ -289,10 +289,10 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 
 	private getSavvyTeardownStrings(
 		salvageMax: CoinsPF2e,
-		spendingLimitForLevel: { hour: CoinsPF2e; day: CoinsPF2e; week: CoinsPF2e }
+		spendingLimitForLevel: { hour: Coins; day: Coins; week: Coins }
 	) {
 		const halfSalvageMax = CoinsPF2eUtility.multCoins(0.5, salvageMax);
-		const dailySpendingLimit = spendingLimitForLevel.day;
+		const dailySpendingLimit = new game.pf2e.Coins(spendingLimitForLevel.day);
 		const baseIncomeSuccessValue = CoinsPF2eUtility.minCoins(halfSalvageMax, dailySpendingLimit);
 		const incomeSuccessValue = baseIncomeSuccessValue;
 		const incomeFailureValue = new game.pf2e.Coins();

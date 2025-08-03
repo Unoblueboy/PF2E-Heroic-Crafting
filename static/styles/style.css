@@ -1112,4 +1112,28 @@ section.heroic-crafting-menu {
 			}
 		}
 	}
+
+	&.forage-result {
+		div.card-content {
+			display: grid;
+			grid-template-rows: 1fr 1fr;
+			grid-template-columns: max-content 1fr;
+			grid-template-areas:
+				"level-label level-value"
+				"forage-label forage-value";
+			align-items: center;
+
+			span.content-label {
+				justify-self: left;
+				font-weight: 700;
+			}
+
+			span.content-value {
+				justify-self: right;
+			}
+		}
+		div.card-buttons {
+			margin-bottom: 0.25rem;
+		}
+	}
 }

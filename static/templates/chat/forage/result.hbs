@@ -1,0 +1,24 @@
+{{log this}}
+<div class="pf2e chat-card forage-result"
+     data-forage-results
+     data-actor-uuid="{{actor.uuid}}"
+     data-forage-amount="{{forage}}">
+    <hr>
+    <div class="card-content">
+        <span class="content-label">Location Level:</span>
+        <span class="content-value">{{locationLevel}}</span>
+        <span class="content-label">Foraged Crafting Resources:</span>
+        <span class="content-value">{{forage}}</span>
+    </div>
+    {{#if (ne forage.copperValue 0)}}
+        <div class="card-buttons"
+             data-visibility="owner">
+            <button type="button"
+                    data-action="forage-resources"
+                    data-duration="1">Forage Resources for 1 day</button>
+            <button type="button"
+                    data-action="forage-resources"
+                    data-duration="7">Forage Resources for 1 week</button>
+        </div>
+    {{/if}}
+</div>

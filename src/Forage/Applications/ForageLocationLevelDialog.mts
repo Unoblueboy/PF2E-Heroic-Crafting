@@ -58,9 +58,9 @@ export class ForageLocationLevelDialog extends HandlebarsApplicationMixin(Applic
 		this: ForageLocationLevelDialog,
 		_event: Event,
 		_form: HTMLFormElement,
-		_formData: FormDataExtended
+		formData: FormDataExtended
 	) {
-		this.result = _formData.object.levelInput as number;
+		this.result = formData.object.levelInput as number;
 	}
 
 	static async GetLocationLevel() {

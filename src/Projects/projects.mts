@@ -191,7 +191,7 @@ class Project extends AProject {
 
 	get max() {
 		return this.baseItem.then((item) => {
-			if (this.itemData.isFormula) return FORMULA_PRICE.get(item.level) ?? new game.pf2e.Coins();
+			if (this.itemData.isFormula) return new game.pf2e.Coins(FORMULA_PRICE.get(item.level));
 			return CoinsPF2eUtility.multCoins(this.batchSize, item.price.value);
 		});
 	}

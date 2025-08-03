@@ -38,7 +38,7 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	const totalSpent = await getTotalMaterialSpent(craftDetails);
 	const newProjectTotal: CoinsPF2e = getNewProjectTotal(outcome, project, totalSpent);
 
-	const projectMax = await project.max;
+	const projectMax = new game.pf2e.Coins(await project.max);
 	if (newProjectTotal.copperValue < 0) {
 		await Projects.deleteProject(actor, projectId);
 	} else if (newProjectTotal.copperValue >= projectMax.copperValue) {

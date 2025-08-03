@@ -283,8 +283,9 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		if (!craftDurationSelect) return;
 
 		const craftDuration = craftDurationSelect.value as ProjectCraftDuration;
-		const singleSpendingLimit =
-			HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[craftDuration] ?? new game.pf2e.Coins();
+		const singleSpendingLimit = new game.pf2e.Coins(
+			HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[craftDuration]
+		);
 		const spendingLimit = singleSpendingLimit.scale(this.itemDetails.batchSize);
 		const moneyGroupCoins = new game.pf2e.Coins(curValues.perItem[materialData.item ?? ""]);
 
@@ -333,8 +334,9 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		if (!craftDurationSelect) return;
 
 		const craftDuration = craftDurationSelect.value as ProjectCraftDuration;
-		const singleSpendingLimit =
-			HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[craftDuration] ?? new game.pf2e.Coins();
+		const singleSpendingLimit = new game.pf2e.Coins(
+			HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[craftDuration]
+		);
 		const spendingLimit = singleSpendingLimit.scale(this.itemDetails.batchSize);
 		const uuid = materialData.uuid;
 		if (!uuid) return;
@@ -525,6 +527,6 @@ export function getItemDetails(actor: CharacterPF2e, projectId: string) {
 export async function getProjectMax(itemDetails: ProjectItemDetails, item?: PhysicalItemPF2e): Promise<CoinsPF2e> {
 	item ??= (await foundry.utils.fromUuid(itemDetails.itemData.uuid)) as PhysicalItemPF2e;
 	return itemDetails.itemData.isFormula
-		? FORMULA_PRICE.get(item.level) ?? new game.pf2e.Coins()
+		? new game.pf2e.Coins(FORMULA_PRICE.get(item.level))
 		: CoinsPF2eUtility.multCoins(itemDetails.batchSize, item.price.value);
 }
