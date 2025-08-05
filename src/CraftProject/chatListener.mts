@@ -1,13 +1,13 @@
-import { CharacterPF2e } from "../../types/src/module/actor";
 import { ChatMessagePF2e } from "../../types/src/module/chat-message/document";
 import { PhysicalItemPF2e } from "../../types/src/module/item";
 import { CoinsPF2e } from "../../types/src/module/item/physical";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
+import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 import { fractionToPercent } from "../Helper/generics.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { AProject, Projects } from "../Projects/projects.mjs";
-import { getTotalMaterialSpent } from "./craftProject.mjs";
+import { CraftProjectUtility } from "./craftProjectUtility.mjs";
 import { ProjectCraftDetails, TreasureMaterialSpent, TreasurePostUseOperation } from "./types.mjs";
 
 export async function craftProjectChatButtonListener(message: ChatMessagePF2e, html: HTMLElement, _data: unknown) {
@@ -22,11 +22,13 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 
 	const craftDetailsString = generalDiv.dataset["craftDetails"];
 	if (!craftDetailsString) return;
-	const craftDetails = JSON.parse(craftDetailsString ?? "") as ProjectCraftDetails;
+	const craftDetails = JSON.parse(craftDetailsString) as ProjectCraftDetails;
 
 	const actorUuid = generalDiv.dataset.actorUuid;
 	if (!actorUuid) return;
-	const actor = (await foundry.utils.fromUuid(actorUuid ?? "")) as CharacterPF2e;
+
+	const actor = await foundry.utils.fromUuid<CharacterPF2eHeroicCrafting>(actorUuid);
+	if (!actor) return;
 
 	const projectId = generalDiv.dataset.projectId as string;
 	const outcome = button.dataset.outcome as DegreeOfSuccessString;
@@ -35,7 +37,7 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 
 	await useMaterialSpent(actor, craftDetails);
 
-	const totalSpent = await getTotalMaterialSpent(craftDetails);
+	const totalSpent = await CraftProjectUtility.getTotalCost(craftDetails.materialsSpent);
 	const newProjectTotal: CoinsPF2e = getNewProjectTotal(outcome, project, totalSpent);
 
 	const projectMax = new game.pf2e.Coins(await project.max);
@@ -83,7 +85,7 @@ function getNewProjectTotal(outcome: string, project: AProject, totalSpent: Coin
 	}
 }
 
-async function useMaterialSpent(actor: CharacterPF2e, craftDetails: ProjectCraftDetails): Promise<void> {
+async function useMaterialSpent(actor: CharacterPF2eHeroicCrafting, craftDetails: ProjectCraftDetails): Promise<void> {
 	const materialsSpent = craftDetails.materialsSpent;
 	if (materialsSpent.generic) {
 		await MaterialTrove.subtractValue(actor, materialsSpent.generic);

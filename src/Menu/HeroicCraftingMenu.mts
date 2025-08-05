@@ -1,4 +1,3 @@
-import { CharacterPF2e } from "../../types/src/module/actor";
 import { CraftingFormula } from "../../types/src/module/actor/character/crafting";
 import { PhysicalItemPF2e, TreasurePF2e } from "../../types/src/module/item";
 import { CoinsPF2e } from "../../types/src/module/item/physical";
@@ -100,7 +99,10 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			template: "modules/pf2e-heroic-crafting/templates/menu/character-summary.hbs",
 			classes: ["charcter-summary"],
 		},
-		[HeroCraftingMenuPart.TABS]: { template: "templates/generic/tab-navigation.hbs", classes: ["standard-form"] },
+		[HeroCraftingMenuPart.TABS]: {
+			template: "modules/pf2e-heroic-crafting/templates/menu/tab-navigation.hbs",
+			classes: ["standard-form"],
+		},
 		[HeroCraftingMenuTab.BEGIN]: {
 			template: "modules/pf2e-heroic-crafting/templates/menu/begin.hbs",
 			classes: ["begin-project"],
@@ -273,7 +275,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		if (!project) return;
 		const item = await project.baseItem;
 		if (!item) return;
-		const chatData = await item.getChatData();
+		const chatData = await (item as PhysicalItemPF2e).getChatData();
 		const descriptionValue = await game.pf2e.TextEditor.enrichHTML(await project.description);
 		const summaryContext = {
 			item,
@@ -443,7 +445,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 	}
 
 	private getItemGroups() {
-		type ItemType = keyof ItemInstances<CharacterPF2e>;
+		type ItemType = keyof ItemInstances<CharacterPF2eHeroicCrafting>;
 		const itemGroups: { name: string; items: PhysicalItemPF2e[] }[] = [];
 
 		for (const itemType of [["weapon", "shield"], "armor", "equipment", "consumable", "treasure", "backpack"] as (
@@ -489,6 +491,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		await foundry.applications.handlebars.loadTemplates([
 			"modules/pf2e-heroic-crafting/templates/menu/salvage/tabs/existing.hbs",
 			"modules/pf2e-heroic-crafting/templates/menu/salvage/tabs/new.hbs",
+			"modules/pf2e-heroic-crafting/templates/menu/salvage/tab-navigation.hbs",
 		]);
 	}
 }

@@ -1,4 +1,3 @@
-import { CharacterPF2e } from "../../../types/src/module/actor";
 import {
 	ConsumablePF2e,
 	ItemPF2e,
@@ -14,6 +13,7 @@ import {
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/_module.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
+import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
 import { calculateDC } from "../../Helper/dc.mjs";
@@ -26,7 +26,7 @@ import { BeginProjectUpdateDetailsOptions } from "../types.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 type BeginProjectApplicationOptions = {
-	actor: CharacterPF2e;
+	actor: CharacterPF2eHeroicCrafting;
 	callback: (result: BeginProjectFullDetails | undefined) => void;
 	itemSettings?: {
 		formula?: {
@@ -41,7 +41,7 @@ type BeginProjectApplicationOptions = {
 
 // TODO: refactor to update on actor update
 export class BeginProjectApplication extends HandlebarsApplicationMixin(ApplicationV2) {
-	actor: CharacterPF2e;
+	actor: CharacterPF2eHeroicCrafting;
 	callback: (result: BeginProjectFullDetails | undefined) => void;
 	includeIsFormula: boolean;
 	isFormulaDefaultValue: boolean;

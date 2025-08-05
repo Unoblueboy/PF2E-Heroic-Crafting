@@ -1,4 +1,3 @@
-import { CharacterPF2e } from "../../../types/src/module/actor";
 import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../../types/src/module/item";
 import { Coins, CoinsPF2e } from "../../../types/src/module/item/physical";
 import {
@@ -12,17 +11,19 @@ import {
 	CRAFTING_MATERIAL_SLUG,
 	HEROIC_CRAFTING_GATHERED_INCOME,
 	HEROIC_CRAFTING_SPENDING_LIMIT,
+	HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD,
 	MATERIAL_TROVE_SLUG,
 	SALVAGE_MATERIAL_SLUG,
 } from "../../Helper/constants.mjs";
 import { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs";
+import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 // TODO: refactor to update on actor update
 export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	result?: SalvageApplicationResult;
 	item?: PhysicalItemPF2e;
-	actor?: CharacterPF2e;
+	actor?: CharacterPF2eHeroicCrafting;
 	callback?: (result: SalvageApplicationResult | undefined) => void;
 	lockItem?: boolean;
 
@@ -201,7 +202,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		if (!item) return;
 
 		if (!this.lockItem || (this.lockItem && !this.item)) {
-			this.actor ||= item.parent as CharacterPF2e;
+			this.actor ||= item.parent;
 			this.item = item;
 		}
 		this.updateDetails({ useDefaultSalvageMax: true });
@@ -289,7 +290,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 
 	private getSavvyTeardownStrings(
 		salvageMax: CoinsPF2e,
-		spendingLimitForLevel: { hour: Coins; day: Coins; week: Coins }
+		spendingLimitForLevel: HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD
 	) {
 		const halfSalvageMax = CoinsPF2eUtility.multCoins(0.5, salvageMax);
 		const dailySpendingLimit = new game.pf2e.Coins(spendingLimitForLevel.day);
@@ -400,13 +401,15 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		if (itemLevelSpan) itemLevelSpan.textContent = String(this.item.level).padStart(2, "0");
 	}
 
-	async getItem(data: Record<string, JSONValue>): Promise<PhysicalItemPF2e | null> {
+	async getItem(data: Record<string, JSONValue>): Promise<PhysicalItemPF2e<CharacterPF2eHeroicCrafting> | null> {
 		if (typeof data.type === "string" && data.type?.toLowerCase() != "item") {
 			ui.notifications.info("Only items can be salvaged");
 			return null;
 		}
 
-		const item = await CONFIG.PF2E.Item.documentClasses.armor.fromDropData<ItemPF2e>(data);
+		const item = await CONFIG.PF2E.Item.documentClasses.armor.fromDropData<ItemPF2e<CharacterPF2eHeroicCrafting>>(
+			data
+		);
 
 		if (!item) return null;
 		if (!data.fromInventory && !item.parent) {
@@ -417,7 +420,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			ui.notifications.info("Only physical items can be salvaged");
 			return null;
 		}
-		if (item.isOfType("treasure") && (item as TreasurePF2e).isCoinage) {
+		if (item.isOfType("treasure") && (item as TreasurePF2e<CharacterPF2eHeroicCrafting>).isCoinage) {
 			ui.notifications.info("Coins cannot be salvaged");
 			return null;
 		}

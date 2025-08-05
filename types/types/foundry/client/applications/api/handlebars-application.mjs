@@ -1,4 +1,3 @@
-"use strict";
 /** Augment an Application class with [Handlebars](https://handlebarsjs.com) template rendering behavior. */
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

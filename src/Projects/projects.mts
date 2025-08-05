@@ -1,9 +1,9 @@
-import { CharacterPF2e } from "../../types/src/module/actor";
 import { Rarity } from "../../types/src/module/data";
 import { SpellPF2e } from "../../types/src/module/item";
 import { Coins, CoinsPF2e, PhysicalItemPF2e } from "../../types/src/module/item/physical";
 import { ItemUUID } from "../../types/types/foundry/common/documents/_module.mjs";
 import { itemDataUuid, ProjectItemDetails } from "../BeginProject/types.mjs";
+import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { FORMULA_PRICE, MODULE_ID, RARITIES } from "../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 
@@ -11,24 +11,26 @@ type PF2eHeroicCraftingFlags = {
 	projects?: Record<string, ProjectItemDetails>;
 };
 
-function getPF2eHeroicCraftingFlags(actor: CharacterPF2e) {
+const HEROIC_CRAFTING_ROLL_OPTION_PREFIX = "heroic:crafting" as const;
+
+function getPF2eHeroicCraftingFlags(actor: CharacterPF2eHeroicCrafting) {
 	return actor.flags[MODULE_ID] as PF2eHeroicCraftingFlags | undefined;
 }
 
 export class Projects {
 	static readonly collection: Map<string, Projects> = new Map<string, Projects>();
 
-	private readonly actorProjectsMap: Map<string, Project>;
-	private readonly actor: CharacterPF2e;
+	private readonly actorProjectsMap: Map<string, AProject>;
+	private readonly actor: CharacterPF2eHeroicCrafting;
 	private readonly projectFactory: ProjectFactory;
-	private constructor(actor: CharacterPF2e) {
+	private constructor(actor: CharacterPF2eHeroicCrafting) {
 		this.actor = actor;
 		const projectObjects = getPF2eHeroicCraftingFlags(actor)?.projects ?? {};
 
-		this.actorProjectsMap = new Map<string, Project>();
+		this.actorProjectsMap = new Map<string, AProject>();
 		this.projectFactory = new ProjectFactory(actor);
 		for (const [id, project] of Object.entries(projectObjects)) {
-			this.actorProjectsMap.set(id, this.projectFactory.createProduct(id, project));
+			this.actorProjectsMap.set(id, this.projectFactory.createProject(id, project));
 		}
 	}
 
@@ -40,7 +42,7 @@ export class Projects {
 		return [...this.actorProjectsMap.values()];
 	}
 
-	static getProjects(actor: CharacterPF2e): Projects | undefined {
+	static getProjects(actor: CharacterPF2eHeroicCrafting): Projects | undefined {
 		if (this.collection.has(actor.uuid)) return this.collection.get(actor.uuid);
 
 		const projects = new Projects(actor);
@@ -48,14 +50,14 @@ export class Projects {
 		return projects;
 	}
 
-	static getProject(actor: CharacterPF2e, id: string): Project | undefined {
+	static getProject(actor: CharacterPF2eHeroicCrafting, id: string): AProject | undefined {
 		const projects = this.getProjects(actor);
 		if (!projects) return;
 
 		return projects.getProject(id);
 	}
 
-	static async deleteProject(actor: CharacterPF2e, id: string) {
+	static async deleteProject(actor: CharacterPF2eHeroicCrafting, id: string) {
 		const projects = this.getProjects(actor);
 		if (!projects) return;
 
@@ -68,7 +70,7 @@ export class Projects {
 
 	async addProject(projectDetails: ProjectItemDetails) {
 		const randomId = foundry.utils.randomID();
-		this.actorProjectsMap.set(randomId, this.projectFactory.createProduct(randomId, projectDetails));
+		this.actorProjectsMap.set(randomId, this.projectFactory.createProject(randomId, projectDetails));
 		await this.actor.update({ [`flags.${MODULE_ID}.projects.${randomId}`]: projectDetails });
 	}
 
@@ -87,12 +89,12 @@ export class Projects {
 }
 
 class ProjectFactory {
-	private readonly actor: CharacterPF2e;
-	constructor(actor: CharacterPF2e) {
+	private readonly actor: CharacterPF2eHeroicCrafting;
+	constructor(actor: CharacterPF2eHeroicCrafting) {
 		this.actor = actor;
 	}
 
-	createProduct(id: string, projectDetails: ProjectItemDetails): Project {
+	createProject(id: string, projectDetails: ProjectItemDetails): AProject {
 		if (projectDetails.itemData.spellUuid) {
 			return new ProjectWithSpell(projectDetails, { id, actor: this.actor });
 		}
@@ -115,13 +117,13 @@ export type ProjectContextData = {
 
 export abstract class AProject implements ProjectItemDetails {
 	id: string;
-	actor: CharacterPF2e;
+	actor: CharacterPF2eHeroicCrafting;
 	dc: number;
 	batchSize: number;
 	itemData: itemDataUuid;
 	value: CoinsPF2e;
 	protected baseItemPromise?: Promise<PhysicalItemPF2e>;
-	constructor(projectDetails: ProjectItemDetails, data: { id: string; actor: CharacterPF2e }) {
+	constructor(projectDetails: ProjectItemDetails, data: { id: string; actor: CharacterPF2eHeroicCrafting }) {
 		this.id = data.id;
 		this.actor = data.actor;
 		this.dc = projectDetails.dc;
@@ -181,6 +183,14 @@ export abstract class AProject implements ProjectItemDetails {
 			max: await this.max,
 			baseItem: await this.baseItem,
 		};
+	}
+
+	async getRollOptions() {
+		const item = await this.baseItem;
+		return new Set([
+			...this.actor.getRollOptions(),
+			...item.getRollOptions(item.type).map((trait) => `${HEROIC_CRAFTING_ROLL_OPTION_PREFIX}:${trait}`),
+		]);
 	}
 }
 

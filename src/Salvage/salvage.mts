@@ -1,4 +1,3 @@
-import { CharacterPF2e } from "../../types/src/module/actor";
 import { ChatMessagePF2e } from "../../types/src/module/chat-message";
 import { PhysicalItemPF2e, TreasurePF2e } from "../../types/src/module/item";
 import { CheckRoll } from "../../types/src/module/system/check";
@@ -11,8 +10,9 @@ import { SalvageApplication } from "./Applications/SalvageApplication.mjs";
 import { SalvageApplicationResult } from "./Applications/types.mjs";
 import { CoinsPF2e } from "../../types/src/module/item/physical";
 import { calculateDC } from "../Helper/dc.mjs";
+import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 
-export async function salvage(actor: CharacterPF2e, item?: PhysicalItemPF2e, lockItem = false) {
+export async function salvage(actor: CharacterPF2eHeroicCrafting, item?: PhysicalItemPF2e, lockItem = false) {
 	const salvageDetails = await SalvageApplication.GetSalvageDetails({ actor: actor, item: item, lockItem: lockItem });
 
 	if (!salvageDetails) {

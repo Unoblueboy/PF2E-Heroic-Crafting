@@ -528,6 +528,9 @@
 				&.success-bar {
 					background-color: var(--color-pf-text-success);
 				}
+				&.criticalSuccess-bar {
+					background-color: var(--color-pf-text-critical-success);
+				}
 				&.start {
 					border-top-left-radius: 2px;
 					border-bottom-left-radius: 2px;

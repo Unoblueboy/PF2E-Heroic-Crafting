@@ -1,6 +1,6 @@
-import { CharacterPF2e } from "../../types/src/module/actor";
 import { ChatMessagePF2e } from "../../types/src/module/chat-message/document";
 import { PhysicalItemPF2e } from "../../types/src/module/item";
+import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { SALVAGE_MATERIAL_SLUG } from "../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
@@ -37,7 +37,8 @@ async function gainMaterials(event: Event, message: ChatMessagePF2e) {
 }
 
 async function gainSalvageMaterials(data: DOMStringMap) {
-	const item = (await fromUuid(data.itemUuid as string)) as PhysicalItemPF2e;
+	if (!data.itemUuid) return;
+	const item = await fromUuid<PhysicalItemPF2e<CharacterPF2eHeroicCrafting>>(data.itemUuid);
 	if (!item) return;
 	if (!item.actor) return;
 
@@ -56,11 +57,12 @@ async function gainSalvageMaterials(data: DOMStringMap) {
 		await item.delete();
 	}
 
-	await MaterialTrove.addValue(item.actor as CharacterPF2e, CoinsPF2eUtility.minCoins(salvageMaxCoins, totalIncome));
+	await MaterialTrove.addValue(item.actor, CoinsPF2eUtility.minCoins(salvageMaxCoins, totalIncome));
 }
 
 async function gainSavvyTeardownMaterials(data: DOMStringMap) {
-	const item = (await fromUuid(data.itemUuid as string)) as PhysicalItemPF2e;
+	if (!data.itemUuid) return;
+	const item = await foundry.utils.fromUuid<PhysicalItemPF2e<CharacterPF2eHeroicCrafting>>(data.itemUuid);
 	if (!item) return;
 	if (!item.actor) return;
 	const income = game.pf2e.Coins.fromString(data.salvageIncome ?? "");
@@ -71,5 +73,5 @@ async function gainSavvyTeardownMaterials(data: DOMStringMap) {
 		await item.delete();
 	}
 
-	await MaterialTrove.addValue(item.actor as CharacterPF2e, income);
+	await MaterialTrove.addValue(item.actor, income);
 }

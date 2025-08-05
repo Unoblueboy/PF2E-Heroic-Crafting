@@ -46,4 +46,8 @@ export class CoinsPF2eUtility {
 		if (this.coinsToCopperValue(coins1) >= this.coinsToCopperValue(coins2)) return new game.pf2e.Coins(coins1);
 		return new game.pf2e.Coins(coins2);
 	}
+
+	static isCoin(coin: unknown): coin is Coins {
+		return typeof coin === "object" && coin !== null;
+	}
 }

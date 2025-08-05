@@ -1,11 +1,14 @@
-import { CharacterPF2e } from "../../types/src/module/actor";
 import { Coins, PhysicalItemPF2e } from "../../types/src/module/item/physical";
+import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { Projects } from "../Projects/projects.mjs";
 import { BeginProjectApplication } from "./Applications/BeginProjectApplication.mjs";
 import { BeginProjectDetails, BeginProjectDetailsType } from "./types.mjs";
 
-export async function beginProject(actor?: CharacterPF2e, details?: BeginProjectDetails): Promise<boolean> {
+export async function beginProject(
+	actor?: CharacterPF2eHeroicCrafting,
+	details?: BeginProjectDetails
+): Promise<boolean> {
 	if (!actor) {
 		ui.notifications.error("An actor must be selected");
 		return false;
@@ -42,7 +45,10 @@ export async function beginProject(actor?: CharacterPF2e, details?: BeginProject
 	return true;
 }
 
-async function handleStartingValues(actor: CharacterPF2e, startingValues: { currency?: Coins; generic?: Coins }) {
+async function handleStartingValues(
+	actor: CharacterPF2eHeroicCrafting,
+	startingValues: { currency?: Coins; generic?: Coins }
+) {
 	if (startingValues.currency) {
 		actor.inventory.removeCoins(startingValues.currency);
 	}

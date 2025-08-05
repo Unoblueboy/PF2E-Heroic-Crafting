@@ -1,4 +1,4 @@
-import { Coins } from "../../types/src/module/item/physical";
+import { Coins, CoinsPF2e } from "../../types/src/module/item/physical";
 
 export const MATERIAL_TROVE_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.wtpSAjQwSyPOglzU`;
 export const CRAFTING_MATERIAL_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.UFqgBzSfC8XfuKVg`;
@@ -11,9 +11,21 @@ export const SALVAGE_MATERIAL_SLUG = "generic-salvage-material";
 export const RARITIES: readonly ["common", "uncommon", "rare", "unique"] = ["common", "uncommon", "rare", "unique"];
 export const MODULE_ID = "pf2e-heroic-crafting";
 
-export const HEROIC_CRAFTING_SPENDING_LIMIT: Map<number, { hour: Coins; day: Coins; week: Coins }> = new Map<
+export type HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD = {
+	hour: Coins;
+	day: Coins;
+	week: Coins;
+};
+
+export type HEROIC_CRAFTING_SPENDING_LIMIT_COINSPF2E_RECORD = {
+	hour: CoinsPF2e;
+	day: CoinsPF2e;
+	week: CoinsPF2e;
+};
+
+export const HEROIC_CRAFTING_SPENDING_LIMIT: Map<number, HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD> = new Map<
 	number,
-	{ hour: Coins; day: Coins; week: Coins }
+	HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD
 >([
 	[
 		1,

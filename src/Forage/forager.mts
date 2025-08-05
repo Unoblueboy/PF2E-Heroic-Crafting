@@ -1,14 +1,14 @@
-import { CharacterPF2e } from "../../types/src/module/actor";
 import { ChatMessagePF2e } from "../../types/src/module/chat-message";
 import { CheckRoll } from "../../types/src/module/system/check";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
+import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { HEROIC_CRAFTING_GATHERED_INCOME } from "../Helper/constants.mjs";
 import { ForageDcDialog } from "./Applications/ForageDcDialog.mjs";
 import { ForageLocationLevelDialog } from "./Applications/ForageLocationLevelDialog.mjs";
 import { ForageCraftingResourcesRequest, GetDCMessage, RollCheckMessage, SocketMessage } from "./types.mjs";
 
-export async function forageCraftingResources(actor: CharacterPF2e) {
+export async function forageCraftingResources(actor: CharacterPF2eHeroicCrafting) {
 	if (!actor) return;
 	if (!game.users.activeGM) {
 		ui.notifications.info("A GM must be online for this function to run");
@@ -68,13 +68,13 @@ async function getForageDcSocket(message: GetDCMessage, userId: string) {
 async function rollForageCheckSocket(message: RollCheckMessage, _userId: string) {
 	if (game.user.id !== message.receiver) return;
 	if (message.dc === undefined) return;
-	const actor = await foundry.utils.fromUuid<CharacterPF2e>(message.actorUuid);
+	const actor = await foundry.utils.fromUuid<CharacterPF2eHeroicCrafting>(message.actorUuid);
 	if (!actor) return;
 
 	await rollForageCheck(actor, { dc: message.dc, locationLevel: message.locationLevel });
 }
 
-async function rollForageCheck(actor: CharacterPF2e, data: { dc: number; locationLevel: number }) {
+async function rollForageCheck(actor: CharacterPF2eHeroicCrafting, data: { dc: number; locationLevel: number }) {
 	async function getStatisticRollCallback(
 		_roll: Rolled<CheckRoll>,
 		_outcome: DegreeOfSuccessString | null | undefined,

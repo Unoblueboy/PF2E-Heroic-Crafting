@@ -1,7 +1,8 @@
 {
 	"PF2E": {
 		"RuleElement": {
-			"Test": "Heroic Crafting - Test"
+			"Test": "Heroic Crafting - Test",
+			"ModifyProgress": "Heroic Crafting - Modify Progress"
 		}
 	}
 }

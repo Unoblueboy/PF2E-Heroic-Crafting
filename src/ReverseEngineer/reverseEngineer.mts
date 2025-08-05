@@ -1,11 +1,11 @@
-import { CharacterPF2e } from "../../types/src/module/actor";
 import { PhysicalItemPF2e } from "../../types/src/module/item";
 import { BeginProjectApplication } from "../BeginProject/Applications/BeginProjectApplication.mjs";
 import { beginProject } from "../BeginProject/beginProject.mjs";
+import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { createSalvage } from "../Salvage/salvage.mjs";
 import { ReverseEngineerApplication } from "./Applications/ReverseEngineerApplication.mjs";
 
-export async function reverseEngineer(actor: CharacterPF2e, item?: PhysicalItemPF2e) {
+export async function reverseEngineer(actor: CharacterPF2eHeroicCrafting, item?: PhysicalItemPF2e) {
 	if (!actor) {
 		return;
 	}

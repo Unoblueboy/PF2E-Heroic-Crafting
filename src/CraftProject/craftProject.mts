@@ -1,17 +1,16 @@
-import { CharacterPF2e } from "../../types/src/module/actor";
 import { ChatMessagePF2e } from "../../types/src/module/chat-message";
 import { PhysicalItemPF2e } from "../../types/src/module/item";
-import { CoinsPF2e } from "../../types/src/module/item/physical";
 import { CheckRoll } from "../../types/src/module/system/check";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
-import { CoinsPF2eUtility } from "../Helper/currency.mjs";
+import { CharacterPF2eHeroicCrafting, HeroicCraftingProjectHelper } from "../character.mjs";
 import { fractionToPercent } from "../Helper/generics.mjs";
 import { Projects } from "../Projects/projects.mjs";
 import { CraftProjectApplication } from "./Applications/CraftProjectApplications.mjs";
+import { CraftProjectUtility } from "./craftProjectUtility.mjs";
 import { ProjectCraftDetails, ProjectCraftDuration } from "./types.mjs";
 
-export async function craftProject(actor: CharacterPF2e, projectId: string) {
+export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId: string) {
 	if (!actor) return;
 	if (!projectId) return;
 	const projects = Projects.getProjects(actor);
@@ -22,7 +21,7 @@ export async function craftProject(actor: CharacterPF2e, projectId: string) {
 	const craftDetails = await CraftProjectApplication.getCraftDetails({ actor, projectId });
 	if (!craftDetails) return;
 
-	const totalSpent = await getTotalMaterialSpent(craftDetails);
+	const totalCost = await CraftProjectUtility.getTotalCost(craftDetails.materialsSpent);
 	const item = (await foundry.utils.fromUuid(project.itemData.uuid)) as PhysicalItemPF2e;
 
 	async function getStatisticRollCallback(
@@ -33,7 +32,19 @@ export async function craftProject(actor: CharacterPF2e, projectId: string) {
 	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
 			if (!project) return; // this should never happen
-			const materials = await getMaterialsSpent(craftDetails);
+			const materials = await getMaterialsContext(craftDetails);
+
+			const projectProgress = HeroicCraftingProjectHelper.getProjectProgress(
+				actor,
+				{
+					criticalFailure: { ...totalCost, isNegative: true },
+					failure: {},
+					success: totalCost,
+					criticalSuccess: totalCost,
+				},
+				[...item.getRollOptions(item.type), ...actor.getRollOptions(), "action:craft", "action:craft-project"]
+			);
+			console.log("Heroic Crafting |", projectProgress);
 
 			const projectMax = await project.max;
 			const projectCur = project.value;
@@ -53,7 +64,7 @@ export async function craftProject(actor: CharacterPF2e, projectId: string) {
 					}),
 					craftDetails: JSON.stringify(craftDetails),
 					materials,
-					totalMaterialsSpent: totalSpent,
+					totalMaterialsSpent: totalCost,
 					outcome,
 				}
 			);
@@ -68,20 +79,20 @@ export async function craftProject(actor: CharacterPF2e, projectId: string) {
 
 	actor.skills?.crafting?.check?.roll({
 		dc: { value: project.dc, visible: true },
-		extraRollOptions: ["action:craft-projct", "action:craft", "specialty"],
+		extraRollOptions: ["action:craft-project", "action:craft"],
 		extraRollNotes: [
 			{
-				selector: "crafting",
+				selector: "skill-check",
 				text: "<strong>Success</strong> You work productively during this period. Add double this activity's Cost to the project's Current Value.",
 				outcome: ["success", "criticalSuccess"],
 			},
 			{
-				selector: "crafting",
+				selector: "skill-check",
 				text: "<strong>Failure</strong> You work unproductively during this period. Add half this activity's Cost to the project's Current Value.",
 				outcome: ["failure"],
 			},
 			{
-				selector: "crafting",
+				selector: "skill-check",
 				text: "<strong>Critical Failure</strong> You ruin your materials and suffer a setback while crafting. Deduct this activity's Cost from the project's Current Value. If this reduces the project's Current Value below 0, the project is ruined and must be started again.",
 				outcome: ["criticalFailure"],
 			},
@@ -96,7 +107,7 @@ export async function craftProject(actor: CharacterPF2e, projectId: string) {
 	});
 }
 
-async function getMaterialsSpent(craftDetails?: ProjectCraftDetails) {
+async function getMaterialsContext(craftDetails?: ProjectCraftDetails) {
 	if (!craftDetails) return [];
 	const materials = [];
 	if (craftDetails.materialsSpent.generic) {
@@ -132,22 +143,4 @@ async function getMaterialsSpent(craftDetails?: ProjectCraftDetails) {
 		});
 	}
 	return materials;
-}
-
-export async function getTotalMaterialSpent(craftDetails: ProjectCraftDetails): Promise<CoinsPF2e> {
-	const materialsSpent = craftDetails.materialsSpent;
-	let totalSpent = new game.pf2e.Coins();
-	if (materialsSpent.generic) {
-		totalSpent = totalSpent.plus(materialsSpent.generic);
-	}
-	if (materialsSpent.currency) {
-		totalSpent = totalSpent.plus(materialsSpent.currency);
-	}
-	for (const material of materialsSpent.treasure ?? []) {
-		const item = await foundry.utils.fromUuid<PhysicalItemPF2e>(material.uuid);
-		if (!item) continue;
-		totalSpent = totalSpent.plus(CoinsPF2eUtility.multCoins(material.quantity ?? 1, material.value));
-	}
-
-	return totalSpent;
 }
