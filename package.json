@@ -15,14 +15,13 @@
 	"devDependencies": {
 		"@eslint/js": "^9.31.0",
 		"@foundryvtt/foundryvtt-cli": "^1.1.0",
+		"@types/node": "^24.2.1",
 		"concurrently": "^9.2.0",
 		"eslint": "^9.31.0",
+		"eslint-config-prettier": "^10.1.8",
 		"globals": "^16.3.0",
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.37.0"
 	},
-	"types": "./types",
-	"dependencies": {
-		"systemjs": "^6.15.1"
-	}
+	"types": "./types"
 }

@@ -12,7 +12,7 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 // TODO: refactor to take actor as a construct parameter, and update on actor update
 export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(ApplicationV2) {
-	CraftingMaterialsCopperValue: CoinsPF2e;
+	CraftingMaterialsCoins: CoinsPF2e;
 	addSubChosen: "add" | "sub";
 	curEditValue: CoinsPF2e;
 	curAddSubValue: CoinsPF2e;
@@ -20,11 +20,11 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 	callback?: (result: EditMaterialTroveApplicationResult | undefined) => void;
 
 	constructor(
-		CraftingMaterialsCopperValue: Coins,
+		CraftingMaterialsCoins: Coins,
 		callback: (result: EditMaterialTroveApplicationResult | undefined) => void
 	) {
 		super();
-		this.CraftingMaterialsCopperValue = new game.pf2e.Coins(CraftingMaterialsCopperValue);
+		this.CraftingMaterialsCoins = new game.pf2e.Coins(CraftingMaterialsCoins);
 		this.addSubChosen = "add";
 		this.curEditValue = new game.pf2e.Coins();
 		this.curAddSubValue = new game.pf2e.Coins();
@@ -139,8 +139,8 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 				this.result = {
 					newMaterialTroveValue:
 						this.addSubChosen === "add"
-							? CoinsPF2eUtility.addCoins(this.CraftingMaterialsCopperValue, this.curAddSubValue ?? {})
-							: CoinsPF2eUtility.subCoins(this.CraftingMaterialsCopperValue, this.curAddSubValue ?? {}),
+							? CoinsPF2eUtility.addCoins(this.CraftingMaterialsCoins, this.curAddSubValue ?? {})
+							: CoinsPF2eUtility.subCoins(this.CraftingMaterialsCoins, this.curAddSubValue ?? {}),
 					useActorCoins: formData.object.addSubUseCoins as boolean,
 				};
 				break;
@@ -195,8 +195,8 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		if (denomination && value && value !== 0) this.curAddSubValue[denomination] = value;
 		const curValue =
 			this.addSubChosen === "add"
-				? CoinsPF2eUtility.addCoins(this.CraftingMaterialsCopperValue, this.curAddSubValue ?? {})
-				: CoinsPF2eUtility.subCoins(this.CraftingMaterialsCopperValue, this.curAddSubValue ?? {});
+				? CoinsPF2eUtility.addCoins(this.CraftingMaterialsCoins, this.curAddSubValue ?? {})
+				: CoinsPF2eUtility.subCoins(this.CraftingMaterialsCoins, this.curAddSubValue ?? {});
 		const newMaterialDiv = this.element.querySelector("#edit-material-trove-add-sub-new-materials");
 		if (newMaterialDiv) newMaterialDiv.textContent = curValue.toString();
 	}
@@ -241,8 +241,8 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 
 		const buttons = [{ type: "submit", icon: "fa-solid fa-treasure-chest", label: "Update Material Trove" }];
 		const craftingMaterials = {
-			curValue: this.CraftingMaterialsCopperValue.toString(),
-			coins: this.CraftingMaterialsCopperValue,
+			curValue: this.CraftingMaterialsCoins.toString(),
+			coins: this.CraftingMaterialsCoins,
 		};
 		this.curEditValue = new game.pf2e.Coins({ ...craftingMaterials.coins });
 		this.curAddSubValue = new game.pf2e.Coins({

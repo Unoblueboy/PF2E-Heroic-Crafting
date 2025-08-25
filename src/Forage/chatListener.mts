@@ -1,6 +1,7 @@
 import { ChatMessagePF2e } from "../../types/src/module/chat-message";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
+import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 
 const ChatMessage = CONFIG.ChatMessage.documentClass as typeof ChatMessagePF2e;
 
@@ -21,7 +22,7 @@ async function addResourcesToTrove(_e: Event, _message: ChatMessagePF2e): Promis
 	const data = { ...button.dataset, ...div.dataset };
 
 	const forage = game.pf2e.Coins.fromString(data.forageAmount ?? "");
-	const materialTrove = await actor.getMaterialTrove();
+	const materialTrove = await MaterialTrove.getMaterialTrove(actor);
 	const duration = Number.parseInt(data.duration ?? "") || 1;
 	const totalForage = CoinsPF2eUtility.multCoins(duration, forage);
 	await materialTrove?.add(totalForage);

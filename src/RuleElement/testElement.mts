@@ -22,9 +22,9 @@ export class TestRuleElement extends game.pf2e.RuleElement {
 			"Heroic Crafting |",
 			"Synthetics",
 			this.actor.name,
-			(this.actor as CharacterPF2eHeroicCrafting).heroicCraftingSynthetics
+			(this.actor as CharacterPF2eHeroicCrafting).synthetics
 		);
-		const synthetics = ((this.actor as CharacterPF2eHeroicCrafting).heroicCraftingSynthetics.testSynthetic ??= []);
+		const synthetics = ((this.actor as CharacterPF2eHeroicCrafting).synthetics.testSynthetic ??= []);
 		synthetics.push({ predicate });
 	}
 

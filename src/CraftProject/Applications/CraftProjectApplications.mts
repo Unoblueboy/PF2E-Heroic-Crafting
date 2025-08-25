@@ -20,7 +20,7 @@ import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
 import { fractionToPercent } from "../../Helper/generics.mjs";
 import { SignedCoins, SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
-import { AProject } from "../../Projects/projects.mjs";
+import { AProject, Projects } from "../../Projects/projects.mjs";
 import { CraftProjectUtility } from "../craftProjectUtility.mjs";
 import {
 	ProjectCraftDetails,
@@ -329,7 +329,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 	private static async EnforceMax(
 		this: CraftProjectApplication,
-		curValues: { perItem: Record<string, Coins & { quantity?: number }>; total: CoinsPF2e },
+		curValues: { perItem: Record<string, Coins & { quantity?: number }>; total: Coins },
 		inputs: NodeListOf<HTMLInputElement>,
 		materialData: Record<string, string | undefined>
 	) {
@@ -344,7 +344,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 	private static async EnforceBasicMax(
 		this: CraftProjectApplication,
-		curValues: { perItem: Record<string, Coins & { quantity?: number }>; total: CoinsPF2e },
+		curValues: { perItem: Record<string, Coins & { quantity?: number }>; total: Coins },
 		inputs: NodeListOf<HTMLInputElement>,
 		materialData: Record<string, string | undefined>
 	) {
@@ -395,7 +395,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 	private static async EnforceAdvancedMax(
 		this: CraftProjectApplication,
-		curValues: { perItem: Record<string, Coins & { quantity?: number }>; total: CoinsPF2e },
+		curValues: { perItem: Record<string, Coins & { quantity?: number }>; total: Coins },
 		inputs: NodeListOf<HTMLInputElement>,
 		materialData: Record<string, string | undefined>
 	) {
@@ -589,7 +589,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 }
 
 export function getProject(actor: CharacterPF2eHeroicCrafting, projectId: string): AProject {
-	return actor.projects!.getProject(projectId)!;
+	return Projects.getProject(actor, projectId)!;
 }
 
 export async function getProjectMax(itemDetails: ProjectItemDetails, item?: PhysicalItemPF2e): Promise<CoinsPF2e> {

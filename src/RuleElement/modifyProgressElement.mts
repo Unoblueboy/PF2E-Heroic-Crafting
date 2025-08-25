@@ -12,7 +12,6 @@ import {
 	HEROIC_CRAFTING_SPENDING_LIMIT_COINSPF2E_RECORD,
 } from "../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
-import { SignedCoins, SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
 
 type ModifyProgressSchema = RuleElementSchema & {
 	outcome: StringField;
@@ -92,56 +91,6 @@ export class ModifyProgressRuleElement extends game.pf2e.RuleElement<ModifyProgr
 		override: 50,
 	};
 
-	static getNewValue(current: SignedCoins, operation: "multiply" | "divide", change: number): SignedCoins;
-	static getNewValue(
-		current: SignedCoins,
-		operation: "add" | "subtract" | "downgrade" | "upgrade" | "override",
-		change: SignedCoins
-	): SignedCoins;
-	static getNewValue<TCurrent extends ModifyProgressSynthetic>(
-		current: SignedCoins,
-		operation: TCurrent["operation"],
-		change: TCurrent["change"]
-	): SignedCoins;
-	static getNewValue(
-		current: SignedCoins,
-		operation: ModifyProgressChangeOperation,
-		change: unknown
-	): SignedCoins | undefined {
-		switch (operation) {
-			case "multiply":
-				if (typeof change !== "number") return;
-				return new SignedCoinsPF2e(current).multiply(change);
-			case "divide":
-				if (typeof change !== "number") return;
-				if (change === 0) return;
-				return new SignedCoinsPF2e(current).multiply(1 / change);
-			case "add":
-				if (typeof change !== "object") return;
-				if (change === null) return;
-				return new SignedCoinsPF2e(current).plus(change);
-			case "subtract":
-				if (typeof change !== "object") return;
-				if (change === null) return;
-				return new SignedCoinsPF2e(current).subtract(change);
-			case "downgrade":
-				if (typeof change !== "object") return;
-				if (change === null) return;
-				return SignedCoinsPF2e.minCoins(current, change);
-			case "upgrade":
-				if (typeof change !== "object") return;
-				if (change === null) return;
-				return SignedCoinsPF2e.maxCoins(current, change);
-			case "override":
-				if (typeof change !== "object") return;
-				if (change === null) return;
-				return change;
-			default:
-				break;
-		}
-		return {};
-	}
-
 	override resolveInjectedProperties<T extends string | number | object | null | undefined>(
 		source: T,
 		options?: { injectables?: Record<string, unknown>; warn?: boolean } | undefined
@@ -183,7 +132,7 @@ export class ModifyProgressRuleElement extends game.pf2e.RuleElement<ModifyProgr
 		if (this.ignored) return;
 
 		const predicate = this.resolveInjectedProperties(this.predicate);
-		const synthetics = ((this.actor as CharacterPF2eHeroicCrafting).heroicCraftingSynthetics.modifyProgress ??= []);
+		const synthetics = ((this.actor as CharacterPF2eHeroicCrafting).synthetics.modifyProgress ??= []);
 
 		let change = this.resolveValue(this.value);
 
