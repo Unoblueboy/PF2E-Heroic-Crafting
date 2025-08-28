@@ -20,10 +20,12 @@ import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
 import { calculateDC } from "../../Helper/dc.mjs";
 import { DENOMINATION } from "../../Helper/signedCoins.mjs";
 import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
-import { BeginProjectStartingValues } from "../types.mjs";
-import { BeginProjectFullDetails } from "../types.mjs";
-import { BeginProjectDetailsType } from "../types.mjs";
-import { BeginProjectUpdateDetailsOptions } from "../types.mjs";
+import {
+	BeginProjectStartingValues,
+	BeginProjectFullDetails,
+	BeginProjectDetailsType,
+	BeginProjectUpdateDetailsOptions,
+} from "../types.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -41,7 +43,6 @@ type BeginProjectApplicationOptions = {
 	};
 };
 
-// TODO: refactor to update on actor update
 export class BeginProjectApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	actor: CharacterPF2eHeroicCrafting;
 	callback: (result: BeginProjectFullDetails | undefined) => void;
@@ -331,35 +332,43 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		const maxTotalStarting = this.getMaxStartingValue();
 		switch (partId) {
 			case "drag-drop":
-				context.details = {
-					item: {
-						img: this.item ? this.item.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
-						name: this.item ? this.item.name : "Drag item here...",
-						level: this.item ? String(this.item.level).padStart(2, "0") : "??",
-					},
-					spell: {
-						img: this.spell ? this.spell.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
-						name: this.spell ? this.spell.name : "Drag Spell here...",
-						rank: this.spell ? String(this.spell.rank).padStart(2, "0") : "??",
-						hide: this.formData.isFormula || (this.item && !isGenericScrollOrWand(this.item)),
-					},
-				};
+				this.prepareDragDropContext(context);
 				break;
 			case "summary":
-				context.details = {
-					formData: this.formData,
-					totalStarting: {
-						current: CoinsPF2eUtility.addCoins(this.formData.currency, this.formData.trove).toString(),
-						max: maxTotalStarting.copperValue === 0 ? "???" : maxTotalStarting.toString(),
-					},
-					batchSizeMax: this.batchSizeMax,
-				};
+				this.prepareSummaryContext(context, maxTotalStarting);
 				break;
 
 			default:
 				break;
 		}
 		return context;
+	}
+
+	private prepareDragDropContext(context: Record<string, unknown>) {
+		context.details = {
+			item: {
+				img: this.item ? this.item.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
+				name: this.item ? this.item.name : "Drag item here...",
+				level: this.item ? String(this.item.level).padStart(2, "0") : "??",
+			},
+			spell: {
+				img: this.spell ? this.spell.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
+				name: this.spell ? this.spell.name : "Drag Spell here...",
+				rank: this.spell ? String(this.spell.rank).padStart(2, "0") : "??",
+				hide: this.formData.isFormula || (this.item && !isGenericScrollOrWand(this.item)),
+			},
+		};
+	}
+
+	private prepareSummaryContext(context: Record<string, unknown>, maxTotalStarting: CoinsPF2e) {
+		context.details = {
+			formData: this.formData,
+			totalStarting: {
+				current: CoinsPF2eUtility.addCoins(this.formData.currency, this.formData.trove).toString(),
+				max: maxTotalStarting.copperValue === 0 ? "???" : maxTotalStarting.toString(),
+			},
+			batchSizeMax: this.batchSizeMax,
+		};
 	}
 
 	protected async onDrop(event: DragEvent) {
