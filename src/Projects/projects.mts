@@ -42,8 +42,8 @@ export class Projects {
 		return [...this.actorProjectsMap.values()];
 	}
 
-	static getProjects(actor: CharacterPF2eHeroicCrafting): Projects | undefined {
-		if (this.collection.has(actor.uuid)) return this.collection.get(actor.uuid);
+	static getProjects(actor: CharacterPF2eHeroicCrafting): Projects {
+		if (this.collection.has(actor.uuid)) return this.collection.get(actor.uuid)!;
 
 		const projects = new Projects(actor);
 		this.collection.set(actor.uuid, projects);

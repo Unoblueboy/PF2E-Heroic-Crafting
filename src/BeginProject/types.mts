@@ -30,7 +30,7 @@ export type BeginProjectFullDetails = {
 };
 export type BeginProjectStartingValues = {
 	currency?: Coins;
-	generic?: Coins;
+	trove?: Coins;
 };
 export type BeginProjectPartialDetails = {
 	type: BeginProjectDetailsType.PARTIAL;

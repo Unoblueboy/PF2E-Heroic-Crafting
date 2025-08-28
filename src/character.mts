@@ -5,11 +5,13 @@ import { RuleElementSynthetics } from "../types/src/module/rules";
 import { DegreeOfSuccessString } from "../types/src/module/system/degree-of-success";
 import { SignedCoins } from "./Helper/signedCoins.mjs";
 import { ModifyProgressSynthetic } from "./RuleElement/modifyProgressElement.mjs";
+import { ModifyConstantSynthetic } from "./RuleElement/modifyConstantElement.mjs";
 import { ModifyProgressRuleElementHelper } from "./RuleElement/Helpers/ModifyProgressRuleElementHelper.mjs";
 
 interface PF2eHeroicCraftingRuleElementSynthetics {
 	testSynthetic?: unknown[];
 	modifyProgress?: ModifyProgressSynthetic[];
+	modifyConstant?: ModifyConstantSynthetic[];
 }
 
 export type CharacterPF2eHeroicCrafting<TActor extends CharacterPF2e = CharacterPF2e> = TActor & {

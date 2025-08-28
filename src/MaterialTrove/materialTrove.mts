@@ -150,14 +150,14 @@ export class MaterialTrove {
 		const materialTrove = await MaterialTrove.getMaterialTrove(actor);
 		if (!materialTrove) return;
 
-		materialTrove.add(value);
+		await materialTrove.add(value);
 	}
 
 	static async subtractValue(actor: CharacterPF2eHeroicCrafting, value: Coins) {
 		const materialTrove = await MaterialTrove.getMaterialTrove(actor);
 		if (!materialTrove) return;
 
-		materialTrove.subtract(value);
+		await materialTrove.subtract(value);
 	}
 
 	async syncValue() {

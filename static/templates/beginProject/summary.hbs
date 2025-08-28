@@ -1,3 +1,4 @@
+{{log "Heroic Crafting | Begin Project: Summary" this}}
 <div class="begin-project-summary">
     <hr style="margin:0.5rem 0;">
     <div class="begin-project-craft-summary">
@@ -6,22 +7,26 @@
             <div class="input-group">
                 <label for="summary-is-formula">Is Formula?</label>
                 <div class="input-fields">
-                    <input type="checkbox"
+                    <input data-action="update-input-manual"
                            class="summary-is-formula"
-                           data-action="click-is-formula"
-                           name="summary-is-formula">
+                           type="checkbox"
+                           name="isFormula"
+                           id="{{id}}-summary-is-formula"
+                           {{#if details.formData.isFormula}}checked{{/if}}>
                 </div>
             </div>
         {{/if}}
         <div class="input-group">
             <label for="summary-dc">DC</label>
             <div class="input-fields">
-                <input class="summary-dc"
+                <input data-action="update-input-manual"
+                       class="summary-dc"
                        type="number"
                        min="1"
-                       value="1"
+                       value="{{details.formData.dc}}"
                        step="1"
-                       name="summary-dc"
+                       name="dc"
+                       id="{{id}}-summary-dc"
                        required>
             </div>
         </div>
@@ -30,13 +35,16 @@
             <div class="input-fields batch-fields">
                 <button type="button"
                         data-action="decrease-summary-batch-size">-</button>
-                <input class="summary-batch-size"
-                       data-action="update-batch-size"
+                <input data-action="update-input-manual"
+                       class="summary-batch-size"
                        type="number"
                        min="1"
-                       value="1"
+                       value="{{details.formData.batchSize}}"
+                       {{#if details.batchSizeMax}}max="{{details.batchSizeMax}}"
+                       {{/if}}
                        step="1"
-                       name="summary-batch-size"
+                       name="batchSize"
+                       id="{{id}}-summary-batch-size"
                        required>
                 <button type="button"
                         data-action="increase-summary-batch-size">+</button>
@@ -47,9 +55,9 @@
     <div class="begin-project-start-summary">
         <h4>Starting Value</h4>
         <div class="total-starting">
-            <span class="starting-value">0 gp</span>
+            <span class="starting-value">{{details.totalStarting.current}}</span>
             <span class="seperator">/</span>
-            <span class="starting-max">???</span>
+            <span class="starting-max">{{details.totalStarting.max}}</span>
         </div>
         <div class="material-list">
             <div class="basic-material currency">
@@ -65,45 +73,49 @@
                     <div class="input-group">
                         <label for="beginProject-summary-currency-pp">Platinum</label>
                         <div class="input-fields">
-                            <input type="number"
+                            <input data-action="update-input-manual"
+                                   type="number"
                                    min="0"
-                                   value="0"
+                                   value="{{details.formData.currency.pp}}"
                                    step="1"
-                                   name="currency-pp"
-                                   id="beginProject-summary-currency-pp">
+                                   name="currency.pp"
+                                   id="{{id}}-summary-currency-pp">
                         </div>
                     </div>
                     <div class="input-group">
                         <label for="beginProject-summary-currency-gp">Gold</label>
                         <div class="input-fields">
-                            <input type="number"
+                            <input data-action="update-input-manual"
+                                   type="number"
                                    min="0"
-                                   value="0"
+                                   value="{{details.formData.currency.gp}}"
                                    step="1"
-                                   name="currency-gp"
-                                   id="beginProject-summary-currency-gp">
+                                   name="currency.gp"
+                                   id="{{id}}-summary-currency-gp">
                         </div>
                     </div>
                     <div class="input-group">
                         <label for="beginProject-summary-currency-sp">Silver</label>
                         <div class="input-fields">
-                            <input type="number"
+                            <input data-action="update-input-manual"
+                                   type="number"
                                    min="0"
-                                   value="0"
+                                   value="{{details.formData.currency.sp}}"
                                    step="1"
-                                   name="currency-sp"
-                                   id="beginProject-summary-currency-sp">
+                                   name="currency.sp"
+                                   id="{{id}}-summary-currency-sp">
                         </div>
                     </div>
                     <div class="input-group">
                         <label for="beginProject-summary-currency-cp">Copper</label>
                         <div class="input-fields">
-                            <input type="number"
+                            <input data-action="update-input-manual"
+                                   type="number"
                                    min="0"
-                                   value="0"
+                                   value="{{details.formData.currency.cp}}"
                                    step="1"
-                                   name="currency-cp"
-                                   id="beginProject-summary-currency-cp">
+                                   name="currency.cp"
+                                   id="{{id}}-summary-currency-cp">
                         </div>
                     </div>
                 </div>
@@ -122,45 +134,49 @@
                         <div class="input-group">
                             <label for="beginProject-summary-trove-pp">Platinum</label>
                             <div class="input-fields">
-                                <input type="number"
+                                <input data-action="update-input-manual"
+                                       type="number"
                                        min="0"
-                                       value="0"
+                                       value="{{details.formData.trove.pp}}"
                                        step="1"
-                                       name="trove-pp"
-                                       id="beginProject-summary-trove-pp">
+                                       name="trove.pp"
+                                       id="{{id}}-summary-trove-pp">
                             </div>
                         </div>
                         <div class="input-group">
                             <label for="beginProject-summary-trove-gp">Gold</label>
                             <div class="input-fields">
-                                <input type="number"
+                                <input data-action="update-input-manual"
+                                       type="number"
                                        min="0"
-                                       value="0"
+                                       value="{{details.formData.trove.gp}}"
                                        step="1"
-                                       name="trove-gp"
-                                       id="beginProject-summary-trove-gp">
+                                       name="trove.gp"
+                                       id="{{id}}-summary-trove-gp">
                             </div>
                         </div>
                         <div class="input-group">
                             <label for="beginProject-summary-trove-sp">Silver</label>
                             <div class="input-fields">
-                                <input type="number"
+                                <input data-action="update-input-manual"
+                                       type="number"
                                        min="0"
-                                       value="0"
+                                       value="{{details.formData.trove.sp}}"
                                        step="1"
-                                       name="trove-sp"
-                                       id="beginProject-summary-trove-sp">
+                                       name="trove.sp"
+                                       id="{{id}}-summary-trove-sp">
                             </div>
                         </div>
                         <div class="input-group">
                             <label for="beginProject-summary-trove-cp">Copper</label>
                             <div class="input-fields">
-                                <input type="number"
+                                <input data-action="update-input-manual"
+                                       type="number"
                                        min="0"
-                                       value="0"
+                                       value="{{details.formData.trove.cp}}"
                                        step="1"
-                                       name="trove-cp"
-                                       id="beginProject-summary-trove-cp">
+                                       name="trove.cp"
+                                       id="{{id}}-summary-trove-cp">
                             </div>
                         </div>
                     </div>

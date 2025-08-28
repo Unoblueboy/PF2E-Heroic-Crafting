@@ -1,9 +1,9 @@
-import { Coins, PhysicalItemPF2e } from "../../types/src/module/item/physical";
+import { PhysicalItemPF2e } from "../../types/src/module/item/physical";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { Projects } from "../Projects/projects.mjs";
 import { BeginProjectApplication } from "./Applications/BeginProjectApplication.mjs";
-import { BeginProjectDetails, BeginProjectDetailsType } from "./types.mjs";
+import { BeginProjectDetails, BeginProjectDetailsType, BeginProjectStartingValues } from "./types.mjs";
 
 export async function beginProject(
 	actor?: CharacterPF2eHeroicCrafting,
@@ -36,23 +36,21 @@ export async function beginProject(
 	if (details?.type !== BeginProjectDetailsType.FULL) {
 		return false;
 	}
+	console.debug("Heroic Crafting | Begin Project Details", details);
 
 	const { itemDetails, startingValue } = details;
 
-	handleStartingValues(actor, startingValue);
+	await handleStartingValues(actor, startingValue);
 	const projects = Projects.getProjects(actor);
-	await projects?.addProject(itemDetails);
+	await projects.addProject(itemDetails);
 	return true;
 }
 
-async function handleStartingValues(
-	actor: CharacterPF2eHeroicCrafting,
-	startingValues: { currency?: Coins; generic?: Coins }
-) {
+async function handleStartingValues(actor: CharacterPF2eHeroicCrafting, startingValues: BeginProjectStartingValues) {
 	if (startingValues.currency) {
-		actor.inventory.removeCoins(startingValues.currency);
+		await actor.inventory.removeCoins(startingValues.currency);
 	}
-	if (startingValues.generic) {
-		MaterialTrove.subtractValue(actor, startingValues.generic);
+	if (startingValues.trove) {
+		await MaterialTrove.subtractValue(actor, startingValues.trove);
 	}
 }

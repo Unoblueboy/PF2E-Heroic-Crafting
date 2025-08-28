@@ -1,6 +1,7 @@
 import { Coins } from "../../types/src/module/item/physical";
 
 const DENOMINATIONS = ["pp", "gp", "sp", "cp"] as const;
+export type DENOMINATION = (typeof DENOMINATIONS)[number];
 export type SignedCoins = Coins & { isNegative?: boolean };
 
 export class SignedCoinsPF2e {

@@ -9,6 +9,7 @@ import {
 import { Coins, CoinsPF2e } from "../../../types/src/module/item/physical";
 import {
 	ApplicationClosingOptions,
+	ApplicationConfiguration,
 	ApplicationRenderOptions,
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/_module.mjs";
@@ -17,6 +18,7 @@ import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
 import { calculateDC } from "../../Helper/dc.mjs";
+import { DENOMINATION } from "../../Helper/signedCoins.mjs";
 import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
 import { BeginProjectStartingValues } from "../types.mjs";
 import { BeginProjectFullDetails } from "../types.mjs";
@@ -44,25 +46,48 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 	actor: CharacterPF2eHeroicCrafting;
 	callback: (result: BeginProjectFullDetails | undefined) => void;
 	includeIsFormula: boolean;
-	isFormulaDefaultValue: boolean;
 	lockItem: boolean;
 	checkFromInventory: boolean;
-	result?: BeginProjectFullDetails;
 	item?: PhysicalItemPF2e;
 	spell?: SpellPF2e;
+
+	result?: BeginProjectFullDetails;
+	submitDisabled: boolean;
+	batchSizeMax?: number;
+
+	formData: {
+		isFormula: boolean;
+		dc: number;
+		batchSize: number;
+		currency: Coins;
+		trove: Coins;
+	};
+
 	constructor(options: BeginProjectApplicationOptions) {
 		super(options as object);
 		this.actor = options.actor;
 		this.callback = options.callback;
 		this.includeIsFormula = options.itemSettings?.formula?.include ?? true;
-		this.isFormulaDefaultValue = options.itemSettings?.formula?.defaultValue ?? false;
 		this.lockItem = options.itemSettings?.lockItem ?? false;
 		this.item = options.itemSettings?.item;
 		this.checkFromInventory = options.itemSettings?.checkFromInventory ?? false;
+
+		this.submitDisabled = !this.item;
+
+		this.formData = {
+			isFormula: options.itemSettings?.formula?.defaultValue ?? false,
+			dc: this.item ? calculateDC(this.item.level, this.item.rarity) : 1,
+			batchSize: getMaxBatchSize(this.item),
+			currency: new game.pf2e.Coins(),
+			trove: new game.pf2e.Coins(),
+		};
+
+		if (this.item) {
+			this.batchSizeMax = getMaxBatchSize(this.item);
+		}
 	}
 
 	static override readonly DEFAULT_OPTIONS = {
-		id: "begin-project",
 		classes: ["begin-project-dialog"],
 		position: { width: 350 },
 		tag: "form",
@@ -76,7 +101,6 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			closeOnSubmit: true,
 		},
 		actions: {
-			"click-is-formula": BeginProjectApplication.clickIsFormula,
 			"increase-summary-batch-size": BeginProjectApplication.increaseSummaryBatchSize,
 			"decrease-summary-batch-size": BeginProjectApplication.decreaseSummaryBatchSize,
 		},
@@ -96,17 +120,14 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 	) {
 		if (!this.item) return;
 
-		const isFormula = this.includeIsFormula
-			? (_formData.object["summary-is-formula"] as boolean)
-			: this.isFormulaDefaultValue;
 		this.result = {
 			type: BeginProjectDetailsType.FULL,
 			itemDetails: {
-				dc: _formData.object["summary-dc"] as number,
-				batchSize: _formData.object["summary-batch-size"] as number,
+				dc: this.formData.dc,
+				batchSize: this.formData.batchSize,
 				itemData: {
 					uuid: this.item.uuid,
-					isFormula: isFormula,
+					isFormula: this.formData.isFormula,
 				},
 				value: this.getCurrentStartingValue(),
 			},
@@ -128,32 +149,36 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		});
 	}
 
-	private static async clickIsFormula(this: BeginProjectApplication, _event: Event, _target: HTMLElement) {
-		this.updateDetails();
-	}
-
 	private static async increaseSummaryBatchSize(this: BeginProjectApplication, _event: Event, _target: HTMLElement) {
-		const batchSizeInput = this.element.querySelector<HTMLInputElement>(".summary-batch-size");
-		if (batchSizeInput) {
-			const batchSize = Number.parseInt(batchSizeInput.value) + 1;
-			const batchMax = Number.parseInt(batchSizeInput.max) || Infinity;
-			batchSizeInput.value = Math.min(batchSize, batchMax).toString();
-		}
+		this.formData.batchSize = Math.min(this.formData.batchSize + 1, this.batchSizeMax || Infinity);
 		this.scaleStartingValue();
+		this.render();
 	}
 
 	private static async decreaseSummaryBatchSize(this: BeginProjectApplication, _event: Event, _target: HTMLElement) {
-		const batchSizeInput = this.element.querySelector<HTMLInputElement>(".summary-batch-size");
-		if (batchSizeInput) {
-			const batchSize = Number.parseInt(batchSizeInput.value) - 1;
-			const batchMin = Number.parseInt(batchSizeInput.min);
-			batchSizeInput.value = Math.max(batchSize, batchMin).toString();
-		}
+		this.formData.batchSize = Math.max(this.formData.batchSize - 1, 1);
 		this.scaleStartingValue();
+		this.render();
 	}
 
-	protected override _onClose(_options: ApplicationClosingOptions): void {
+	override _initializeApplicationOptions(
+		options: Partial<ApplicationConfiguration> & BeginProjectApplicationOptions
+	): ApplicationConfiguration {
+		const result = super._initializeApplicationOptions(options);
+		console.log("Heroic Crafting |", options);
+		result.uniqueId = "begin-project-" + options.actor.uuid.replace(".", "-");
+		return result;
+	}
+
+	override async _onFirstRender(context: object, options: fa.ApplicationRenderOptions) {
+		await super._onFirstRender(context, options);
+		this.actor.apps[this.id] = this;
+	}
+
+	protected override _onClose(options: ApplicationClosingOptions): void {
+		super._onClose(options);
 		this.callback(this.result);
+		delete this.actor.apps[this.id];
 	}
 
 	protected override async _onRender(context: object, options: ApplicationRenderOptions) {
@@ -166,17 +191,15 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 				},
 			},
 		}).bind(this.element);
-		const moneyGroupDivs = this.element.querySelectorAll<HTMLElement>("div[data-action='update-money-group']");
-		moneyGroupDivs.forEach((moneyGroupDiv) =>
-			moneyGroupDiv.addEventListener("change", (event: Event) => this.updateStartingValue(event))
-		);
 
-		const batchSizeInputs = this.element.querySelectorAll<HTMLInputElement>(
-			"input[data-action='update-batch-size']"
+		const manualUpdateInputs = this.element.querySelectorAll<HTMLInputElement>(
+			"input[data-action='update-input-manual']"
 		);
-		batchSizeInputs.forEach((batchSizeInput) =>
-			batchSizeInput.addEventListener("change", (_event: Event) => this.scaleStartingValue())
-		);
+		manualUpdateInputs.forEach((batchSizeInput) => {
+			batchSizeInput.addEventListener(batchSizeInput.type === "checkbox" ? "click" : "change", (event: Event) =>
+				this.manualUpdateInput(event)
+			);
+		});
 
 		const updateDetailsOptions: BeginProjectUpdateDetailsOptions = {};
 		if (this.item && options.isFirstRender) {
@@ -185,38 +208,59 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		this.updateDetails(updateDetailsOptions);
 	}
 
+	private manualUpdateInput(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const totalPath = target.name;
+		const pathSegments = totalPath.split(".");
+		const value = Number.parseInt(target.value);
+
+		switch (pathSegments[0]) {
+			case "dc": {
+				this.formData.dc = value;
+				break;
+			}
+			case "isFormula": {
+				this.formData.isFormula = target.checked;
+				this.updateDetails();
+
+				break;
+			}
+			case "batchSize": {
+				this.formData.batchSize = value;
+				this.scaleStartingValue();
+				break;
+			}
+			case "trove":
+			case "currency": {
+				this.formData[pathSegments[0]][pathSegments[1] as DENOMINATION] = value;
+				this.enforceMax(pathSegments[0]);
+				break;
+			}
+			default:
+				break;
+		}
+
+		this.render();
+	}
+
 	private scaleStartingValue() {
 		const curValue = this.getCurrentStartingValue();
 		const maxStartingValue = this.getMaxStartingValue();
 		const scalingFactor = maxStartingValue.copperValue / curValue.copperValue;
 		if (scalingFactor >= 1) {
-			this.updateStartingValueText();
 			return;
 		}
 
 		const breakdown = this.getCurrentStartingValueBreakdown();
-		const newBreakdown = {
-			currency: CoinsPF2eUtility.multCoins(scalingFactor, breakdown.currency ?? {}),
-			trove: CoinsPF2eUtility.multCoins(scalingFactor, breakdown.generic ?? {}),
-		};
-		this.setInputs(newBreakdown);
-		this.updateStartingValueText();
+		this.formData.currency = CoinsPF2eUtility.multCoins(scalingFactor, breakdown.currency ?? {});
+		this.formData.trove = CoinsPF2eUtility.multCoins(scalingFactor, breakdown.trove ?? {});
 	}
 
-	private async updateStartingValue(event: Event) {
-		const element = event.currentTarget as HTMLElement;
-		const curMoneyGroupInputs = element.querySelectorAll<HTMLInputElement>("input");
-
-		await this.enforceMax(curMoneyGroupInputs, element.dataset);
-		this.updateStartingValueText();
-	}
-
-	private async enforceMax(inputs: NodeListOf<HTMLInputElement>, materialData: Record<string, string | undefined>) {
+	private async enforceMax(key: "currency" | "trove") {
 		const breakdown = this.getCurrentStartingValueBreakdown();
 		const curValue = this.getCurrentStartingValue();
 
 		const maxStartingValue = this.getMaxStartingValue();
-		const key = (materialData.item === "trove" ? "generic" : materialData.item) as "currency" | "generic";
 		const breakdownData = new game.pf2e.Coins(breakdown[key] ?? {});
 
 		const preMaterialContribution = CoinsPF2eUtility.subCoins(curValue, breakdownData);
@@ -227,7 +271,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			case "currency":
 				maxSpend = CoinsPF2eUtility.minCoins(this.actor.inventory.coins, remainingBudgetCopper);
 				break;
-			case "generic":
+			case "trove":
 				maxSpend = CoinsPF2eUtility.minCoins(await MaterialTrove.getValue(this.actor), remainingBudgetCopper);
 				break;
 			default:
@@ -236,139 +280,23 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		}
 		if (breakdownData.copperValue <= maxSpend.copperValue) return;
 
-		for (const input of inputs) {
-			const name = input.name.toLowerCase();
-			if (name.endsWith("pp")) {
-				input.value = `${maxSpend.pp ?? 0}`;
-			} else if (name.endsWith("gp")) {
-				input.value = `${maxSpend.gp ?? 0}`;
-			} else if (name.endsWith("sp")) {
-				input.value = `${maxSpend.sp ?? 0}`;
-			} else if (name.endsWith("cp")) {
-				input.value = `${maxSpend.cp ?? 0}`;
-			}
-		}
+		this.formData[key] = maxSpend;
 	}
 
 	private ResetStartingValue() {
-		const inputs = this.element.querySelectorAll<HTMLInputElement>(
-			".begin-project-start-summary .money-group input"
-		);
-		inputs.forEach((input) => (input.value = "0"));
-		this.updateStartingValueText();
-	}
-
-	private setInputs(breakdown: BeginProjectStartingValues) {
-		const inputs = this.element.querySelectorAll<HTMLInputElement>(
-			".begin-project-start-summary .money-group input"
-		);
-
-		for (const input of inputs) {
-			switch (input.name) {
-				case "currency-pp":
-					input.value = (breakdown.currency?.pp || 0).toString();
-					break;
-				case "trove-pp":
-					input.value = (breakdown.generic?.pp || 0).toString();
-					break;
-				case "currency-gp":
-					input.value = (breakdown.currency?.gp || 0).toString();
-					break;
-				case "trove-gp":
-					input.value = (breakdown.generic?.gp || 0).toString();
-					break;
-				case "currency-sp":
-					input.value = (breakdown.currency?.sp || 0).toString();
-					break;
-				case "trove-sp":
-					input.value = (breakdown.generic?.sp || 0).toString();
-					break;
-				case "currency-cp":
-					input.value = (breakdown.currency?.cp || 0).toString();
-					break;
-				case "trove-cp":
-					input.value = (breakdown.generic?.cp || 0).toString();
-					break;
-				default:
-					break;
-			}
-		}
+		this.formData.currency = new game.pf2e.Coins();
+		this.formData.trove = new game.pf2e.Coins();
 	}
 
 	private getCurrentStartingValueBreakdown(): BeginProjectStartingValues {
-		const inputs = this.element.querySelectorAll<HTMLInputElement>(
-			".begin-project-start-summary .money-group input"
-		);
-
-		const result: { currency: Coins; generic: Coins } = {
-			currency: {},
-			generic: {},
+		return {
+			currency: this.formData.currency,
+			trove: this.formData.trove,
 		};
-		for (const input of inputs) {
-			switch (input.name) {
-				case "currency-pp":
-					result.currency.pp = Number.parseInt(input.value) || 0;
-					break;
-				case "trove-pp":
-					result.generic.pp = Number.parseInt(input.value) || 0;
-					break;
-				case "currency-gp":
-					result.currency.gp = Number.parseInt(input.value) || 0;
-					break;
-				case "trove-gp":
-					result.generic.gp = Number.parseInt(input.value) || 0;
-					break;
-				case "currency-sp":
-					result.currency.sp = Number.parseInt(input.value) || 0;
-					break;
-				case "trove-sp":
-					result.generic.sp = Number.parseInt(input.value) || 0;
-					break;
-				case "currency-cp":
-					result.currency.cp = Number.parseInt(input.value) || 0;
-					break;
-				case "trove-cp":
-					result.generic.cp = Number.parseInt(input.value) || 0;
-					break;
-				default:
-					break;
-			}
-		}
-		return result;
 	}
 
 	private getCurrentStartingValue(): CoinsPF2e {
-		const inputs = this.element.querySelectorAll<HTMLInputElement>(
-			".begin-project-start-summary .money-group input"
-		);
-		const coins: Coins = {};
-		for (const input of inputs) {
-			switch (input.name) {
-				case "currency-pp":
-				case "trove-pp":
-					if (!coins.pp) coins.pp = 0;
-					coins.pp += Number.parseInt(input.value) || 0;
-					break;
-				case "currency-gp":
-				case "trove-gp":
-					if (!coins.gp) coins.gp = 0;
-					coins.gp += Number.parseInt(input.value) || 0;
-					break;
-				case "currency-sp":
-				case "trove-sp":
-					if (!coins.sp) coins.sp = 0;
-					coins.sp += Number.parseInt(input.value) || 0;
-					break;
-				case "currency-cp":
-				case "trove-cp":
-					if (!coins.cp) coins.cp = 0;
-					coins.cp += Number.parseInt(input.value) || 0;
-					break;
-				default:
-					break;
-			}
-		}
-		return new game.pf2e.Coins(coins);
+		return CoinsPF2eUtility.addCoins(this.formData.currency, this.formData.trove);
 	}
 
 	override async _prepareContext(options: ApplicationRenderOptions) {
@@ -380,11 +308,13 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 				icon: "fa-solid fa-compass-drafting",
 				cssClass: "begin-project-button",
 				label: "Begin Project",
-				disabled: true,
+				disabled: this.submitDisabled,
 			},
 			{ type: "button", icon: "fa-solid fa-xmark", label: "Cancel", action: "close" },
 		];
+
 		return foundry.utils.mergeObject(data, {
+			id: this.id,
 			buttons,
 			includeIsFormula: this.includeIsFormula,
 			hasMaterialTrove: !!(await MaterialTrove.getMaterialTrove(this.actor)),
@@ -398,6 +328,37 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 	) {
 		super._preparePartContext(partId, context, options);
 		context.partId = `${this.id}-${partId}`;
+		const maxTotalStarting = this.getMaxStartingValue();
+		switch (partId) {
+			case "drag-drop":
+				context.details = {
+					item: {
+						img: this.item ? this.item.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
+						name: this.item ? this.item.name : "Drag item here...",
+						level: this.item ? String(this.item.level).padStart(2, "0") : "??",
+					},
+					spell: {
+						img: this.spell ? this.spell.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
+						name: this.spell ? this.spell.name : "Drag Spell here...",
+						rank: this.spell ? String(this.spell.rank).padStart(2, "0") : "??",
+						hide: this.formData.isFormula || (this.item && !isGenericScrollOrWand(this.item)),
+					},
+				};
+				break;
+			case "summary":
+				context.details = {
+					formData: this.formData,
+					totalStarting: {
+						current: CoinsPF2eUtility.addCoins(this.formData.currency, this.formData.trove).toString(),
+						max: maxTotalStarting.copperValue === 0 ? "???" : maxTotalStarting.toString(),
+					},
+					batchSizeMax: this.batchSizeMax,
+				};
+				break;
+
+			default:
+				break;
+		}
 		return context;
 	}
 
@@ -421,6 +382,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		}
 
 		this.updateDetails(options);
+		this.render();
 	}
 
 	private async getItem(data: Record<string, JSONValue>): Promise<PhysicalItemPF2e | null> {
@@ -452,8 +414,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	private async getSpell(data: Record<string, JSONValue>): Promise<SpellPF2e | null> {
-		const isFormulaCheckbox = this.element.querySelector<HTMLInputElement>(".is-formula-checkbox");
-		if (isFormulaCheckbox?.checked) {
+		if (this.formData.isFormula) {
 			return null;
 		}
 
@@ -489,127 +450,31 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	private updateDetails(options: BeginProjectUpdateDetailsOptions = {}) {
-		this.updateItemDragDropDiv();
-		this.updateSpellDragDropDiv();
-
 		if (options.itemDropped) {
-			this.updateDcInput();
+			this.updateDc();
 			this.resetBatchSizeInput();
 			this.ResetStartingValue();
 		}
 
-		const submitButton = this.element.querySelector<HTMLButtonElement>(
-			".footer-button-panel .begin-project-button"
-		);
-		if (!submitButton) return;
-		submitButton.disabled = !this.item;
+		this.submitDisabled = !this.item;
 	}
 
-	private updateItemDragDropDiv() {
-		const itemDragDropDiv = this.element.querySelector<HTMLDivElement>(".drop-item-zone.item-drop");
-		if (!itemDragDropDiv) return;
-
-		const itemIconImg = itemDragDropDiv.querySelector<HTMLImageElement>(".item-icon");
-		if (itemIconImg) {
-			itemIconImg.src = this.item ? this.item.img : "systems/pf2e/icons/actions/craft/unknown-item.webp";
-		}
-		const itemNameInput = itemDragDropDiv.querySelector<HTMLInputElement>(".item-name");
-		if (itemNameInput) {
-			itemNameInput.value = this.item ? this.item.name : "Drag item here...";
-		}
-		const itemLevelInput = itemDragDropDiv.querySelector<HTMLInputElement>(".item-level");
-		if (itemLevelInput) {
-			itemLevelInput.value = this.item ? String(this.item.level).padStart(2, "0") : "??";
-		}
-	}
-
-	private updateSpellDragDropDiv() {
-		const spellDragDropDiv = this.element.querySelector<HTMLDivElement>(".drop-item-zone.spell-drop");
-		if (!spellDragDropDiv) return;
-
-		const isFormulaCheckbox = this.element.querySelector<HTMLInputElement>(".summary-is-formula");
-		const isFormula = this.includeIsFormula ? isFormulaCheckbox?.checked : this.isFormulaDefaultValue;
-		if (isFormula) {
-			spellDragDropDiv.classList.add("hide");
-			return;
-		}
-		if (!this.item) {
-			spellDragDropDiv.classList.add("hide");
-			return;
-		}
-		if (!this.item.isOfType("consumable")) {
-			spellDragDropDiv.classList.add("hide");
-			return;
-		}
-		if (!isGenericScrollOrWand(this.item)) {
-			spellDragDropDiv.classList.add("hide");
-			return;
-		}
-		const spellIconImg = spellDragDropDiv.querySelector<HTMLImageElement>(".spell-icon");
-		if (spellIconImg) {
-			spellIconImg.src = this.spell ? this.spell.img : "systems/pf2e/icons/actions/craft/unknown-item.webp";
-		}
-		const spellNameInput = spellDragDropDiv.querySelector<HTMLInputElement>(".spell-name");
-		if (spellNameInput) {
-			spellNameInput.value = this.spell ? this.spell.name : "Drag Spell here...";
-		}
-		const spellLevelInput = spellDragDropDiv.querySelector<HTMLInputElement>(".spell-rank");
-		if (spellLevelInput) {
-			spellLevelInput.value = this.spell ? String(this.spell.rank).padStart(2, "0") : "??";
-		}
-		spellDragDropDiv.classList.remove("hide");
-	}
-
-	private updateDcInput() {
+	private updateDc() {
 		if (!this.item) return;
-		const dcInput = this.element.querySelector<HTMLInputElement>(".summary-dc");
-		if (dcInput) {
-			const dc = calculateDC(this.item.level, this.item.rarity);
-			dcInput.value = dc.toString();
-		}
+
+		this.formData.dc = calculateDC(this.item.level, this.item.rarity);
 	}
 
 	private resetBatchSizeInput() {
 		if (!this.item) return;
-		const batchSizeInput = this.element.querySelector<HTMLInputElement>(".summary-batch-size");
-		if (batchSizeInput) {
-			const isAmmo = this.item.isOfType("consumable") && (this.item as ConsumablePF2e).isAmmo;
-			const isMundaneAmmo = isAmmo && !this.item.isMagical;
-			const isConsumable =
-				(this.item.isOfType("consumable") && (this.item as ConsumablePF2e).category !== "wand") ||
-				(this.item.isOfType("weapon") && (this.item as WeaponPF2e).baseType === "alchemical-bomb");
-
-			const magicalAmmo = isConsumable && !isAmmo ? 4 : 1;
-			const batchSize = Math.max(
-				this.item.system.price.per,
-				isMundaneAmmo ? Math.clamp(this.item.system.price.per, 1, 10) : magicalAmmo
-			);
-			batchSizeInput.value = batchSize.toString();
-			batchSizeInput.max = batchSize.toString();
-		}
-	}
-
-	private updateStartingValueText() {
-		if (!this.item) return;
-
-		const startingValueSpan = this.element.querySelector<HTMLSpanElement>(
-			".begin-project-start-summary .total-starting .starting-value"
-		);
-		const startingMaxSpan = this.element.querySelector<HTMLSpanElement>(
-			".begin-project-start-summary .total-starting .starting-max"
-		);
-
-		if (!startingValueSpan || !startingMaxSpan) return;
-		startingValueSpan.textContent = this.getCurrentStartingValue().toString();
-		const maxStartingValue = this.getMaxStartingValue();
-		startingMaxSpan.textContent = maxStartingValue.toString();
+		const batchSize = getMaxBatchSize(this.item);
+		this.formData.batchSize = batchSize;
+		this.batchSizeMax = batchSize;
 	}
 
 	private getMaxStartingValue(): CoinsPF2e {
 		if (!this.item) return new game.pf2e.Coins();
-		const batchSizeInput = this.element.querySelector<HTMLInputElement>(".summary-batch-size");
-		const batchSize = batchSizeInput ? Number.parseInt(batchSizeInput.value) || 1 : 1;
-		const maxStartingValue = CoinsPF2eUtility.multCoins(batchSize / 2, this.item.price.value);
+		const maxStartingValue = CoinsPF2eUtility.multCoins(this.formData.batchSize / 2, this.item.price.value);
 		return maxStartingValue;
 	}
 }
@@ -638,4 +503,20 @@ function getGenericScrollOrWandRank(item: ConsumablePF2e) {
 	const containedSpellRankString = /(\d+)(?=((st)|(nd)|(rd)|(th)))/.exec(item.name) ?? ["1"];
 	const containedSpellRank = Number.parseInt(containedSpellRankString[0]) || 1;
 	return containedSpellRank;
+}
+
+function getMaxBatchSize(item: PhysicalItemPF2e | undefined): number {
+	if (!item) return 1;
+	const isAmmo = item.isOfType("consumable") && (item as ConsumablePF2e).isAmmo;
+	const isMundaneAmmo = isAmmo && !item.isMagical;
+	const isConsumable =
+		(item.isOfType("consumable") && (item as ConsumablePF2e).category !== "wand") ||
+		(item.isOfType("weapon") && (item as WeaponPF2e).baseType === "alchemical-bomb");
+
+	const magicalAmmo = isConsumable && !isAmmo ? 4 : 1;
+	const batchSize = Math.max(
+		item.system.price.per,
+		isMundaneAmmo ? Math.clamp(item.system.price.per, 1, 10) : magicalAmmo
+	);
+	return batchSize;
 }
