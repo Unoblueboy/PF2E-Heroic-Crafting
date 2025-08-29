@@ -1130,4 +1130,11 @@ section.heroic-crafting-menu {
 			margin-bottom: 0.25rem;
 		}
 	}
+
+	&.heroic-crafting div.card-buttons {
+		display: flex;
+		flex-basis: 100%;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
 }

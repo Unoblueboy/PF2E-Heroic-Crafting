@@ -1,10 +1,11 @@
 <div class="item-summary">
     <div class="summary-details">
-        <img src={{item.img}}
+        <img src={{project.img}}
              class="item-icon">
-        <span class="item-name">{{#if (gt item.quantity 1)}}{{item.quantity}}x {{/if}}{{item.name}}</span>
+        <span class="item-name">{{#if (gt project.batchSize 1)}}{{project.batchSize}}x
+            {{/if}}{{project.name}}</span>
         <span class="item-level-spacer">Item</span>
-        <span class="item-level">{{item.level}}</span>
+        <span class="item-level">{{project.baseItem.level}}</span>
     </div>
     <hr>
 </div>

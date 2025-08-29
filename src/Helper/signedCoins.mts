@@ -84,10 +84,18 @@ export class SignedCoinsPF2e {
 		});
 	}
 
+	static getCopperValue(coins: SignedCoins) {
+		return new SignedCoinsPF2e(coins).copperValue;
+	}
+
 	static addCoins(coins: SignedCoins, otherCoins: SignedCoins) {
 		const signedCoins = new SignedCoinsPF2e(coins);
 		const signedOtherCoins = new SignedCoinsPF2e(otherCoins);
 		return signedCoins.plus(signedOtherCoins);
+	}
+
+	static sumCoins(...coinsList: SignedCoins[]) {
+		return coinsList.reduce((prev, cur) => this.addCoins(prev, cur), new SignedCoinsPF2e());
 	}
 
 	static subtractCoins(coins: SignedCoins, otherCoins: SignedCoins) {

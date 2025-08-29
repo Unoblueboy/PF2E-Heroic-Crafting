@@ -87,8 +87,8 @@ function getNewProjectTotal(outcome: string, project: AProject, totalSpent: Sign
 
 async function useMaterialSpent(actor: CharacterPF2eHeroicCrafting, craftDetails: ProjectCraftDetails): Promise<void> {
 	const materialsSpent = craftDetails.materialsSpent;
-	if (materialsSpent.generic) {
-		await MaterialTrove.subtractValue(actor, materialsSpent.generic);
+	if (materialsSpent.trove) {
+		await MaterialTrove.subtractValue(actor, materialsSpent.trove);
 	}
 	if (materialsSpent.currency) {
 		await actor.inventory.removeCoins(materialsSpent.currency);

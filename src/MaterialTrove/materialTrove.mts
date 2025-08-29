@@ -1,5 +1,5 @@
 import { ContainerPF2e, TreasurePF2e } from "../../types/src/module/item";
-import { Coins, CoinsPF2e, PhysicalItemPF2e } from "../../types/src/module/item/physical";
+import { Coins, CoinsPF2e } from "../../types/src/module/item/physical";
 import { TreasureSource } from "../../types/src/module/item/treasure/data";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import {
@@ -66,13 +66,14 @@ export class MaterialTrove {
 		light?: TreasurePF2e;
 	};
 	value: CoinsPF2e;
-	contents: Collection<string, PhysicalItemPF2e>;
+	get contents() {
+		return this.materialTrove.contents;
+	}
 	private constructor(actor: CharacterPF2eHeroicCrafting, materialTrove: ContainerPF2e) {
 		this.actor = actor;
 		this.materialTrove = materialTrove;
 		this.genericCraftingMaterials = {};
 		this.value = new game.pf2e.Coins();
-		this.contents = materialTrove.contents;
 	}
 
 	private async initializeGenericCraftingMaterials(): Promise<void> {
@@ -125,7 +126,7 @@ export class MaterialTrove {
 			return;
 		}
 
-		if (this.troves.has(actor.uuid)) return this.troves.get(actor.uuid);
+		if (this.troves.has(actor.uuid)) return this.troves.get(actor.uuid)!;
 
 		const trove = await this.newMaterialTrove(
 			actor,

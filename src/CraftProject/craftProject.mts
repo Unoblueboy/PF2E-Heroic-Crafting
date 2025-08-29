@@ -110,13 +110,13 @@ export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId
 async function getMaterialsContext(craftDetails?: ProjectCraftDetails) {
 	if (!craftDetails) return [];
 	const materials = [];
-	if (craftDetails.materialsSpent.generic) {
+	if (craftDetails.materialsSpent.trove) {
 		materials.push({
 			item: {
 				name: "Generic Crafting Material",
 				img: "icons/tools/fasteners/nails-steel-brown.webp",
 			},
-			spent: craftDetails.materialsSpent.generic,
+			spent: craftDetails.materialsSpent.trove,
 		});
 	}
 	if (craftDetails.materialsSpent.currency) {
