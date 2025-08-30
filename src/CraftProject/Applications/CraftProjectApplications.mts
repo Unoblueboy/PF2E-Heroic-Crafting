@@ -42,7 +42,6 @@ type CraftProjectApplicationTeasureRecord = {
 	postUseOperation: TreasurePostUseOperation;
 };
 
-// TODO: refactor to update on actor update
 export class CraftProjectApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	actor: CharacterPF2eHeroicCrafting;
 	project: AProject;

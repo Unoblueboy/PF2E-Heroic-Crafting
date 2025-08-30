@@ -1,6 +1,7 @@
 import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../../types/src/module/item";
 import {
 	ApplicationClosingOptions,
+	ApplicationConfiguration,
 	ApplicationRenderOptions,
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
@@ -10,23 +11,29 @@ import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } fr
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-// TODO: refactor to update on actor update
+type ReverseEngineerApplicationOptions = {
+	actor: CharacterPF2eHeroicCrafting;
+	callback: (
+		result:
+			| {
+					uuid: string;
+			  }
+			| undefined
+	) => void;
+};
+
 export class ReverseEngineerApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	actor: CharacterPF2eHeroicCrafting;
 	result?: { uuid: string };
 	item?: PhysicalItemPF2e;
 	callback: (result: { uuid: string } | undefined) => void;
-	constructor(options: {
-		actor: CharacterPF2eHeroicCrafting;
-		callback: (result: { uuid: string } | undefined) => void;
-	}) {
+	constructor(options: ReverseEngineerApplicationOptions) {
 		super(options as object);
 		this.actor = options.actor;
 		this.callback = options.callback;
 	}
 
 	static override readonly DEFAULT_OPTIONS = {
-		id: "reverse-engineer",
 		classes: ["reverse-engineer-dialog"],
 		position: { width: 350 },
 		tag: "form",
@@ -42,7 +49,7 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 	};
 
 	static override readonly PARTS = {
-		"drag-drop": { template: "modules/pf2e-heroic-crafting/templates/salvage/drag-drop.hbs" },
+		"drag-drop": { template: "modules/pf2e-heroic-crafting/templates/reverseEngineer/drag-drop.hbs" },
 		footer: { template: "templates/generic/form-footer.hbs", classes: ["footer-button-panel"] },
 	};
 
@@ -64,8 +71,37 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 		});
 	}
 
-	protected override _onClose(_options: ApplicationClosingOptions): void {
+	protected override _initializeApplicationOptions(
+		options: Partial<ApplicationConfiguration> & ReverseEngineerApplicationOptions
+	): ApplicationConfiguration {
+		const data = super._initializeApplicationOptions(options);
+		data.uniqueId = `reverse-engineer-Actor-${options.actor.id}`;
+		return data;
+	}
+
+	override async render(options?: boolean | ApplicationRenderOptions): Promise<this> {
+		await this.verifyItemExistence();
+		return await super.render(options);
+	}
+
+	override async _onFirstRender(context: object, options: ApplicationRenderOptions) {
+		await super._onFirstRender(context, options);
+		this.actor.apps[this.id] = this;
+	}
+
+	private async verifyItemExistence() {
+		if (!this.item) return;
+		this.item =
+			(await this.getItem({
+				type: "item",
+				uuid: this.item.uuid,
+			})) ?? undefined;
+	}
+
+	protected override _onClose(options: ApplicationClosingOptions): void {
+		super._onClose(options);
 		this.callback(this.result);
+		delete this.actor.apps[this.id];
 	}
 
 	protected override async _onRender(context: object, options: ApplicationRenderOptions) {
@@ -78,8 +114,6 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 				},
 			},
 		}).bind(this.element);
-
-		this.updateDetails();
 	}
 
 	override async _prepareContext(options: ApplicationRenderOptions) {
@@ -91,13 +125,26 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 				icon: "fa-solid fa-gear-complex",
 				cssClass: "reverse-engineer-button",
 				label: "Reverse Engineer",
-				disabled: true,
+				disabled: !this.item,
 			},
 			{ type: "button", icon: "fa-solid fa-xmark", label: "Cancel", action: "close" },
 		];
-		return foundry.utils.mergeObject(data, {
+		console.log(
+			this.item ?? {
+				img: "systems/pf2e/icons/actions/craft/unknown-item.webp",
+				name: "Drag item here...",
+				level: "??",
+			}
+		);
+		return {
+			...data,
 			buttons,
-		});
+			item: this.item ?? {
+				img: "systems/pf2e/icons/actions/craft/unknown-item.webp",
+				name: "Drag item here...",
+				level: "??",
+			},
+		};
 	}
 
 	override async _preparePartContext(
@@ -118,16 +165,22 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 
 		this.item = item;
 
-		this.updateDetails();
+		this.render();
 	}
 
 	async getItem(data: Record<string, JSONValue>): Promise<PhysicalItemPF2e | null> {
-		if (typeof data.type === "string" && data.type?.toLowerCase() != "item") {
+		if (typeof data.type === "string" && data.type?.toLowerCase() !== "item") {
 			ui.notifications.info("Only items can be reverse engineered");
 			return null;
 		}
 
-		const item = await CONFIG.PF2E.Item.documentClasses.armor.fromDropData<ItemPF2e>(data);
+		const item = await (async () => {
+			try {
+				return await CONFIG.PF2E.Item.documentClasses.armor.fromDropData<ItemPF2e>(data);
+			} catch {
+				return null;
+			}
+		})();
 
 		if (!item) return null;
 		if (!data.fromInventory && !item.parent) {
@@ -156,30 +209,5 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 		}
 
 		return item;
-	}
-
-	private updateDetails() {
-		this.UpdateDragDropDiv();
-
-		const submitButton = this.element.querySelector<HTMLButtonElement>(
-			".footer-button-panel .reverse-engineer-button"
-		);
-		if (!submitButton) return;
-		submitButton.disabled = !this.item;
-	}
-
-	private UpdateDragDropDiv() {
-		if (!this.item) return;
-
-		const dragDropDiv = this.element.querySelector<HTMLDivElement>(".drop-item-zone");
-		if (!dragDropDiv) return;
-
-		const itemIconImg = dragDropDiv.querySelector<HTMLImageElement>(".item-icon");
-		if (itemIconImg) itemIconImg.src = this.item.img;
-		const itemNameSpan = dragDropDiv.querySelector<HTMLSpanElement>(".item-name");
-		if (itemNameSpan) itemNameSpan.textContent = this.item.name;
-
-		const itemLevelSpan = dragDropDiv.querySelector<HTMLSpanElement>(".item-level");
-		if (itemLevelSpan) itemLevelSpan.textContent = String(this.item.level).padStart(2, "0");
 	}
 }

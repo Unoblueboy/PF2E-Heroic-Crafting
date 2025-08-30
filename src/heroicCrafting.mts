@@ -14,6 +14,13 @@ import { craftProjectChatButtonListener } from "./CraftProject/chatListener.mjs"
 import { forageCraftingResourcesChatButtonListener } from "./Forage/chatListener.mjs";
 import { initRuleElements } from "./RuleElement/initRuleElements.mjs";
 
+Handlebars.registerHelper("padStart", (objectToFormat: unknown, maxLength: number, fillString: string) => {
+	console.assert(typeof maxLength === "number", "Max Length expected to be number");
+	console.assert(typeof fillString === "string", "Fill string expected to be number");
+	const formatString = String(objectToFormat);
+	return fillString ? formatString.padStart(maxLength, fillString) : formatString.padStart(maxLength);
+});
+
 Hooks.once("init", () => {
 	console.log("Heroic Crafting | Initializing game variables");
 	game.pf2eHeroicCrafting = {

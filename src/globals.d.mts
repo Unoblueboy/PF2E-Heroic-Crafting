@@ -18,5 +18,13 @@ declare global {
 				options?: { chain?: boolean; perf_mode?: string; bind?: any[] }
 			) => number;
 		};
+
+		const Handlebars: {
+			registerHelper: (
+				name: string,
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+				fn: Function
+			) => void;
+		};
 	}
 }
