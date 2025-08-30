@@ -2,6 +2,7 @@ import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../../types/src/mod
 import { Coins, CoinsPF2e } from "../../../types/src/module/item/physical";
 import {
 	ApplicationClosingOptions,
+	ApplicationConfiguration,
 	ApplicationRenderOptions,
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
@@ -19,20 +20,20 @@ import { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-// TODO: refactor to update on actor update
+// TODO: refactor to not use querySelector
 export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	result?: SalvageApplicationResult;
 	item?: PhysicalItemPF2e;
-	actor?: CharacterPF2eHeroicCrafting;
-	callback?: (result: SalvageApplicationResult | undefined) => void;
+	actor: CharacterPF2eHeroicCrafting;
+	callback: (result: SalvageApplicationResult | undefined) => void;
 	lockItem?: boolean;
 
-	constructor(options: SalvageApplicationOptions = {}) {
+	constructor(options: SalvageApplicationOptions) {
 		super(options as object);
 		this.actor = options.actor;
 		this.item = options.item;
 		this.lockItem = options.lockItem;
-		if (options.callback) this.callback = options.callback;
+		this.callback = options.callback;
 	}
 
 	static override readonly DEFAULT_OPTIONS = {
@@ -100,6 +101,14 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			positive: true,
 		}),
 	});
+
+	protected override _initializeApplicationOptions(
+		options: Partial<ApplicationConfiguration> & SalvageApplicationOptions
+	): ApplicationConfiguration {
+		const data = super._initializeApplicationOptions(options);
+		data.uniqueId = `salvage-Actor-${options.actor.id}`;
+		return data;
+	}
 
 	static async handler(this: SalvageApplication, _event: Event, form: HTMLFormElement, formData: FormDataExtended) {
 		if (!this.item || !this.actor) return;
@@ -174,6 +183,31 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		};
 	}
 
+	override async render(options?: boolean | ApplicationRenderOptions): Promise<this> {
+		await this.verifyItemExistence();
+		return await super.render(options);
+	}
+
+	private async verifyItemExistence() {
+		if (!this.item) return;
+		this.item =
+			(await this.getItem({
+				type: "item",
+				uuid: this.item.uuid,
+			})) ?? undefined;
+	}
+
+	override async _onFirstRender(context: object, options: ApplicationRenderOptions) {
+		await super._onFirstRender(context, options);
+		this.actor.apps[this.id] = this;
+	}
+
+	protected override _onClose(options: ApplicationClosingOptions): void {
+		super._onClose(options);
+		this.callback(this.result);
+		delete this.actor.apps[this.id];
+	}
+
 	private static async useSavvyTeardownClick(this: SalvageApplication, event: Event, _target: HTMLElement) {
 		if (event.type != "click") return;
 		this.updateDetails();
@@ -202,7 +236,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		if (!item) return;
 
 		if (!this.lockItem || (this.lockItem && !this.item)) {
-			this.actor ||= item.parent;
+			this.actor ??= item.parent;
 			this.item = item;
 		}
 		this.updateDetails({ useDefaultSalvageMax: true });
@@ -407,9 +441,15 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			return null;
 		}
 
-		const item = await CONFIG.PF2E.Item.documentClasses.armor.fromDropData<ItemPF2e<CharacterPF2eHeroicCrafting>>(
-			data
-		);
+		const item = await (async () => {
+			try {
+				return await CONFIG.PF2E.Item.documentClasses.armor.fromDropData<ItemPF2e<CharacterPF2eHeroicCrafting>>(
+					data
+				);
+			} catch {
+				return null;
+			}
+		})();
 
 		if (!item) return null;
 		if (!data.fromInventory && !item.parent) {
@@ -434,11 +474,6 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		}
 
 		return item;
-	}
-
-	override _onClose(options: ApplicationClosingOptions) {
-		super._onClose(options);
-		if (this.callback) this.callback(this.result);
 	}
 
 	override async _onRender(context: object, options: ApplicationRenderOptions) {

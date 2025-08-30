@@ -14,8 +14,8 @@ export type SalvageApplicationResult = {
 };
 
 export type SalvageApplicationOptions = {
-	actor?: CharacterPF2eHeroicCrafting;
+	actor: CharacterPF2eHeroicCrafting;
 	item?: PhysicalItemPF2e;
 	lockItem?: boolean;
-	callback?: (result: SalvageApplicationResult | undefined) => void;
+	callback: (result: SalvageApplicationResult | undefined) => void;
 };
