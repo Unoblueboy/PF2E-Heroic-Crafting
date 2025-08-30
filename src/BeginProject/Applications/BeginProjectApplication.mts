@@ -193,14 +193,11 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			},
 		}).bind(this.element);
 
-		const manualUpdateInputs = this.element.querySelectorAll<HTMLInputElement>(
-			"input[data-action='update-input-manual']"
-		);
-		manualUpdateInputs.forEach((batchSizeInput) => {
-			batchSizeInput.addEventListener(batchSizeInput.type === "checkbox" ? "click" : "change", (event: Event) =>
-				this.manualUpdateInput(event)
-			);
-		});
+		for (const input of this.element.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
+			'[data-action="update-input-manual"]'
+		)) {
+			input.addEventListener(input.type === "checkbox" ? "click" : "change", this.manualUpdateInput.bind(this));
+		}
 
 		const updateDetailsOptions: BeginProjectUpdateDetailsOptions = {};
 		if (this.item && options.isFirstRender) {

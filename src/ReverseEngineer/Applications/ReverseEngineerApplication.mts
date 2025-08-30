@@ -84,11 +84,6 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 		return await super.render(options);
 	}
 
-	override async _onFirstRender(context: object, options: ApplicationRenderOptions) {
-		await super._onFirstRender(context, options);
-		this.actor.apps[this.id] = this;
-	}
-
 	private async verifyItemExistence() {
 		if (!this.item) return;
 		this.item =
@@ -96,6 +91,11 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 				type: "item",
 				uuid: this.item.uuid,
 			})) ?? undefined;
+	}
+
+	override async _onFirstRender(context: object, options: ApplicationRenderOptions) {
+		await super._onFirstRender(context, options);
+		this.actor.apps[this.id] = this;
 	}
 
 	protected override _onClose(options: ApplicationClosingOptions): void {
