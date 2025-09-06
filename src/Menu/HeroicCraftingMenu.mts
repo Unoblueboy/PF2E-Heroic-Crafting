@@ -145,6 +145,16 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		},
 	};
 
+	static openHeroCraftingMenu(actor?: CharacterPF2eHeroicCrafting | null) {
+		actor ??=
+			canvas.tokens.controlled.length === 1
+				? (canvas.tokens.controlled[0].actor as CharacterPF2eHeroicCrafting)
+				: (game.user.character as CharacterPF2eHeroicCrafting | null);
+		if (!actor || actor.type !== "character") return;
+
+		new HeroCraftingMenu({ actor: actor }).render(true);
+	}
+
 	private static async beginProject(this: HeroCraftingMenu, event: Event, target: HTMLElement) {
 		if (!(event.target instanceof HTMLButtonElement)) return;
 		const itemUuid = target.dataset.itemUuid;

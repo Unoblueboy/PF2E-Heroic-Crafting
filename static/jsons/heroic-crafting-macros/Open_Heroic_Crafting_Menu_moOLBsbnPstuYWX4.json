@@ -1,0 +1,27 @@
+{
+	"name": "Open Heroic Crafting Menu",
+	"type": "script",
+	"command": "game.pf2eHeroicCrafting.openHeroCraftingMenu()",
+	"img": "icons/tools/hand/hammer-simple-stone.webp",
+	"author": "xtF1DuSWhBdA8aGR",
+	"scope": "global",
+	"folder": null,
+	"flags": {},
+	"_stats": {
+		"compendiumSource": null,
+		"duplicateSource": null,
+		"exportSource": null,
+		"coreVersion": "13.348",
+		"systemId": "pf2e",
+		"systemVersion": "7.4.3",
+		"createdTime": 1757169667606,
+		"modifiedTime": 1757169667606,
+		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
+	},
+	"ownership": {
+		"default": 0
+	},
+	"_id": "moOLBsbnPstuYWX4",
+	"sort": 0,
+	"_key": "!macros!moOLBsbnPstuYWX4"
+}

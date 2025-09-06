@@ -29,7 +29,7 @@ Hooks.once("init", () => {
 		beginProject,
 		reverseEngineer,
 		craftProject,
-		HeroCraftingMenu,
+		openHeroCraftingMenu: HeroCraftingMenu.openHeroCraftingMenu,
 		forageCraftingResources,
 		editProject,
 	};

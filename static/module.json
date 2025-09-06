@@ -123,6 +123,19 @@
 				"PLAYER": "LIMITED",
 				"ASSISTANT": "OWNER"
 			}
+		},
+		{
+			"label": "Heroic Crafting Macros",
+			"type": "Macro",
+			"name": "heroic-crafting-macros",
+			"path": "./packs/heroic-crafting-macros",
+			"system": "pf2e",
+			"package": "pf2e-heroic-crafting",
+			"banner": "systems/pf2e/assets/compendium-banner/orange.webp",
+			"ownership": {
+				"PLAYER": "LIMITED",
+				"ASSISTANT": "OWNER"
+			}
 		}
 	],
 	"packFolders": [
@@ -135,7 +148,8 @@
 				"heroic-crafting-items",
 				"heroic-crafting-effects",
 				"heroic-crafting-vehicles",
-				"heroic-crafting-journals"
+				"heroic-crafting-journals",
+				"heroic-crafting-macros"
 			]
 		}
 	]
