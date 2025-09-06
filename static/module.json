@@ -55,7 +55,7 @@
 			"package": "pf2e-heroic-crafting",
 			"banner": "systems/pf2e/assets/compendium-banner/green.webp",
 			"ownership": {
-				"PLAYER": "LIMITED",
+				"PLAYER": "OBSERVER",
 				"ASSISTANT": "OWNER"
 			}
 		},
@@ -68,7 +68,7 @@
 			"package": "pf2e-heroic-crafting",
 			"banner": "systems/pf2e/assets/compendium-banner/green.webp",
 			"ownership": {
-				"PLAYER": "LIMITED",
+				"PLAYER": "OBSERVER",
 				"ASSISTANT": "OWNER"
 			}
 		},
@@ -81,7 +81,7 @@
 			"package": "pf2e-heroic-crafting",
 			"banner": "systems/pf2e/assets/compendium-banner/blue.webp",
 			"ownership": {
-				"PLAYER": "LIMITED",
+				"PLAYER": "OBSERVER",
 				"ASSISTANT": "OWNER"
 			}
 		},
@@ -94,7 +94,7 @@
 			"package": "pf2e-heroic-crafting",
 			"banner": "systems/pf2e/assets/compendium-banner/blue.webp",
 			"ownership": {
-				"PLAYER": "LIMITED",
+				"PLAYER": "OBSERVER",
 				"ASSISTANT": "OWNER"
 			}
 		},
@@ -107,7 +107,7 @@
 			"package": "pf2e-heroic-crafting",
 			"banner": "systems/pf2e/assets/compendium-banner/red.webp",
 			"ownership": {
-				"PLAYER": "LIMITED",
+				"PLAYER": "OBSERVER",
 				"ASSISTANT": "OWNER"
 			}
 		},
@@ -120,7 +120,7 @@
 			"package": "pf2e-heroic-crafting",
 			"banner": "systems/pf2e/assets/compendium-banner/orange.webp",
 			"ownership": {
-				"PLAYER": "LIMITED",
+				"PLAYER": "OBSERVER",
 				"ASSISTANT": "OWNER"
 			}
 		},
@@ -133,7 +133,7 @@
 			"package": "pf2e-heroic-crafting",
 			"banner": "systems/pf2e/assets/compendium-banner/orange.webp",
 			"ownership": {
-				"PLAYER": "LIMITED",
+				"PLAYER": "OBSERVER",
 				"ASSISTANT": "OWNER"
 			}
 		}
