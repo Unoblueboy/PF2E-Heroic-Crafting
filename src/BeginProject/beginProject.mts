@@ -42,7 +42,20 @@ export async function beginProject(
 
 	await handleStartingValues(actor, startingValue);
 	const projects = Projects.getProjects(actor);
-	await projects.addProject(itemDetails);
+	const project = await projects.addProject(itemDetails);
+	const chatMessageData: DeepPartial<ChatMessage["_source"]> = {
+		content: await foundry.applications.handlebars.renderTemplate(
+			"modules/pf2e-heroic-crafting/templates/chat/beginProject/message.hbs",
+			{
+				project: await project.getContextData(),
+				actor,
+			}
+		),
+		speaker: { actor: actor.id },
+		author: game.userId,
+		style: CONST.CHAT_MESSAGE_STYLES.EMOTE,
+	};
+	ChatMessage.create<ChatMessage>(chatMessageData);
 	return true;
 }
 
@@ -51,6 +64,6 @@ async function handleStartingValues(actor: CharacterPF2eHeroicCrafting, starting
 		await actor.inventory.removeCoins(startingValues.currency);
 	}
 	if (startingValues.trove) {
-		await MaterialTrove.subtractValue(actor, startingValues.trove);
+		await MaterialTrove.subtractValue(actor, startingValues.trove, false);
 	}
 }

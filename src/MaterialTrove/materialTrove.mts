@@ -9,51 +9,28 @@ import {
 	HEROIC_CRAFTING_SPENDING_LIMIT,
 } from "../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
+import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
 
 import { EditMaterialTroveApplication } from "./Applications/EditMaterialTroveApplication.mjs";
 import { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";
 
-async function useActorCoins(
+export async function useActorCoins(
 	result: EditMaterialTroveApplicationResult,
 	craftingMaterials: CoinsPF2e,
 	actor: CharacterPF2eHeroicCrafting
 ) {
-	if (result.useActorCoins) {
-		const coinsToMoveCopper = result.newMaterialTroveValue.copperValue - craftingMaterials.copperValue;
-		if (coinsToMoveCopper < 0) {
+	if (result.updateActorCoins) {
+		const coinsToMove = SignedCoinsPF2e.subtractCoins(result.newMaterialTroveValue, craftingMaterials);
+		if (coinsToMove.copperValue < 0) {
 			// Add Coins to character Sheet
-			const coinsToMove = CoinsPF2eUtility.copperValueToCoins(-coinsToMoveCopper);
+			coinsToMove.isNegative = false;
 			actor.inventory.addCoins(coinsToMove);
-		} else if (coinsToMoveCopper > 0) {
+		} else if (coinsToMove.copperValue > 0) {
 			// Take Coins from character Sheet
-			const coinsToMove = CoinsPF2eUtility.copperValueToCoins(coinsToMoveCopper);
 			return await actor.inventory.removeCoins(coinsToMove);
 		}
 	}
 	return true;
-}
-
-export async function editMaterialTrove(actor: CharacterPF2eHeroicCrafting) {
-	if (!actor) {
-		ui.notifications.error("An actor must be selected");
-		return;
-	}
-
-	const materialTrove = await MaterialTrove.getMaterialTrove(actor);
-	if (!materialTrove) return;
-
-	// Get new value of Generic Crafting Materials
-	const result = (await EditMaterialTroveApplication.EditMaterialTrove(
-		materialTrove.value
-	)) as EditMaterialTroveApplicationResult;
-	if (!result) return;
-
-	if (!(await useActorCoins(result, materialTrove.value, actor))) {
-		ui.notifications.error("Not enough coins in inventory");
-		return;
-	}
-
-	materialTrove.setValue(result.newMaterialTroveValue);
 }
 
 export class MaterialTrove {
@@ -104,10 +81,16 @@ export class MaterialTrove {
 		return trove;
 	}
 
+	static actorHasMaterialTrove(actor: CharacterPF2eHeroicCrafting) {
+		return this.troves.has(actor.uuid);
+	}
+
 	static async getMaterialTrove(
 		actor: CharacterPF2eHeroicCrafting,
 		notifyOnFailure: boolean = true
 	): Promise<MaterialTrove | undefined> {
+		if (this.troves.has(actor.uuid)) return this.troves.get(actor.uuid)!;
+
 		const materialTroves = actor.itemTypes.backpack.filter((x) => x?.slug === MATERIAL_TROVE_SLUG);
 
 		if (materialTroves.length === 0) {
@@ -126,8 +109,6 @@ export class MaterialTrove {
 			return;
 		}
 
-		if (this.troves.has(actor.uuid)) return this.troves.get(actor.uuid)!;
-
 		const trove = await this.newMaterialTrove(
 			actor,
 			materialTroves[0] as ContainerPF2e<CharacterPF2eHeroicCrafting>
@@ -136,26 +117,50 @@ export class MaterialTrove {
 		return trove;
 	}
 
+	static async editMaterialTrove(actor: CharacterPF2eHeroicCrafting) {
+		if (!actor) {
+			ui.notifications.error("An actor must be selected");
+			return;
+		}
+
+		const materialTrove = await MaterialTrove.getMaterialTrove(actor);
+		if (!materialTrove) return;
+
+		// Get new value of Generic Crafting Materials
+		const result = (await EditMaterialTroveApplication.EditMaterialTrove({
+			actor,
+			materialTrove,
+		})) as EditMaterialTroveApplicationResult;
+		if (!result) return;
+
+		if (!(await useActorCoins(result, materialTrove.value, actor))) {
+			ui.notifications.error("Not enough coins in inventory");
+			return;
+		}
+
+		materialTrove.setValue(result.newMaterialTroveValue);
+	}
+
 	static removeMaterialTrove(actor: CharacterPF2eHeroicCrafting): void {
 		this.troves.delete(actor.uuid);
 	}
 
-	static async getValue(actor: CharacterPF2eHeroicCrafting): Promise<CoinsPF2e> {
-		const materialTrove = await MaterialTrove.getMaterialTrove(actor);
+	static async getValue(actor: CharacterPF2eHeroicCrafting, notifyOnFailure: boolean = true): Promise<CoinsPF2e> {
+		const materialTrove = await MaterialTrove.getMaterialTrove(actor, notifyOnFailure);
 		if (!materialTrove) return new game.pf2e.Coins();
 
 		return materialTrove.value;
 	}
 
-	static async addValue(actor: CharacterPF2eHeroicCrafting, value: Coins) {
-		const materialTrove = await MaterialTrove.getMaterialTrove(actor);
+	static async addValue(actor: CharacterPF2eHeroicCrafting, value: Coins, notifyOnFailure: boolean = true) {
+		const materialTrove = await MaterialTrove.getMaterialTrove(actor, notifyOnFailure);
 		if (!materialTrove) return;
 
 		await materialTrove.add(value);
 	}
 
-	static async subtractValue(actor: CharacterPF2eHeroicCrafting, value: Coins) {
-		const materialTrove = await MaterialTrove.getMaterialTrove(actor);
+	static async subtractValue(actor: CharacterPF2eHeroicCrafting, value: Coins, notifyOnFailure: boolean = true) {
+		const materialTrove = await MaterialTrove.getMaterialTrove(actor, notifyOnFailure);
 		if (!materialTrove) return;
 
 		await materialTrove.subtract(value);

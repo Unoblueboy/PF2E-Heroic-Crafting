@@ -1,0 +1,12 @@
+<div class="pf2e chat-card heroic-crafting"
+     data-begin-project>
+    <div class="card-content begin-project">
+        <p>{{actor.name}} has begun a project:</p>
+        <div style="display: flex; align-items: center; margin-bottom: 3px;">
+            <img src="{{project.img}}"
+                 style="height:32px; width:32px; margin-right: 3px;">
+            <span>{{#if (gt project.batchSize 1)}}{{project.batchSize}}x {{/if}}{{project.itemLink}}</span>
+        </div>
+        <p>Starting value: {{project.value}}</p>
+    </div>
+</div>

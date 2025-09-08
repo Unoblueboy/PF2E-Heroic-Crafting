@@ -315,7 +315,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			id: this.id,
 			buttons,
 			includeIsFormula: this.includeIsFormula,
-			hasMaterialTrove: !!(await MaterialTrove.getMaterialTrove(this.actor)),
+			hasMaterialTrove: !!(await MaterialTrove.getMaterialTrove(this.actor, false)),
 		});
 	}
 
@@ -352,7 +352,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 				img: this.spell ? this.spell.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
 				name: this.spell ? this.spell.name : "Drag Spell here...",
 				rank: this.spell ? String(this.spell.rank).padStart(2, "0") : "??",
-				hide: this.formData.isFormula || (this.item && !isGenericScrollOrWand(this.item)),
+				hide: this.formData.isFormula || !isGenericScrollOrWand(this.item),
 			},
 		};
 	}
@@ -495,7 +495,10 @@ const consumableMagicSlugs = [
 	"wand-of-continuation",
 ];
 
-function isGenericScrollOrWand(item: PhysicalItemPF2e) {
+function isGenericScrollOrWand(item: PhysicalItemPF2e | undefined) {
+	if (!item) {
+		return false;
+	}
 	if (!["wand", "scroll"].includes((item as ConsumablePF2e).category)) {
 		return false;
 	}

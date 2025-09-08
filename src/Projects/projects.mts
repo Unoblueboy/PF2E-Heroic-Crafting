@@ -70,8 +70,10 @@ export class Projects {
 
 	async addProject(projectDetails: ProjectItemDetails) {
 		const randomId = foundry.utils.randomID();
-		this.actorProjectsMap.set(randomId, this.projectFactory.createProject(randomId, projectDetails));
+		const project = this.projectFactory.createProject(randomId, projectDetails);
+		this.actorProjectsMap.set(randomId, project);
 		await this.actor.update({ [`flags.${MODULE_ID}.projects.${randomId}`]: projectDetails });
+		return project;
 	}
 
 	async deleteProject(id: string) {
@@ -111,6 +113,7 @@ export type ProjectContextData = {
 	value: CoinsPF2e;
 	max: CoinsPF2e;
 	baseItem: PhysicalItemPF2e;
+	itemLink: string;
 	baseSpell?: SpellPF2e;
 	spellRank?: number;
 };
@@ -182,6 +185,7 @@ export abstract class AProject implements ProjectItemDetails {
 			value: this.value,
 			max: await this.max,
 			baseItem: await this.baseItem,
+			itemLink: await this.itemLink,
 		};
 	}
 

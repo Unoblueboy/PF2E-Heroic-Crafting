@@ -88,6 +88,10 @@ export class SignedCoinsPF2e {
 		return new SignedCoinsPF2e(coins).copperValue;
 	}
 
+	static negate(coins: SignedCoins) {
+		return new SignedCoinsPF2e(coins).negate();
+	}
+
 	static addCoins(coins: SignedCoins, otherCoins: SignedCoins) {
 		const signedCoins = new SignedCoinsPF2e(coins);
 		const signedOtherCoins = new SignedCoinsPF2e(otherCoins);

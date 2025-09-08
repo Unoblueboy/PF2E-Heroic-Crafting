@@ -5,7 +5,6 @@ import { HeroCraftingMenu } from "./Menu/HeroicCraftingMenu.mjs";
 import { beginProject } from "./BeginProject/beginProject.mjs";
 import { reverseEngineer } from "./ReverseEngineer/reverseEngineer.mjs";
 import { craftProject } from "./CraftProject/craftProject.mjs";
-import { editMaterialTrove } from "./MaterialTrove/materialTrove.mjs";
 import { salvage } from "./Salvage/salvage.mjs";
 import { editProject } from "./EditProject/editProject.mjs";
 import { junkCollectorOnConsume } from "./Feats/junkCollector.mjs";
@@ -24,7 +23,6 @@ Handlebars.registerHelper("padStart", (objectToFormat: unknown, maxLength: numbe
 Hooks.once("init", () => {
 	console.log("Heroic Crafting | Initializing game variables");
 	game.pf2eHeroicCrafting = {
-		editMaterialTrove,
 		salvage,
 		beginProject,
 		reverseEngineer,

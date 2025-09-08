@@ -10,65 +10,68 @@
 	}
 }
 
-#edit-material-trove-add-sub-addSubChoice {
-	list-style-type: none;
-	padding: 0;
-	display: flex;
-	gap: 10px;
-	margin: 0;
+.edit-material-trove-dialog {
+	.materials-summary {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		align-items: stretch;
+		justify-content: space-between;
+		gap: 0.5rem;
 
-	--button-size: var(--input-height);
-	--button-background-color: var(--color-cool-5-50);
-	--button-border-color: var(--color-light-5);
-	--button-text-color: var(--color-light-3);
-	--button-focus-outline-color: var(--color-warm-2);
-	--button-hover-background-color: var(--color-warm-2);
-	--button-hover-border-color: var(--color-light-3);
-	--button-hover-text-color: var(--color-light-1);
+		hr {
+			margin: 0.5rem 0;
+		}
 
-	input[name="addSubChoice"] {
-		display: none;
+		.material-details {
+			flex: 4;
+			display: flex;
+			flex-direction: column;
+			align-items: stretch;
+			text-align: center;
+			gap: 0;
+
+			.title {
+				padding-top: 0.5rem;
+				font-weight: bold;
+				flex: 0;
+			}
+
+			.value {
+				padding: 0.3rem;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				flex: 1;
+
+				.lose {
+					color: red;
+				}
+
+				.gain {
+					color: green;
+				}
+			}
+		}
+
+		.material-decoration {
+			flex: 3;
+			align-self: flex-end;
+		}
 	}
 
-	li {
-		flex: 1;
-		margin-bottom: 0;
+	.money-form {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		gap: 0.5rem;
+		align-items: flex-end;
 
-		label {
+		.form-group {
 			display: flex;
-			justify-content: center;
+			flex-direction: column;
+			flex-wrap: nowrap;
 			align-items: center;
-			height: var(--button-size);
-			min-height: var(--button-size);
-			gap: 0.25rem;
-			padding: 0 0.5rem;
-			background: var(--button-background-color);
-			border: 1px solid var(--button-border-color);
-			border-radius: 4px;
-			color: var(--button-text-color);
-			font-family: var(--font-sans);
-			font-size: var(--font-size-14);
-			line-height: normal;
-			text-decoration: none;
-			cursor: var(--cursor-pointer);
-			transition: 0.5s;
-
-			&:focus {
-				outline: 1px solid var(--button-focus-outline-color);
-				box-shadow: 0 0 4px var(--button-focus-outline-color);
-			}
-
-			&:hover {
-				background: var(--button-hover-background-color);
-				color: var(--button-hover-text-color);
-				border-color: var(--button-hover-border-color);
-			}
-
-			&:has(+ input:checked) {
-				background: var(--button-hover-background-color);
-				color: var(--button-hover-text-color);
-				border-color: var(--button-hover-border-color);
-			}
 		}
 	}
 }

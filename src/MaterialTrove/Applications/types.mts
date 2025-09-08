@@ -1,6 +1,6 @@
-import { CoinsPF2e } from "../../../types/src/module/item/physical";
+import { SignedCoins } from "../../Helper/signedCoins.mjs";
 
 export type EditMaterialTroveApplicationResult = {
-	newMaterialTroveValue: CoinsPF2e;
-	useActorCoins: boolean;
+	newMaterialTroveValue: SignedCoins;
+	updateActorCoins: boolean;
 };

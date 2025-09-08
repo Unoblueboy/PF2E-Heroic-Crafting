@@ -1,0 +1,121 @@
+{{log "Heroic Crafting |" this}}
+<section class="tab {{tab.cssClass}}"
+         data-group="{{tab.group}}"
+         data-tab="{{tab.id}}">
+    <div class="materials-summary"
+         data-tooltip-direction="UP">
+        <div class="material-details">
+            <span class="title">Treasure Trove</span>
+            <hr>
+            <div class="value"><span
+                      {{#if (ne trove.baseValue.copperValue trove.newValue.copperValue)}}data-tooltip="Original Value: {{trove.baseValue}}"
+                      class="{{#if (gt trove.baseValue.copperValue trove.newValue.copperValue)}}lose{{/if}}
+                      {{#if (lt trove.baseValue.copperValue trove.newValue.copperValue)}}gain{{/if}}"
+                      {{/if}}>{{trove.newValue}}</span>
+            </div>
+        </div>
+        <div class="material-decoration"><svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="-65 -25 130 50"
+                 fill="none">
+                <defs>
+                    <marker id="arrow-{{partId}}"
+                            viewBox="0 0 10 10"
+                            refX="5"
+                            refY="5"
+                            markerWidth="6"
+                            markerHeight="6"
+                            orient="auto-start-reverse">
+                        <path d="m0 0 10 5-10 5z"
+                              fill="#efe6d8" />
+                    </marker>
+                </defs>
+                <path d="M-55-10c20-10 90-10 110 0"
+                      stroke="#efe6d8"
+                      fill="transparent"
+                      marker-end="url(#arrow-{{partId}})"
+                      stroke-width="2" />
+                <path d="M55 10C35 20-35 20-55 10"
+                      stroke="#efe6d8"
+                      fill="transparent"
+                      marker-end="url(#arrow-{{partId}})"
+                      stroke-width="2" />
+            </svg>
+        </div>
+        <div class="material-details">
+            <span class="title">Actor currency</span>
+            <hr>
+            <div class="value"><span
+                      {{#if (ne currency.baseValue.copperValue currency.newValue.copperValue)}}data-tooltip="Original Value: {{currency.baseValue}}"
+                      class="{{#if (gt currency.baseValue.copperValue currency.newValue.copperValue)}}lose{{/if}}
+                      {{#if (lt currency.baseValue.copperValue currency.newValue.copperValue)}}gain{{/if}}"
+                      {{/if}}>{{currency.newValue}}</span></div>
+        </div>
+    </div>
+    <hr style="margin:0.5rem 0;">
+    <div class="money-form">
+        <div class="form-group">
+            <label for="{{partId}}-edit-pp">{{localize 'PF2E.CurrencyPP'}}</label>
+            <div class="form-fields">
+                <input data-action="update-input-manual"
+                       type="number"
+                       name="edit.pp"
+                       value={{curValue.pp}}
+                       min="0"
+                       step="1"
+                       id="{{partId}}-edit-pp">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="{{partId}}-edit-gp">{{localize 'PF2E.CurrencyGP'}}</label>
+            <div class="form-fields">
+                <input data-action="update-input-manual"
+                       type="number"
+                       name="edit.gp"
+                       value={{curValue.gp}}
+                       min="0"
+                       step="1"
+                       id="{{partId}}-edit-gp">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="{{partId}}-edit-sp">{{localize 'PF2E.CurrencySP'}}</label>
+            <div class="form-fields">
+                <input data-action="update-input-manual"
+                       type="number"
+                       name="edit.sp"
+                       value={{curValue.sp}}
+                       min="0"
+                       step="1"
+                       id="{{partId}}-edit-sp">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="{{partId}}-edit-cp">{{localize 'PF2E.CurrencyCP'}}</label>
+            <div class="form-fields">
+                <input data-action="update-input-manual"
+                       type="number"
+                       name="edit.cp"
+                       value={{curValue.cp}}
+                       min="0"
+                       step="1"
+                       id="{{partId}}-edit-cp">
+            </div>
+        </div>
+    </div>
+    <hr style="margin:0.5rem 0;">
+    <div class="standard-form">
+        <div class="form-group">
+            <label for="{{partId}}-edit-updateActorCoins">Use Coins</label>
+            <div class="form-fields">
+                <input data-action="update-input-manual"
+                       type="checkbox"
+                       name="edit.updateActorCoins"
+                       id="{{partId}}-edit-updateActorCoins"
+                       {{#if updateActorCoins}}checked{{/if}}>
+            </div>
+            <p class="hint">If the new value of the material trove is greater than the current value, the difference
+                will be removed from the actor&#39;s inventory. Otherwise, the difference will be added to the
+                actor&#39;s inventory.</p>
+        </div>
+    </div>
+</section>

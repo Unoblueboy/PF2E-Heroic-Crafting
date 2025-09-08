@@ -14,14 +14,19 @@ import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { craftProject } from "../CraftProject/craftProject.mjs";
 import { editProject } from "../EditProject/editProject.mjs";
 import { forageCraftingResources } from "../Forage/forager.mjs";
-import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../Helper/constants.mjs";
+import {
+	CRAFTING_MATERIAL_SLUG,
+	MATERIAL_TROVE_SLUG,
+	MATERIAL_TROVE_UUID,
+	SALVAGE_MATERIAL_SLUG,
+} from "../Helper/constants.mjs";
 import { calculateDC } from "../Helper/dc.mjs";
-import { editMaterialTrove, MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
+import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { ProjectContextData, Projects } from "../Projects/projects.mjs";
 import { reverseEngineer } from "../ReverseEngineer/reverseEngineer.mjs";
 import { salvage } from "../Salvage/salvage.mjs";
 
-const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
+const { ApplicationV2, DialogV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 enum HeroCraftingMenuTab {
 	BEGIN = "begin",
@@ -228,7 +233,21 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 	}
 
 	private static async editMaterialTrove(this: HeroCraftingMenu, _event: Event, _target: HTMLElement) {
-		await editMaterialTrove(this.actor);
+		if (!MaterialTrove.actorHasMaterialTrove(this.actor)) {
+			const createTrove = await DialogV2.confirm({
+				window: { title: "Create Material Trove" },
+				content: "Do you want to create a material trove?",
+				rejectClose: false,
+				modal: true,
+			});
+
+			if (!createTrove) return;
+
+			const materialTrove = (await fromUuid(MATERIAL_TROVE_UUID)) as TreasurePF2e;
+			await Item.implementation.create(materialTrove.toObject(), { parent: this.actor });
+		}
+
+		await MaterialTrove.editMaterialTrove(this.actor);
 	}
 
 	async toggleGeneralSummary(target: HTMLElement) {
@@ -285,7 +304,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		if (!project) return;
 		const item = await project.baseItem;
 		if (!item) return;
-		const chatData = await (item as PhysicalItemPF2e).getChatData();
+		const chatData = await item.getChatData();
 		const descriptionValue = await game.pf2e.TextEditor.enrichHTML(await project.description);
 		const summaryContext = {
 			item,
