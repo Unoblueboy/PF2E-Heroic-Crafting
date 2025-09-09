@@ -1,0 +1,86 @@
+<div class="materials-summary"
+     data-tooltip-direction="UP">
+    <div class="material-details">
+        <span class="title">Treasure Trove</span>
+        <hr>
+        <div class="value"><span
+                  {{#if (ne trove.baseValue.copperValue trove.newValue.copperValue)}}data-tooltip="Original Value: {{trove.baseValue}}"
+                  class="{{#if (gt trove.baseValue.copperValue trove.newValue.copperValue)}}lose{{/if}}
+                      {{#if (lt trove.baseValue.copperValue trove.newValue.copperValue)}}gain{{/if}}"
+                  {{/if}}>{{trove.newValue}}</span>
+        </div>
+    </div>
+    <div class="material-decoration">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             viewBox="-65 -25 130 50"
+             fill="none">
+            <defs>
+                <linearGradient id="top-gradient-{{partId}}"
+                                x1="0%"
+                                x2="100%"
+                                y1="0%"
+                                y2="0%">
+                    <stop offset="00%"
+                          stop-color="#e7d1b1"
+                          stop-opacity="0" />
+                    <stop offset="50%"
+                          stop-color="#e7d1b1"
+                          stop-opacity="1" />
+                </linearGradient>
+                <linearGradient id="bottom-gradient-{{partId}}"
+                                x1="100%"
+                                x2="0%"
+                                y1="0%"
+                                y2="0%">
+                    <stop offset="00%"
+                          stop-color="#e7d1b1"
+                          stop-opacity="0" />
+                    <stop offset="50%"
+                          stop-color="#e7d1b1"
+                          stop-opacity="1" />
+                </linearGradient>
+                <marker id="arrow-{{partId}}"
+                        viewBox="0 0 10 10"
+                        refX="5"
+                        refY="5"
+                        markerWidth="6"
+                        markerHeight="6"
+                        orient="auto-start-reverse">
+                    <path d="m0 0 10 5-10 5z"
+                          fill="#e7d1b1" />
+                </marker>
+            </defs>
+            <path d="M-55-10c20-10 90-10 110 0"
+                  stroke="url(#top-gradient-{{partId}})"
+                  fill="transparent"
+                  marker-end="url(#arrow-{{partId}})"
+                  stroke-width="2"
+                  class="
+                        {{#if (gt currency.newValue.copperValue currency.baseValue.copperValue)}}
+                            active
+                        {{else}}
+                            inactive
+                        {{/if}}" />
+            <path d="M55 10C35 20-35 20-55 10"
+                  stroke="url(#bottom-gradient-{{partId}})"
+                  fill="transparent"
+                  marker-end="url(#arrow-{{partId}})"
+                  stroke-width="2"
+                  class="
+                        {{#if (lt currency.newValue.copperValue currency.baseValue.copperValue)}}
+                            active
+                        {{else}}
+                            inactive
+                        {{/if}}" />
+        </svg>
+    </div>
+    <div class="material-details">
+        <span class="title">Actor currency</span>
+        <hr>
+        <div class="value"><span
+                  {{#if (ne currency.baseValue.copperValue currency.newValue.copperValue)}}data-tooltip="Original Value: {{currency.baseValue}}"
+                  class="{{#if (gt currency.baseValue.copperValue currency.newValue.copperValue)}}lose{{/if}}
+                      {{#if (lt currency.baseValue.copperValue currency.newValue.copperValue)}}gain{{/if}}"
+                  {{/if}}>{{currency.newValue}}</span></div>
+    </div>
+</div>

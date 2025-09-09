@@ -319,4 +319,12 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		}
 		return context;
 	}
+
+	override async _preRender(context: object, options: ApplicationRenderOptions) {
+		await super._preRender(context, options);
+		await foundry.applications.handlebars.loadTemplates([
+			"modules/pf2e-heroic-crafting/templates/materialTrove/materialSummary.hbs",
+			"modules/pf2e-heroic-crafting/templates/materialTrove/moneyForm.hbs",
+		]);
+	}
 }

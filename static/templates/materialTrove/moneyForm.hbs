@@ -1,0 +1,58 @@
+{{log "Heroic Crafting | Money Form" this}}
+<div class="money-form">
+    {{#if includeSign}}
+        <div class="form-group">
+            <button type="button"
+                    data-action="negate-cur-value"
+                    {{#if (eq trove.baseValue.copperValue 0)}}disabled{{/if}}>{{#if curValue.isNegative}}-{{else}}+{{/if}}</button>
+        </div>
+    {{/if}}
+    <div class="form-group">
+        <label for="{{partId}}-{{tab.id}}-pp">{{localize 'PF2E.CurrencyPP'}}</label>
+        <div class="form-fields">
+            <input data-action="update-input-manual"
+                   type="number"
+                   name="{{tab.id}}.pp"
+                   value={{curValue.pp}}
+                   min="0"
+                   step="1"
+                   id="{{partId}}-{{tab.id}}-pp">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="{{partId}}-{{tab.id}}-gp">{{localize 'PF2E.CurrencyGP'}}</label>
+        <div class="form-fields">
+            <input data-action="update-input-manual"
+                   type="number"
+                   name="{{tab.id}}.gp"
+                   value={{curValue.gp}}
+                   min="0"
+                   step="1"
+                   id="{{partId}}-{{tab.id}}-gp">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="{{partId}}-{{tab.id}}-sp">{{localize 'PF2E.CurrencySP'}}</label>
+        <div class="form-fields">
+            <input data-action="update-input-manual"
+                   type="number"
+                   name="{{tab.id}}.sp"
+                   value={{curValue.sp}}
+                   min="0"
+                   step="1"
+                   id="{{partId}}-{{tab.id}}-sp">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="{{partId}}-{{tab.id}}-cp">{{localize 'PF2E.CurrencyCP'}}</label>
+        <div class="form-fields">
+            <input data-action="update-input-manual"
+                   type="number"
+                   name="{{tab.id}}.cp"
+                   value={{curValue.cp}}
+                   min="0"
+                   step="1"
+                   id="{{partId}}-{{tab.id}}-cp">
+        </div>
+    </div>
+</div>

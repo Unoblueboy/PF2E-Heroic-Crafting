@@ -1,4 +1,4 @@
-import { Coins } from "../../types/src/module/item/physical";
+import { Coins, CoinsPF2e } from "../../types/src/module/item/physical";
 
 const DENOMINATIONS = ["pp", "gp", "sp", "cp"] as const;
 export type DENOMINATION = (typeof DENOMINATIONS)[number];
@@ -32,7 +32,7 @@ export class SignedCoinsPF2e {
 		return SignedCoinsPF2e.copperValueToSignedCoins(totalCopperValue, includePp);
 	}
 
-	subtract(coins: SignedCoins) {
+	subtract(coins: SignedCoins): SignedCoinsPF2e {
 		return this.plus({ ...coins, isNegative: !coins.isNegative });
 	}
 
@@ -41,12 +41,12 @@ export class SignedCoinsPF2e {
 		return new SignedCoinsPF2e({ ...coinPF2eResult, isNegative: factor < 0 ? !this.isNegative : this.isNegative });
 	}
 
-	multiply(multiplier: number) {
+	multiply(multiplier: number): SignedCoinsPF2e {
 		const copperValue = this.copperValue;
 		return SignedCoinsPF2e.copperValueToSignedCoins(Math.floor(multiplier * copperValue));
 	}
 
-	negate() {
+	negate(): SignedCoinsPF2e {
 		return new SignedCoinsPF2e({ ...this, isNegative: !this.isNegative });
 	}
 
@@ -60,6 +60,13 @@ export class SignedCoinsPF2e {
 			},
 			{ isNegative: this.isNegative }
 		);
+	}
+
+	toCoinsPF2e(boundCoins: boolean = true): CoinsPF2e {
+		if (this.copperValue < 0) {
+			console.warn(`${this} converted to CoinsPF2e, sign has been lost in the process`);
+		}
+		return new game.pf2e.Coins(boundCoins ? SignedCoinsPF2e.maxCoins({}, this) : this);
 	}
 
 	static fromString(coinString: string, quantity = 1): SignedCoinsPF2e {
@@ -84,31 +91,31 @@ export class SignedCoinsPF2e {
 		});
 	}
 
-	static getCopperValue(coins: SignedCoins) {
+	static getCopperValue(coins: SignedCoins): number {
 		return new SignedCoinsPF2e(coins).copperValue;
 	}
 
-	static negate(coins: SignedCoins) {
+	static negate(coins: SignedCoins): SignedCoinsPF2e {
 		return new SignedCoinsPF2e(coins).negate();
 	}
 
-	static addCoins(coins: SignedCoins, otherCoins: SignedCoins) {
+	static addCoins(coins: SignedCoins, otherCoins: SignedCoins): SignedCoinsPF2e {
 		const signedCoins = new SignedCoinsPF2e(coins);
 		const signedOtherCoins = new SignedCoinsPF2e(otherCoins);
 		return signedCoins.plus(signedOtherCoins);
 	}
 
-	static sumCoins(...coinsList: SignedCoins[]) {
-		return coinsList.reduce((prev, cur) => this.addCoins(prev, cur), new SignedCoinsPF2e());
+	static sumCoins(...coinsList: SignedCoins[]): SignedCoinsPF2e {
+		return new SignedCoinsPF2e(coinsList.reduce((prev, cur) => this.addCoins(prev, cur), new SignedCoinsPF2e()));
 	}
 
-	static subtractCoins(coins: SignedCoins, otherCoins: SignedCoins) {
+	static subtractCoins(coins: SignedCoins, otherCoins: SignedCoins): SignedCoinsPF2e {
 		const signedCoins = new SignedCoinsPF2e(coins);
 		const signedOtherCoins = new SignedCoinsPF2e(otherCoins);
 		return signedCoins.subtract(signedOtherCoins);
 	}
 
-	static multiplyCoins(mult: number, coins: SignedCoins) {
+	static multiplyCoins(mult: number, coins: SignedCoins): SignedCoinsPF2e {
 		const copperValue = new SignedCoinsPF2e(coins).copperValue;
 		return this.copperValueToSignedCoins(Math.floor(mult * copperValue));
 	}

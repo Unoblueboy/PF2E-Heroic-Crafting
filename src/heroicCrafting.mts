@@ -12,6 +12,7 @@ import { salvageChatButtonListener } from "./Salvage/chatListener.mjs";
 import { craftProjectChatButtonListener } from "./CraftProject/chatListener.mjs";
 import { forageCraftingResourcesChatButtonListener } from "./Forage/chatListener.mjs";
 import { initRuleElements } from "./RuleElement/initRuleElements.mjs";
+import { MaterialTrove } from "./MaterialTrove/materialTrove.mjs";
 
 Handlebars.registerHelper("padStart", (objectToFormat: unknown, maxLength: number, fillString: string) => {
 	console.assert(typeof maxLength === "number", "Max Length expected to be number");
@@ -30,9 +31,12 @@ Hooks.once("init", () => {
 		openHeroCraftingMenu: HeroCraftingMenu.openHeroCraftingMenu,
 		forageCraftingResources,
 		editProject,
+		MaterialTrove,
 	};
 
 	initRuleElements();
+
+	MaterialTrove.onInit();
 });
 
 Hooks.once("ready", () => {
@@ -46,6 +50,8 @@ Hooks.once("ready", () => {
 		},
 		"MIXED"
 	);
+
+	MaterialTrove.onReady();
 
 	game.socket.on("module.pf2e-heroic-crafting", forageSocketListener);
 });

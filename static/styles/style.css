@@ -11,6 +11,10 @@
 }
 
 .edit-material-trove-dialog {
+	hr {
+		margin: 0.5rem 0;
+	}
+
 	.materials-summary {
 		display: flex;
 		flex-direction: row;
@@ -18,10 +22,6 @@
 		align-items: stretch;
 		justify-content: space-between;
 		gap: 0.5rem;
-
-		hr {
-			margin: 0.5rem 0;
-		}
 
 		.material-details {
 			flex: 4;
@@ -57,6 +57,14 @@
 		.material-decoration {
 			flex: 3;
 			align-self: flex-end;
+
+			svg path.inactive {
+				opacity: 30%;
+			}
+
+			svg path.active {
+				opacity: 100%;
+			}
 		}
 	}
 
