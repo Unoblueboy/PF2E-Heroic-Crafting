@@ -28,6 +28,8 @@ import { salvage } from "../Salvage/salvage.mjs";
 
 const { ApplicationV2, DialogV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
+type ItemType = keyof ItemInstances<CharacterPF2eHeroicCrafting>;
+
 enum HeroCraftingMenuTab {
 	BEGIN = "begin",
 	CRAFT = "craft",
@@ -474,7 +476,6 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 	}
 
 	private getItemGroups() {
-		type ItemType = keyof ItemInstances<CharacterPF2eHeroicCrafting>;
 		const itemGroups: { name: string; items: PhysicalItemPF2e[] }[] = [];
 
 		for (const itemType of [["weapon", "shield"], "armor", "equipment", "consumable", "treasure", "backpack"] as (
@@ -493,11 +494,18 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			);
 			if (items.length === 0) continue;
 			itemGroups.push({
-				name: itemType as string,
+				name: this.getItemGroupName(itemType),
 				items: items,
 			});
 		}
 		return itemGroups;
+	}
+
+	private getItemGroupName(itemType: ItemType | ItemType[]): string {
+		if (itemType instanceof Array) {
+			return itemType.map((t) => game.i18n.localize(`TYPES.Item.${t}`)).join(" & ");
+		}
+		return game.i18n.localize(`TYPES.Item.${itemType}`);
 	}
 
 	private getReverseEngineerContext() {
