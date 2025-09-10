@@ -1,5 +1,5 @@
 import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../../types/src/module/item";
-import { Coins, CoinsPF2e } from "../../../types/src/module/item/physical";
+import { Coins } from "../../../types/src/module/item/physical";
 import {
 	ApplicationClosingOptions,
 	ApplicationConfiguration,
@@ -12,21 +12,55 @@ import {
 	CRAFTING_MATERIAL_SLUG,
 	HEROIC_CRAFTING_GATHERED_INCOME,
 	HEROIC_CRAFTING_SPENDING_LIMIT,
-	HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD,
 	MATERIAL_TROVE_SLUG,
 	SALVAGE_MATERIAL_SLUG,
 } from "../../Helper/constants.mjs";
 import { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs";
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
+import { DegreeOfSuccessString } from "../../../types/src/module/system/degree-of-success";
+import { DENOMINATION, SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-// TODO: refactor to not use querySelector
+enum SalvageApplicationPart {
+	DRAG_DROP = "drag-drop",
+	DETAILS = "details",
+	FOOTER = "footer",
+}
+
+type SalvageApplicationFormData = {
+	salvageMax: Coins;
+	useSavvyTeardown: boolean;
+	salvageDuration: number;
+};
+
+type SalvageApplicationRenderDataIncomeData = Partial<
+	Record<
+		DegreeOfSuccessString,
+		{
+			content: string;
+			tooltip: string;
+			value: Coins;
+		}
+	>
+>;
+
+type SalvageApplicationRenderData = {
+	hideDetails: boolean;
+	disableMoneyGroupInputs: boolean;
+	hideSavvyTeardown: boolean;
+	hideSalvageDuration: boolean;
+	incomeData: SalvageApplicationRenderDataIncomeData;
+};
+
 export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2) {
-	result?: SalvageApplicationResult;
-	item?: PhysicalItemPF2e;
-	actor: CharacterPF2eHeroicCrafting;
-	callback: (result: SalvageApplicationResult | undefined) => void;
-	lockItem?: boolean;
+	private result?: SalvageApplicationResult;
+	private item?: PhysicalItemPF2e;
+	private actor: CharacterPF2eHeroicCrafting;
+	private readonly callback: (result: SalvageApplicationResult | undefined) => void;
+	private readonly lockItem?: boolean;
+
+	private readonly formData: SalvageApplicationFormData;
+	private readonly renderData: SalvageApplicationRenderData;
 
 	constructor(options: SalvageApplicationOptions) {
 		super(options as object);
@@ -34,10 +68,41 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		this.item = options.item;
 		this.lockItem = options.lockItem;
 		this.callback = options.callback;
+
+		this.formData = this.initialiseFormData();
+		this.renderData = this.initialiseRenderData();
+	}
+
+	private initialiseFormData(): SalvageApplicationFormData {
+		return {
+			salvageMax: this.getInitialSalvageMax(),
+			useSavvyTeardown: false,
+			salvageDuration: 1,
+		};
+	}
+
+	private getInitialSalvageMax(): Coins {
+		if (!this.item) return { pp: 0, gp: 0, sp: 0, cp: 0 };
+		if (this.isItemSalvage()) return this.item.price.value;
+		return SignedCoinsPF2e.multiplyCoins(0.5, this.item.price.value).toCoinsPF2e();
+	}
+
+	private initialiseRenderData(): SalvageApplicationRenderData {
+		return {
+			hideDetails: !this.item,
+			disableMoneyGroupInputs: this.isItemSalvage(),
+			hideSavvyTeardown: this.isItemSalvage() || !this.hasSavvyTeardownFeat(),
+			hideSalvageDuration: this.formData.useSavvyTeardown,
+			incomeData: this.item
+				? this.getIncomeData()
+				: {
+						success: { content: "", tooltip: "", value: {} },
+						failure: { content: "", tooltip: "", value: {} },
+				  },
+		};
 	}
 
 	static override readonly DEFAULT_OPTIONS = {
-		id: "salvage",
 		classes: ["salvage-dialog"],
 		position: { width: 350 },
 		tag: "form",
@@ -56,156 +121,45 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 	};
 
 	static override readonly PARTS = {
-		"drag-drop": { template: "modules/pf2e-heroic-crafting/templates/salvage/drag-drop.hbs" },
-		details: {
-			template: "modules/pf2e-heroic-crafting/templates/salvage/details.hbs",
-			classes: ["hide"],
+		[SalvageApplicationPart.DRAG_DROP]: {
+			template: "modules/pf2e-heroic-crafting/templates/salvage/drag-drop.hbs",
 		},
-		footer: { template: "templates/generic/form-footer.hbs", classes: ["footer-button-panel"] },
+		[SalvageApplicationPart.DETAILS]: {
+			template: "modules/pf2e-heroic-crafting/templates/salvage/details.hbs",
+		},
+		[SalvageApplicationPart.FOOTER]: {
+			template: "templates/generic/form-footer.hbs",
+			classes: ["footer-button-panel"],
+		},
 	};
-
-	static readonly SCHEMA = new foundry.data.fields.SchemaField({
-		useSavvyTeardown: new foundry.data.fields.BooleanField({
-			initial: false,
-			label: "Savvy Teardown",
-			hint: "Use Savvy Teardown (cannot be used on existing salvage)",
-		}),
-		salvageMaximumCP: new foundry.data.fields.NumberField({
-			required: true,
-			integer: true,
-			min: 0,
-			positive: true,
-		}),
-		salvageMaximumSP: new foundry.data.fields.NumberField({
-			required: true,
-			integer: true,
-			min: 0,
-			positive: true,
-		}),
-		salvageMaximumGP: new foundry.data.fields.NumberField({
-			required: true,
-			integer: true,
-			min: 0,
-			positive: true,
-		}),
-		salvageMaximumPP: new foundry.data.fields.NumberField({
-			required: true,
-			integer: true,
-			min: 0,
-			positive: true,
-		}),
-		salvageDuration: new foundry.data.fields.NumberField({
-			required: true,
-			integer: true,
-			min: 1,
-			positive: true,
-		}),
-	});
 
 	protected override _initializeApplicationOptions(
 		options: Partial<ApplicationConfiguration> & SalvageApplicationOptions
 	): ApplicationConfiguration {
 		const data = super._initializeApplicationOptions(options);
-		data.uniqueId = `salvage-Actor-${options.actor.id}`;
+		data.uniqueId = `salvage-actor-${options.actor.id}`;
+		if (options.item && options.lockItem) {
+			data.uniqueId += `-item-${options.item.id}`;
+		}
 		return data;
 	}
 
-	static async handler(this: SalvageApplication, _event: Event, form: HTMLFormElement, formData: FormDataExtended) {
+	static async handler(this: SalvageApplication, _event: Event, _form: HTMLFormElement, _formData: FormDataExtended) {
 		if (!this.item || !this.actor) return;
-		const spendingLimitForLevel = HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level);
-		if (!spendingLimitForLevel) return;
-		const baseIncomeValue = HEROIC_CRAFTING_GATHERED_INCOME.get(this.item.level);
-		if (!baseIncomeValue) return;
 
-		const salvageMaxCoins: Coins = {
-			pp: formData.object.salvageMaximumPP as number | undefined,
-			gp: formData.object.salvageMaximumGP as number | undefined,
-			sp: formData.object.salvageMaximumSP as number | undefined,
-			cp: formData.object.salvageMaximumCP as number | undefined,
-		};
-
-		if (Object.values(salvageMaxCoins).some((x) => x === undefined)) {
-			const maximumInputs = form.querySelectorAll<HTMLInputElement>(".details .maximum input");
-			for (const ele of maximumInputs) {
-				switch (ele.name) {
-					case "salvageMaximumPP":
-						salvageMaxCoins.pp ||= Number.parseInt(ele.value);
-						break;
-					case "salvageMaximumGP":
-						salvageMaxCoins.gp ||= Number.parseInt(ele.value);
-						break;
-					case "salvageMaximumSP":
-						salvageMaxCoins.sp ||= Number.parseInt(ele.value);
-						break;
-					case "salvageMaximumCP":
-						salvageMaxCoins.cp ||= Number.parseInt(ele.value);
-						break;
-					default:
-						break;
-				}
-			}
-		}
-		let incomeSuccessValue, incomeFailureValue;
-		if (formData.object.useSavvyTeardown) {
-			const halfSalvageMax = CoinsPF2eUtility.multCoins(1 / 2, salvageMaxCoins);
-			const dailySpendingLimit = spendingLimitForLevel.day;
-			const baseIncomeSuccessValue = CoinsPF2eUtility.minCoins(halfSalvageMax, dailySpendingLimit);
-			incomeSuccessValue = baseIncomeSuccessValue;
-			incomeFailureValue = new game.pf2e.Coins();
-		} else {
-			const baseIncomeSuccessValue = baseIncomeValue;
-			const baseIncomeFailureValue = CoinsPF2eUtility.multCoins(1 / 2, baseIncomeValue);
-			const craftingRank = this.actor.skills?.crafting?.rank ?? 0;
-			const hasMasterCrafting = craftingRank >= 3;
-			const hasDismantlerFeat = this.actor.items.some((x) => x.slug === "dismantler" && x.type === "feat");
-			const masterCraftingModifier = hasMasterCrafting ? 2 : 1;
-			const dismantlerModifier = hasDismantlerFeat ? 2 : 1;
-			incomeSuccessValue = CoinsPF2eUtility.multCoins(
-				dismantlerModifier,
-				CoinsPF2eUtility.multCoins(masterCraftingModifier, baseIncomeSuccessValue)
-			);
-			incomeFailureValue = CoinsPF2eUtility.multCoins(
-				dismantlerModifier,
-				CoinsPF2eUtility.multCoins(masterCraftingModifier, baseIncomeFailureValue)
-			);
-		}
+		const incomeData = this.getIncomeData();
 
 		this.result = {
-			savvyTeardown: formData.object.useSavvyTeardown as boolean,
-			max: new game.pf2e.Coins(salvageMaxCoins),
-			duration: formData.object.salvageDuration as number,
+			savvyTeardown: this.formData.useSavvyTeardown,
+			max: new game.pf2e.Coins(this.formData.salvageMax),
+			duration: this.formData.salvageDuration,
 			income: {
-				success: incomeSuccessValue,
-				failure: incomeFailureValue,
+				success: new game.pf2e.Coins(incomeData.success!.value),
+				failure: new game.pf2e.Coins(incomeData.failure!.value),
 			},
 			actor: this.actor,
 			item: this.item,
 		};
-	}
-
-	override async render(options?: boolean | ApplicationRenderOptions): Promise<this> {
-		await this.verifyItemExistence();
-		return await super.render(options);
-	}
-
-	private async verifyItemExistence() {
-		if (!this.item) return;
-		this.item =
-			(await this.getItem({
-				type: "item",
-				uuid: this.item.uuid,
-			})) ?? undefined;
-	}
-
-	override async _onFirstRender(context: object, options: ApplicationRenderOptions) {
-		await super._onFirstRender(context, options);
-		this.actor.apps[this.id] = this;
-	}
-
-	protected override _onClose(options: ApplicationClosingOptions): void {
-		super._onClose(options);
-		this.callback(this.result);
-		delete this.actor.apps[this.id];
 	}
 
 	private static async useSavvyTeardownClick(this: SalvageApplication, event: Event, _target: HTMLElement) {
@@ -224,6 +178,78 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		});
 	}
 
+	override async _onFirstRender(context: object, options: ApplicationRenderOptions) {
+		await super._onFirstRender(context, options);
+		this.actor.apps[this.id] = this;
+	}
+
+	protected override _onClose(options: ApplicationClosingOptions): void {
+		super._onClose(options);
+		this.callback(this.result);
+		delete this.actor.apps[this.id];
+	}
+
+	override async _onRender(context: object, options: ApplicationRenderOptions) {
+		super._onRender(context, options);
+		new foundry.applications.ux.DragDrop.implementation({
+			dropSelector: ".drop-item-zone",
+			callbacks: {
+				drop: (event: DragEvent) => {
+					this.onDrop(event);
+				},
+			},
+		}).bind(this.element);
+
+		for (const input of this.element.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
+			'[data-action="update-input-manual"]'
+		)) {
+			input.addEventListener(input.type === "checkbox" ? "click" : "change", this.manualUpdateInput.bind(this));
+		}
+
+		this.updateDetails({ setDefaultSalvageMax: true });
+	}
+
+	private manualUpdateInput(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const totalPath = target.name;
+		const pathSegments = totalPath.split(".");
+		const value = Number.parseInt(target.value);
+
+		switch (pathSegments[0]) {
+			case "salvageDuration": {
+				this.formData.salvageDuration = value;
+				break;
+			}
+			case "useSavvyTeardown": {
+				this.formData.useSavvyTeardown = target.checked;
+				break;
+			}
+			case "salvageMax": {
+				this.formData.salvageMax[pathSegments[1] as DENOMINATION] = value;
+				this.enforceMax();
+				break;
+			}
+			default:
+				break;
+		}
+
+		this.updateDetails();
+		this.render();
+	}
+
+	private enforceMax() {
+		if (!this.item) {
+			this.formData.salvageMax = {};
+			return;
+		}
+		if (this.isItemSalvage()) return;
+
+		this.formData.salvageMax = SignedCoinsPF2e.minCoins(
+			SignedCoinsPF2e.multiplyCoins(0.75, this.item.price.value),
+			this.formData.salvageMax
+		).toCoinsPF2e();
+	}
+
 	/**
 	 * Callback actions which occur when a dragged element is dropped on a target.
 	 * @param {DragEvent} event       The originating DragEvent
@@ -239,60 +265,52 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			this.actor ??= item.parent;
 			this.item = item;
 		}
-		this.updateDetails({ useDefaultSalvageMax: true });
+
+		this.updateDetails({ setDefaultSalvageMax: true });
+		this.render();
 	}
 
-	private updateDetails(options?: { useDefaultSalvageMax: boolean }) {
-		const detailsDiv = this.element.querySelector(".details") as HTMLDivElement;
+	private updateDetails(options?: { setDefaultSalvageMax: boolean }) {
 		if (!this.item) {
-			detailsDiv.classList.add("hide");
+			this.renderData.hideDetails = true;
 			return;
 		}
-		if (!this.actor) return;
-		const spendingLimitForLevel = HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level);
-		if (!spendingLimitForLevel) return;
-		const baseIncomeValue = new game.pf2e.Coins(HEROIC_CRAFTING_GATHERED_INCOME.get(this.item.level));
-		if (!baseIncomeValue) return;
 
-		this.extractDragDropDiv();
+		if (options?.setDefaultSalvageMax) this.setDefaultSalvageMax();
 
-		const isSalvage = this.item.slug === SALVAGE_MATERIAL_SLUG;
-		const salvageMax = options?.useDefaultSalvageMax
-			? this.getDefaultSalvageMax(isSalvage, detailsDiv)
-			: this.getSalvageMaxFromInputs(detailsDiv);
+		this.updateSavvyTeardownData();
 
-		const hasSavvyTeardownFeat = this.actor.items.some((x) => x.slug === "savvy-teardown" && x.type === "feat");
-		const savvyTeardownCheckBox = detailsDiv.querySelector("#salvage-details-useSavvyTeardown") as HTMLInputElement;
-		const savvyTeardownEles = detailsDiv.querySelectorAll(".savvy-teardown");
-		this.updateSavvyTeardownEles(isSalvage, hasSavvyTeardownFeat, savvyTeardownCheckBox, savvyTeardownEles);
-		const useSavvyTeardown = savvyTeardownCheckBox.checked && !isSalvage && hasSavvyTeardownFeat;
+		this.renderData.incomeData = this.getIncomeData();
 
-		const { tooltipSuccessText, tooltipFailureText, incomeSuccessString, incomeFailureString } = useSavvyTeardown
-			? this.getSavvyTeardownStrings(salvageMax, spendingLimitForLevel)
-			: this.getSalvageStrings(baseIncomeValue);
-
-		const salvageIncomeSuccessDiv = detailsDiv.querySelector(".income #salvage-success-income") as HTMLDivElement;
-		salvageIncomeSuccessDiv.textContent = incomeSuccessString;
-		salvageIncomeSuccessDiv.dataset.tooltip = tooltipSuccessText;
-		const salvageIncomeFailureInput = detailsDiv.querySelector(".income #salvage-failure-income") as HTMLDivElement;
-		salvageIncomeFailureInput.textContent = incomeFailureString;
-		salvageIncomeFailureInput.dataset.tooltip = tooltipFailureText;
-
-		const salvageButton = this.element.querySelector(".footer-button-panel .salvage-button") as HTMLButtonElement;
-		salvageButton.disabled = !this.item;
-
-		const salvageDurationEles = detailsDiv.querySelectorAll(".duration");
-		if (useSavvyTeardown) {
-			salvageDurationEles.forEach((ele) => ele.classList.add("hide"));
-		} else {
-			salvageDurationEles.forEach((ele) => ele.classList.remove("hide"));
-		}
-
-		detailsDiv.classList.remove("hide");
+		this.renderData.hideDetails = false;
 	}
 
-	private getSalvageStrings(baseIncomeValue: CoinsPF2e) {
-		if (!this.actor) return { incomeSuccessString: "", incomeFailureString: "" }; // This should never happen
+	private getIncomeData(): SalvageApplicationRenderDataIncomeData {
+		return this.formData.useSavvyTeardown ? this.getSavvyTeardownIncomeData() : this.getSalvageIncomeData();
+	}
+
+	private hasSavvyTeardownFeat() {
+		return this.actor.itemTypes.feat.some((x) => x.slug === "savvy-teardown");
+	}
+
+	private isItemSalvage() {
+		return this.item?.slug === SALVAGE_MATERIAL_SLUG;
+	}
+
+	private getSalvageIncomeData(): SalvageApplicationRenderDataIncomeData {
+		if (!this.item || !this.actor) {
+			return {
+				success: { content: "", tooltip: "", value: {} },
+				failure: { content: "", tooltip: "", value: {} },
+			};
+		}
+		const baseIncomeValue = new game.pf2e.Coins(HEROIC_CRAFTING_GATHERED_INCOME.get(this.item.level));
+		if (!baseIncomeValue) {
+			return {
+				success: { content: "", tooltip: "", value: {} },
+				failure: { content: "", tooltip: "", value: {} },
+			};
+		}
 
 		const craftingRank = this.actor.skills?.crafting?.rank ?? 0;
 		const hasMasterCrafting = craftingRank >= 3;
@@ -319,14 +337,29 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		if (hasDismantlerFeat) tooltipTextArray.push("Dismantler Feat (×2)");
 		const tooltipSuccessText = [`Base: ${baseIncomeSuccessValue}`].concat(tooltipTextArray).join("<br>");
 		const tooltipFailureText = [`Base: ${baseIncomeFailureValue}`].concat(tooltipTextArray).join("<br>");
-		return { incomeSuccessString, incomeFailureString, tooltipSuccessText, tooltipFailureText };
+
+		return {
+			success: { content: incomeSuccessString, tooltip: tooltipSuccessText, value: incomeSuccessValue },
+			failure: { content: incomeFailureString, tooltip: tooltipFailureText, value: incomeFailureValue },
+		};
 	}
 
-	private getSavvyTeardownStrings(
-		salvageMax: CoinsPF2e,
-		spendingLimitForLevel: HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD
-	) {
-		const halfSalvageMax = CoinsPF2eUtility.multCoins(0.5, salvageMax);
+	private getSavvyTeardownIncomeData(): SalvageApplicationRenderDataIncomeData {
+		if (!this.actor) {
+			return {
+				success: { content: "", tooltip: "", value: {} },
+				failure: { content: "", tooltip: "", value: {} },
+			};
+		}
+		const spendingLimitForLevel = HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level);
+		if (!spendingLimitForLevel) {
+			return {
+				success: { content: "", tooltip: "", value: {} },
+				failure: { content: "", tooltip: "", value: {} },
+			};
+		}
+
+		const halfSalvageMax = CoinsPF2eUtility.multCoins(0.5, this.formData.salvageMax);
 		const dailySpendingLimit = new game.pf2e.Coins(spendingLimitForLevel.day);
 		const baseIncomeSuccessValue = CoinsPF2eUtility.minCoins(halfSalvageMax, dailySpendingLimit);
 		const incomeSuccessValue = baseIncomeSuccessValue;
@@ -344,98 +377,34 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			tooltipSuccessText += `${dailySpendingLimit.toString()}`;
 		}
 		const tooltipFailureText = `Base: ${incomeFailureString}`;
-		return { incomeSuccessString, incomeFailureString, tooltipSuccessText, tooltipFailureText };
+
+		return {
+			success: { content: incomeSuccessString, tooltip: tooltipSuccessText, value: incomeSuccessValue },
+			failure: { content: incomeFailureString, tooltip: tooltipFailureText, value: incomeFailureValue },
+		};
 	}
 
-	private updateSavvyTeardownEles(
-		isSalvage: boolean,
-		hasSavvyTeardownFeat: boolean,
-		savvyTeardownCheckBox: HTMLInputElement,
-		savvyTeardownEles: NodeListOf<Element>
-	) {
-		savvyTeardownCheckBox.disabled = isSalvage || !hasSavvyTeardownFeat;
-
-		if (isSalvage || !hasSavvyTeardownFeat) {
-			savvyTeardownCheckBox.checked = false;
-			savvyTeardownEles.forEach((ele) => ele.classList.add("hide"));
-		} else {
-			savvyTeardownEles.forEach((ele) => ele.classList.remove("hide"));
-		}
+	private updateSavvyTeardownData() {
+		this.renderData.hideSavvyTeardown = this.isItemSalvage() || !this.hasSavvyTeardownFeat();
+		this.formData.useSavvyTeardown &&= !this.renderData.hideSavvyTeardown;
+		this.renderData.hideSalvageDuration = this.formData.useSavvyTeardown;
 	}
 
-	private getSalvageMaxFromInputs(detailsDiv: HTMLDivElement): CoinsPF2e {
-		const maximumInputs = detailsDiv.querySelectorAll<HTMLInputElement>(".maximum input");
-		const coins: Coins = {};
-		for (const ele of maximumInputs) {
-			switch (ele.name) {
-				case "salvageMaximumPP":
-					coins.pp = Number.parseInt(ele.value);
-					break;
-				case "salvageMaximumGP":
-					coins.gp = Number.parseInt(ele.value);
-					break;
-				case "salvageMaximumSP":
-					coins.sp = Number.parseInt(ele.value);
-					break;
-				case "salvageMaximumCP":
-					coins.cp = Number.parseInt(ele.value);
-					break;
-				default:
-					break;
-			}
-		}
-		return new game.pf2e.Coins(coins);
-	}
+	private setDefaultSalvageMax() {
+		if (!this.item) return new game.pf2e.Coins();
 
-	private getDefaultSalvageMax(isSalvage: boolean, detailsDiv: HTMLDivElement): CoinsPF2e {
-		if (!this.item) return new game.pf2e.Coins(); // This should never happen
-
-		const salvageMaxCopper = isSalvage
+		const salvageMaxCopper = this.isItemSalvage()
 			? this.item.price.value.copperValue
 			: Math.floor(this.item.price.value.copperValue / 2);
 		const salvageMaxCoins = CoinsPF2eUtility.copperValueToCoins(salvageMaxCopper);
 
-		const maximumInputs = detailsDiv.querySelectorAll<HTMLInputElement>(".maximum input");
-		for (const ele of maximumInputs) {
-			let value = 0;
-			switch (ele.name) {
-				case "salvageMaximumPP":
-					value = salvageMaxCoins.pp ?? 0;
-					break;
-				case "salvageMaximumGP":
-					value = salvageMaxCoins.gp ?? 0;
-					break;
-				case "salvageMaximumSP":
-					value = salvageMaxCoins.sp ?? 0;
-					break;
-				case "salvageMaximumCP":
-					value = salvageMaxCoins.cp ?? 0;
-					break;
-				default:
-					break;
-			}
-			ele.value = value.toString();
-			ele.disabled = isSalvage;
-		}
-		return salvageMaxCoins;
+		this.formData.salvageMax = salvageMaxCoins;
+		this.renderData.disableMoneyGroupInputs = this.isItemSalvage();
 	}
 
-	private extractDragDropDiv() {
-		if (!this.item) return;
-
-		const dragDropDiv = this.element.querySelector<HTMLDivElement>(".drop-item-zone");
-		if (!dragDropDiv) return;
-
-		const itemIconImg = dragDropDiv.querySelector<HTMLImageElement>(".item-icon");
-		if (itemIconImg) itemIconImg.src = this.item.img;
-		const itemNameSpan = dragDropDiv.querySelector<HTMLSpanElement>(".item-name");
-		if (itemNameSpan) itemNameSpan.textContent = this.item.name;
-
-		const itemLevelSpan = dragDropDiv.querySelector<HTMLSpanElement>(".item-level");
-		if (itemLevelSpan) itemLevelSpan.textContent = String(this.item.level).padStart(2, "0");
-	}
-
-	async getItem(data: Record<string, JSONValue>): Promise<PhysicalItemPF2e<CharacterPF2eHeroicCrafting> | null> {
+	private async getItem(
+		data: Record<string, JSONValue>
+	): Promise<PhysicalItemPF2e<CharacterPF2eHeroicCrafting> | null> {
 		if (typeof data.type === "string" && data.type?.toLowerCase() != "item") {
 			ui.notifications.info("Only items can be salvaged");
 			return null;
@@ -476,51 +445,10 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		return item;
 	}
 
-	override async _onRender(context: object, options: ApplicationRenderOptions) {
-		super._onRender(context, options);
-		new foundry.applications.ux.DragDrop.implementation({
-			dropSelector: ".drop-item-zone",
-			callbacks: {
-				drop: (event: DragEvent) => {
-					this.onDrop(event);
-				},
-			},
-		}).bind(this.element);
-		const numberFields = this.element.querySelectorAll(".maximum input");
-		for (const input of numberFields) {
-			input.addEventListener("change", () => this.updateDetails());
-		}
-		this.updateDetails({ useDefaultSalvageMax: true });
-	}
-
 	override async _prepareContext(options: ApplicationRenderOptions) {
 		const data = await super._prepareContext(options);
 
-		const buttons = [
-			{
-				type: "submit",
-				icon: "fa-sharp fa-solid fa-recycle",
-				label: "Salvage",
-				cssClass: "salvage-button",
-				disabled: true,
-			},
-			{
-				type: "button",
-				icon: "fa-solid fa-xmark",
-				label: "Cancel",
-				cssClass: "cancel-button",
-				action: "close",
-			},
-		];
-		const fields = SalvageApplication.SCHEMA.fields;
-
-		return Object.assign(data, {
-			buttons,
-			fields,
-			datasets: {
-				useSavvyTeardown: { action: "on-use-savvy-teardown-click" },
-			},
-		});
+		return Object.assign(data, {});
 	}
 
 	override async _preparePartContext(
@@ -529,6 +457,48 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		_options: HandlebarsRenderOptions
 	) {
 		context.partId = `${this.id}-${partId}`;
+		switch (partId as SalvageApplicationPart) {
+			case SalvageApplicationPart.DRAG_DROP:
+				context = {
+					...context,
+					item: {
+						img: this.item?.img ?? "systems/pf2e/icons/actions/craft/unknown-item.webp",
+						name: this.item?.name ?? "Drag item here...",
+						level: this.item ? String(this.item.level).padStart(2, "0") : "??",
+					},
+				};
+				break;
+			case SalvageApplicationPart.DETAILS:
+				context = {
+					...context,
+					formData: this.formData,
+					renderData: this.renderData,
+				};
+				break;
+			case SalvageApplicationPart.FOOTER:
+				context = {
+					...context,
+					buttons: [
+						{
+							type: "submit",
+							icon: "fa-sharp fa-solid fa-recycle",
+							label: "Salvage",
+							cssClass: "salvage-button",
+							disabled: !this.item,
+						},
+						{
+							type: "button",
+							icon: "fa-solid fa-xmark",
+							label: "Cancel",
+							cssClass: "cancel-button",
+							action: "close",
+						},
+					],
+				};
+				break;
+			default:
+				break;
+		}
 		return context;
 	}
 }

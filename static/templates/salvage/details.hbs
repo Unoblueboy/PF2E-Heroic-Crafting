@@ -1,45 +1,121 @@
-<div class="details">
-    <hr class="savvy-teardown"
+{{log "HEROIC CRAFTING |" this }}
+<div class="details {{#if renderData.hideDetails}}hide{{/if}}">
+    <hr class="savvy-teardown {{#if renderData.hideSavvyTeardown}}hide{{/if}}"
         style="margin:0.5rem 0;">
-    <div class="savvy-teardown standard-form">
+    <div class="savvy-teardown standard-form {{#if renderData.hideSavvyTeardown}}hide{{/if}}">
         <h4>Savvy Teardown</h4>
-        {{formGroup fields.useSavvyTeardown dataset=datasets.useSavvyTeardown rootId=partId}}
+        <div class="form-group">
+            <label for="{{partId}}-useSavvyTeardown">Savvy Teardown</label>
+            <div class="form-fields">
+                <input data-action="update-input-manual"
+                       type="checkbox"
+                       name="useSavvyTeardown"
+                       data-action="on-use-savvy-teardown-click"
+                       id="{{partId}}-useSavvyTeardown"
+                       {{#if formData.useSavvyTeardown}}checked{{/if}}
+                       {{#if renderData.hideSavvyTeardown}}disabled{{/if}}>
+            </div>
+            <p class="hint">Use Savvy Teardown (cannot be used on existing salvage)</p>
+        </div>
     </div>
     <hr style="margin:0.5rem 0;">
     <div class="maximum standard-form">
         <h4>Salvage Maximum</h4>
-        {{formGroup fields.salvageMaximumPP label=(localize 'PF2E.CurrencyPP') value=0 rootId=partId}}
-        {{formGroup fields.salvageMaximumGP label=(localize 'PF2E.CurrencyGP') value=0 rootId=partId}}
-        {{formGroup fields.salvageMaximumSP label=(localize 'PF2E.CurrencySP') value=0 rootId=partId}}
-        {{formGroup fields.salvageMaximumCP label=(localize 'PF2E.CurrencyCP') value=0 rootId=partId}}
+        <div class="form-group">
+            <label for="{{partId}}-salvage-max-pp">{{localize 'PF2E.CurrencyPP'}}</label>
+            <div class="form-fields">
+                <input data-action="update-input-manual"
+                       type="number"
+                       name="salvageMax.pp"
+                       value="{{formData.salvageMax.pp}}"
+                       min="0"
+                       step="1"
+                       id="{{partId}}-salvage-max-pp"
+                       {{#if renderData.disableMoneyGroupInputs}}disabled{{/if}}>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="{{partId}}-salvage-max-gp">{{localize 'PF2E.CurrencyGP'}}</label>
+            <div class="form-fields">
+                <input data-action="update-input-manual"
+                       type="number"
+                       name="salvageMax.gp"
+                       value="{{formData.salvageMax.gp}}"
+                       min="0"
+                       step="1"
+                       id="{{partId}}-salvage-max-gp"
+                       {{#if renderData.disableMoneyGroupInputs}}disabled{{/if}}>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="{{partId}}-salvage-max-sp">{{localize 'PF2E.CurrencySP'}}</label>
+            <div class="form-fields">
+                <input data-action="update-input-manual"
+                       type="number"
+                       name="salvageMax.sp"
+                       value="{{formData.salvageMax.sp}}"
+                       min="0"
+                       step="1"
+                       id="{{partId}}-salvage-max-sp"
+                       {{#if renderData.disableMoneyGroupInputs}}disabled{{/if}}>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="{{partId}}-salvage-max-cp">{{localize 'PF2E.CurrencyCP'}}</label>
+            <div class="form-fields">
+                <input data-action="update-input-manual"
+                       type="number"
+                       name="salvageMax.cp"
+                       value="{{formData.salvageMax.cp}}"
+                       min="0"
+                       step="1"
+                       id="{{partId}}-salvage-max-cp"
+                       {{#if renderData.disableMoneyGroupInputs}}disabled{{/if}}>
+            </div>
+        </div>
     </div>
     <hr style="margin:0.5rem 0;">
     <div class="income">
         <h4>Salvage Income</h4>
         <div class="result-details"
              data-tooltip-direction="UP">
-            <div class="result-group">
-                <span>Success</span>
-                <div class="tooltip"
-                     data-tooltip
-                     id="salvage-success-income"
-                     disabled>
+            {{#if renderData.incomeData.success}}
+                <div class="result-group">
+                    <span>Success</span>
+                    <div class="tooltip"
+                         data-tooltip="{{renderData.incomeData.success.tooltip}}"
+                         id="salvage-success-income">
+                        {{renderData.incomeData.success.content}}
+                    </div>
                 </div>
-            </div>
-            <div class="result-group">
-                <span>Failure</span>
-                <div class="tooltip"
-                     data-tooltip
-                     id="salvage-failure-income"
-                     disabled>
+            {{/if}}
+            {{#if renderData.incomeData.failure}}
+                <div class="result-group">
+                    <span>Failure</span>
+                    <div class="tooltip"
+                         data-tooltip="{{renderData.incomeData.failure.tooltip}}"
+                         id="salvage-failure-income">
+                        {{renderData.incomeData.failure.content}}
+                    </div>
                 </div>
-            </div>
+            {{/if}}
         </div>
     </div>
-    <hr class="duration"
+    <hr class="duration {{#if renderData.hideSalvageDuration}}hide{{/if}}"
         style="margin:0.5rem 0;">
-    <div class="duration standard-form">
+    <div class="duration standard-form {{#if renderData.hideSalvageDuration}}hide{{/if}}">
         <h4>Salvage Duration</h4>
-        {{formGroup fields.salvageDuration label="Hours Worked" value=1 rootId=partId}}
+        <div class="form-group">
+            <label for="{{partId}}-salvageDuration">Hours Worked</label>
+            <div class="form-fields">
+                <input data-action="update-input-manual"
+                       type="number"
+                       name="salvageDuration"
+                       value="{{formData.salvageDuration}}"
+                       min="1"
+                       step="1"
+                       id="{{partId}}-salvageDuration">
+            </div>
+        </div>
     </div>
 </div>

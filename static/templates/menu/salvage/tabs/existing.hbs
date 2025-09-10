@@ -21,8 +21,10 @@
             </li>
             {{#each salvages as | salvage |}}
                 <li class="salvage-item heroic-item"
+                    data-item-uuid="{{salvage.uuid}}"
                     data-item-id="{{salvage.id}}"
-                    data-action="salvage">
+                    data-action="salvage"
+                    data-is-item>
                     <div class="salvage-item-name heroic-item-name">
                         <img src="{{salvage.img}}">
                         <span>{{salvage.name}}</span>
