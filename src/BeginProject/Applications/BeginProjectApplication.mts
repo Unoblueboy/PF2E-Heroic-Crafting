@@ -6,7 +6,6 @@ import {
 	TreasurePF2e,
 	WeaponPF2e,
 } from "../../../types/src/module/item";
-import { Coins, CoinsPF2e } from "../../../types/src/module/item/physical";
 import {
 	ApplicationClosingOptions,
 	ApplicationConfiguration,
@@ -16,9 +15,9 @@ import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/app
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../../Helper/constants.mjs";
-import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
+import { DENOMINATION, UnsignedCoins } from "../../Helper/currency.mjs";
 import { calculateDC } from "../../Helper/dc.mjs";
-import { DENOMINATION } from "../../Helper/signedCoins.mjs";
+import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
 import {
 	BeginProjectStartingValues,
@@ -60,8 +59,8 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		isFormula: boolean;
 		dc: number;
 		batchSize: number;
-		currency: Coins;
-		trove: Coins;
+		currency: UnsignedCoins;
+		trove: UnsignedCoins;
 	};
 
 	constructor(options: BeginProjectApplicationOptions) {
@@ -79,8 +78,8 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			isFormula: options.itemSettings?.formula?.defaultValue ?? false,
 			dc: this.item ? calculateDC(this.item.level, this.item.rarity) : 1,
 			batchSize: getMaxBatchSize(this.item),
-			currency: new game.pf2e.Coins(),
-			trove: new game.pf2e.Coins(),
+			currency: new UnsignedCoinsPF2e(),
+			trove: new UnsignedCoinsPF2e(),
 		};
 
 		if (this.item) {
@@ -250,8 +249,8 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		}
 
 		const breakdown = this.getCurrentStartingValueBreakdown();
-		this.formData.currency = CoinsPF2eUtility.multCoins(scalingFactor, breakdown.currency ?? {});
-		this.formData.trove = CoinsPF2eUtility.multCoins(scalingFactor, breakdown.trove ?? {});
+		this.formData.currency = UnsignedCoinsPF2e.multiplyCoins(scalingFactor, breakdown.currency ?? {});
+		this.formData.trove = UnsignedCoinsPF2e.multiplyCoins(scalingFactor, breakdown.trove ?? {});
 	}
 
 	private async enforceMax(key: "currency" | "trove") {
@@ -259,18 +258,18 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		const curValue = this.getCurrentStartingValue();
 
 		const maxStartingValue = this.getMaxStartingValue();
-		const breakdownData = new game.pf2e.Coins(breakdown[key] ?? {});
+		const breakdownData = new UnsignedCoinsPF2e(breakdown[key] ?? {});
 
-		const preMaterialContribution = CoinsPF2eUtility.subCoins(curValue, breakdownData);
-		const remainingBudgetCopper = CoinsPF2eUtility.subCoins(maxStartingValue, preMaterialContribution);
+		const preMaterialContribution = UnsignedCoinsPF2e.subtractCoins(curValue, breakdownData);
+		const remainingBudgetCopper = UnsignedCoinsPF2e.subtractCoins(maxStartingValue, preMaterialContribution);
 
-		let maxSpend: CoinsPF2e;
+		let maxSpend: UnsignedCoinsPF2e;
 		switch (key) {
 			case "currency":
-				maxSpend = CoinsPF2eUtility.minCoins(this.actor.inventory.coins, remainingBudgetCopper);
+				maxSpend = UnsignedCoinsPF2e.minCoins(this.actor.inventory.coins, remainingBudgetCopper);
 				break;
 			case "trove":
-				maxSpend = CoinsPF2eUtility.minCoins(await MaterialTrove.getValue(this.actor), remainingBudgetCopper);
+				maxSpend = UnsignedCoinsPF2e.minCoins(await MaterialTrove.getValue(this.actor), remainingBudgetCopper);
 				break;
 			default:
 				maxSpend = maxStartingValue;
@@ -282,8 +281,8 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	private ResetStartingValue() {
-		this.formData.currency = new game.pf2e.Coins();
-		this.formData.trove = new game.pf2e.Coins();
+		this.formData.currency = new UnsignedCoinsPF2e();
+		this.formData.trove = new UnsignedCoinsPF2e();
 	}
 
 	private getCurrentStartingValueBreakdown(): BeginProjectStartingValues {
@@ -293,8 +292,8 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		};
 	}
 
-	private getCurrentStartingValue(): CoinsPF2e {
-		return CoinsPF2eUtility.addCoins(this.formData.currency, this.formData.trove);
+	private getCurrentStartingValue(): UnsignedCoinsPF2e {
+		return UnsignedCoinsPF2e.addCoins(this.formData.currency, this.formData.trove);
 	}
 
 	override async _prepareContext(options: ApplicationRenderOptions) {
@@ -357,11 +356,11 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		};
 	}
 
-	private prepareSummaryContext(context: Record<string, unknown>, maxTotalStarting: CoinsPF2e) {
+	private prepareSummaryContext(context: Record<string, unknown>, maxTotalStarting: UnsignedCoinsPF2e) {
 		context.details = {
 			formData: this.formData,
 			totalStarting: {
-				current: CoinsPF2eUtility.addCoins(this.formData.currency, this.formData.trove).toString(),
+				current: UnsignedCoinsPF2e.addCoins(this.formData.currency, this.formData.trove).toString(),
 				max: maxTotalStarting.copperValue === 0 ? "???" : maxTotalStarting.toString(),
 			},
 			batchSizeMax: this.batchSizeMax,
@@ -478,9 +477,9 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		this.batchSizeMax = batchSize;
 	}
 
-	private getMaxStartingValue(): CoinsPF2e {
-		if (!this.item) return new game.pf2e.Coins();
-		const maxStartingValue = CoinsPF2eUtility.multCoins(this.formData.batchSize / 2, this.item.price.value);
+	private getMaxStartingValue(): UnsignedCoinsPF2e {
+		if (!this.item) return new UnsignedCoinsPF2e();
+		const maxStartingValue = UnsignedCoinsPF2e.multiplyCoins(this.formData.batchSize / 2, this.item.price.value);
 		return maxStartingValue;
 	}
 }

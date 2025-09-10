@@ -1,14 +1,14 @@
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
-import { SignedCoins, SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
+import { UnsignedCoins, SignedCoins } from "../Helper/currency.mjs";
 
 export type ProjectCraftMaterialSpent = {
-	trove?: SignedCoins;
-	currency?: SignedCoins;
+	trove?: UnsignedCoins;
+	currency?: UnsignedCoins;
 	treasure?: TreasureMaterialSpent[];
 };
 
 type ProjectCraftProgress = {
-	[x in DegreeOfSuccessString]: SignedCoinsPF2e;
+	[x in DegreeOfSuccessString]: SignedCoins;
 };
 
 export type ProjectCraftDetails = {
@@ -21,7 +21,7 @@ export type ProjectCraftDetails = {
 
 export type TreasureMaterialSpent = {
 	uuid: string;
-	value: SignedCoins;
+	value: UnsignedCoins;
 	quantity?: number;
 	postUseOperation: TreasurePostUseOperation;
 };

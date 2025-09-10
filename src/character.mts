@@ -3,10 +3,10 @@ console.log("Heroic Crafting |", `Begin Importing ${import.meta.url.replace(/.*\
 import { CharacterPF2e } from "../types/src/module/actor";
 import { RuleElementSynthetics } from "../types/src/module/rules";
 import { DegreeOfSuccessString } from "../types/src/module/system/degree-of-success";
-import { SignedCoins } from "./Helper/signedCoins.mjs";
 import { ModifyProgressSynthetic } from "./RuleElement/modifyProgressElement.mjs";
 import { ModifyConstantSynthetic } from "./RuleElement/modifyConstantElement.mjs";
 import { ModifyProgressRuleElementHelper } from "./RuleElement/Helpers/ModifyProgressRuleElementHelper.mjs";
+import { SignedCoins } from "./Helper/currency.mjs";
 
 interface PF2eHeroicCraftingRuleElementSynthetics {
 	testSynthetic?: unknown[];

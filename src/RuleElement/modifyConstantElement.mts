@@ -1,4 +1,3 @@
-import { CoinsPF2e } from "../../types/src/module/item/physical";
 import {
 	ResolvableValueField,
 	RuleElementOptions,
@@ -13,10 +12,10 @@ import {
 	HEROIC_CRAFTING_GATHERED_INCOME,
 	HEROIC_CRAFTING_SPENDING_LIMIT,
 	HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD,
-	HEROIC_CRAFTING_SPENDING_LIMIT_COINSPF2E_RECORD,
+	HEROIC_CRAFTING_SPENDING_LIMIT_UNSIGNEDCOINSPF2E_RECORD,
 } from "../Helper/constants.mjs";
-import { CoinsPF2eUtility } from "../Helper/currency.mjs";
-import { SignedCoins } from "../Helper/signedCoins.mjs";
+import { CoinsPF2eUtility, SignedCoins, UnsignedCoins } from "../Helper/currency.mjs";
+import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 
 type ModifyConstantSchema = RuleElementSchema & {
 	constant: StringField;
@@ -135,15 +134,18 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 		options?: { injectables?: Record<string, unknown>; warn?: boolean } | undefined
 	): T {
 		const heroicCraftingInjectables: {
-			spendingLimit: Map<number, HEROIC_CRAFTING_SPENDING_LIMIT_COINSPF2E_RECORD>;
-			gatheredIncome: Map<number, CoinsPF2e>;
-			actor?: { spendingLimit: HEROIC_CRAFTING_SPENDING_LIMIT_COINSPF2E_RECORD; gatheredIncome: CoinsPF2e };
+			spendingLimit: Map<number, HEROIC_CRAFTING_SPENDING_LIMIT_UNSIGNEDCOINSPF2E_RECORD>;
+			gatheredIncome: Map<number, UnsignedCoins>;
+			actor?: {
+				spendingLimit: HEROIC_CRAFTING_SPENDING_LIMIT_UNSIGNEDCOINSPF2E_RECORD;
+				gatheredIncome: UnsignedCoins;
+			};
 		} = {
 			spendingLimit: new Map(
 				[...HEROIC_CRAFTING_SPENDING_LIMIT.entries()].map(([k, record]) => [k, coinsToCoinsPF2eRecord(record)])
 			),
 			gatheredIncome: new Map(
-				[...HEROIC_CRAFTING_GATHERED_INCOME.entries()].map(([k, record]) => [k, new game.pf2e.Coins(record)])
+				[...HEROIC_CRAFTING_GATHERED_INCOME.entries()].map(([k, record]) => [k, new UnsignedCoinsPF2e(record)])
 			),
 		};
 
@@ -156,7 +158,7 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 						week: {},
 					}
 				),
-				gatheredIncome: new game.pf2e.Coins(HEROIC_CRAFTING_GATHERED_INCOME.get(this.actor.level) ?? {}),
+				gatheredIncome: new UnsignedCoinsPF2e(HEROIC_CRAFTING_GATHERED_INCOME.get(this.actor.level) ?? {}),
 			};
 		}
 
@@ -291,7 +293,7 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 					typeof change === "string" &&
 					["pp", "gp", "sp", "cp"].some((x) => (change as string).includes(x))
 				) {
-					change = game.pf2e.Coins.fromString(change);
+					change = UnsignedCoinsPF2e.fromString(change);
 				}
 				if (!CoinsPF2eUtility.isCoin(change)) {
 					this.failValidation(`${this.value} (${change}) could not resolve to Coins`);
@@ -315,11 +317,11 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 
 function coinsToCoinsPF2eRecord(
 	record: HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD
-): HEROIC_CRAFTING_SPENDING_LIMIT_COINSPF2E_RECORD {
+): HEROIC_CRAFTING_SPENDING_LIMIT_UNSIGNEDCOINSPF2E_RECORD {
 	return {
-		hour: new game.pf2e.Coins(record.hour),
-		day: new game.pf2e.Coins(record.day),
-		week: new game.pf2e.Coins(record.week),
+		hour: new UnsignedCoinsPF2e(record.hour),
+		day: new UnsignedCoinsPF2e(record.day),
+		week: new UnsignedCoinsPF2e(record.week),
 	};
 }
 

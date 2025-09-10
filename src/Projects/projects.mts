@@ -1,11 +1,12 @@
 import { Rarity } from "../../types/src/module/data";
 import { SpellPF2e } from "../../types/src/module/item";
-import { Coins, CoinsPF2e, PhysicalItemPF2e } from "../../types/src/module/item/physical";
+import { PhysicalItemPF2e } from "../../types/src/module/item/physical";
 import { ItemUUID } from "../../types/types/foundry/common/documents/_module.mjs";
 import { itemDataUuid, ProjectItemDetails } from "../BeginProject/types.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { FORMULA_PRICE, MODULE_ID, RARITIES } from "../Helper/constants.mjs";
-import { CoinsPF2eUtility } from "../Helper/currency.mjs";
+import { UnsignedCoins } from "../Helper/currency.mjs";
+import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 
 type PF2eHeroicCraftingFlags = {
 	projects?: Record<string, ProjectItemDetails>;
@@ -110,8 +111,8 @@ export type ProjectContextData = {
 	id: string;
 	dc: number;
 	batchSize: number;
-	value: CoinsPF2e;
-	max: CoinsPF2e;
+	value: UnsignedCoins;
+	max: UnsignedCoins;
 	baseItem: PhysicalItemPF2e;
 	itemLink: string;
 	baseSpell?: SpellPF2e;
@@ -124,7 +125,7 @@ export abstract class AProject implements ProjectItemDetails {
 	dc: number;
 	batchSize: number;
 	itemData: itemDataUuid;
-	value: CoinsPF2e;
+	value: UnsignedCoins;
 	protected baseItemPromise?: Promise<PhysicalItemPF2e>;
 	constructor(projectDetails: ProjectItemDetails, data: { id: string; actor: CharacterPF2eHeroicCrafting }) {
 		this.id = data.id;
@@ -132,7 +133,7 @@ export abstract class AProject implements ProjectItemDetails {
 		this.dc = projectDetails.dc;
 		this.batchSize = projectDetails.batchSize;
 		this.itemData = projectDetails.itemData;
-		this.value = new game.pf2e.Coins(projectDetails.value);
+		this.value = new UnsignedCoinsPF2e(projectDetails.value);
 	}
 
 	get baseItem(): Promise<PhysicalItemPF2e> {
@@ -144,7 +145,7 @@ export abstract class AProject implements ProjectItemDetails {
 
 	abstract get itemName(): Promise<string>;
 
-	abstract get max(): Promise<CoinsPF2e>;
+	abstract get max(): Promise<UnsignedCoins>;
 
 	get img(): Promise<string> {
 		return this.baseItem.then((item) =>
@@ -158,15 +159,15 @@ export abstract class AProject implements ProjectItemDetails {
 
 	abstract createItem(): Promise<PhysicalItemPF2e | undefined>;
 
-	async setValue(value: Coins) {
-		this.value = new game.pf2e.Coins(value);
+	async setValue(value: UnsignedCoins) {
+		this.value = new UnsignedCoinsPF2e(value);
 		this.actor.update({ [`flags.${MODULE_ID}.projects.${this.id}.value`]: value });
 	}
 
 	async updateProject(details: ProjectItemDetails) {
 		this.dc = details.dc;
 		this.batchSize = details.batchSize;
-		this.value = new game.pf2e.Coins(details.value);
+		this.value = new UnsignedCoinsPF2e(details.value);
 		this.itemData = details.itemData;
 		await this.actor.update({ [`flags.${MODULE_ID}.projects.${this.id}`]: details });
 	}
@@ -209,8 +210,8 @@ class Project extends AProject {
 
 	get max() {
 		return this.baseItem.then((item) => {
-			if (this.itemData.isFormula) return new game.pf2e.Coins(FORMULA_PRICE.get(item.level));
-			return CoinsPF2eUtility.multCoins(this.batchSize, item.price.value);
+			if (this.itemData.isFormula) return new UnsignedCoinsPF2e(FORMULA_PRICE.get(item.level));
+			return UnsignedCoinsPF2e.multiplyCoins(this.batchSize, item.price.value);
 		});
 	}
 

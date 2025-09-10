@@ -20,6 +20,7 @@ import {
 	MATERIAL_TROVE_UUID,
 	SALVAGE_MATERIAL_SLUG,
 } from "../Helper/constants.mjs";
+import { UnsignedCoins } from "../Helper/currency.mjs";
 import { calculateDC } from "../Helper/dc.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { ProjectContextData, Projects } from "../Projects/projects.mjs";
@@ -56,8 +57,8 @@ type HeroCraftingMenuOptions = {
 type HeroCraftingMenuCharacterSummaryContext = {
 	actor: CharacterPF2eHeroicCrafting;
 	money: {
-		coinage: CoinsPF2e;
-		materials: CoinsPF2e | undefined;
+		coinage: UnsignedCoins;
+		materials: UnsignedCoins | undefined;
 	};
 };
 

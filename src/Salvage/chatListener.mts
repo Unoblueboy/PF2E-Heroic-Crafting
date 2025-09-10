@@ -2,7 +2,7 @@ import { ChatMessagePF2e } from "../../types/src/module/chat-message/document";
 import { PhysicalItemPF2e } from "../../types/src/module/item";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { SALVAGE_MATERIAL_SLUG } from "../Helper/constants.mjs";
-import { CoinsPF2eUtility } from "../Helper/currency.mjs";
+import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { createSalvage } from "./salvage.mjs";
 
@@ -42,12 +42,12 @@ async function gainSalvageMaterials(data: DOMStringMap) {
 	if (!item) return;
 	if (!item.actor) return;
 
-	const salvageMaxCoins = game.pf2e.Coins.fromString(data.salvageMax ?? "");
+	const salvageMaxCoins = UnsignedCoinsPF2e.fromString(data.salvageMax ?? "");
 	const duration = Number.parseInt(data.duration as string);
-	const income = game.pf2e.Coins.fromString(data.salvageIncome ?? "");
-	const totalIncome = CoinsPF2eUtility.multCoins(duration, income);
+	const income = UnsignedCoinsPF2e.fromString(data.salvageIncome ?? "");
+	const totalIncome = UnsignedCoinsPF2e.multiplyCoins(duration, income);
 
-	const remainingSalvagePrice = CoinsPF2eUtility.subCoins(salvageMaxCoins, totalIncome);
+	const remainingSalvagePrice = UnsignedCoinsPF2e.subtractCoins(salvageMaxCoins, totalIncome);
 	if (item.slug != SALVAGE_MATERIAL_SLUG) {
 		await createSalvage(item, remainingSalvagePrice);
 	} else if (remainingSalvagePrice.copperValue > 0) {
@@ -57,7 +57,7 @@ async function gainSalvageMaterials(data: DOMStringMap) {
 		await item.delete();
 	}
 
-	await MaterialTrove.addValue(item.actor, CoinsPF2eUtility.minCoins(salvageMaxCoins, totalIncome));
+	await MaterialTrove.addValue(item.actor, UnsignedCoinsPF2e.minCoins(salvageMaxCoins, totalIncome));
 }
 
 async function gainSavvyTeardownMaterials(data: DOMStringMap) {
@@ -65,7 +65,7 @@ async function gainSavvyTeardownMaterials(data: DOMStringMap) {
 	const item = await foundry.utils.fromUuid<PhysicalItemPF2e<CharacterPF2eHeroicCrafting>>(data.itemUuid);
 	if (!item) return;
 	if (!item.actor) return;
-	const income = game.pf2e.Coins.fromString(data.salvageIncome ?? "");
+	const income = UnsignedCoinsPF2e.fromString(data.salvageIncome ?? "");
 
 	if (item.quantity > 1) {
 		await item.update({ "system.quantity": item.quantity - 1 });

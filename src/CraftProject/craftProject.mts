@@ -5,6 +5,7 @@ import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-s
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { CharacterPF2eHeroicCrafting, HeroicCraftingProjectHelper } from "../character.mjs";
 import { fractionToPercent } from "../Helper/generics.mjs";
+import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { Projects } from "../Projects/projects.mjs";
 import { CraftProjectApplication } from "./Applications/CraftProjectApplications.mjs";
 import { CraftProjectUtility } from "./craftProjectUtility.mjs";
@@ -57,7 +58,10 @@ export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId
 						id: project.id,
 						max: await project.max,
 						cur: projectCur,
-						percent: fractionToPercent(projectCur.copperValue, projectMax.copperValue),
+						percent: fractionToPercent(
+							UnsignedCoinsPF2e.getCopperValue(projectCur),
+							UnsignedCoinsPF2e.getCopperValue(projectMax)
+						),
 					},
 					itemLink: await foundry.applications.ux.TextEditor.enrichHTML(await project.itemLink, {
 						rollData: item.getRollData(),

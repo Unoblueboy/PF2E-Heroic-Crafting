@@ -1,13 +1,14 @@
-import { CoinsPF2e, PhysicalItemPF2e } from "../../../types/src/module/item/physical";
+import { PhysicalItemPF2e } from "../../../types/src/module/item/physical";
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
+import { UnsignedCoins } from "../../Helper/currency.mjs";
 
 export type SalvageApplicationResult = {
 	savvyTeardown: boolean;
-	max: CoinsPF2e;
+	max: UnsignedCoins;
 	duration: number;
 	income: {
-		success: CoinsPF2e;
-		failure: CoinsPF2e;
+		success: UnsignedCoins;
+		failure: UnsignedCoins;
 	};
 	actor: CharacterPF2eHeroicCrafting;
 	item: PhysicalItemPF2e;

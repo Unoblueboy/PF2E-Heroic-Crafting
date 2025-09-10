@@ -1,10 +1,7 @@
-import { Coins, CoinsPF2e } from "../../types/src/module/item/physical";
+import { DENOMINATIONS, SignedCoins, UnsignedCoins } from "./currency.mjs";
+import { UnsignedCoinsPF2e } from "./unsignedCoins.mjs";
 
-const DENOMINATIONS = ["pp", "gp", "sp", "cp"] as const;
-export type DENOMINATION = (typeof DENOMINATIONS)[number];
-export type SignedCoins = Coins & { isNegative?: boolean };
-
-export class SignedCoinsPF2e {
+export class SignedCoinsPF2e implements SignedCoins {
 	declare cp: number;
 	declare sp: number;
 	declare gp: number;
@@ -29,7 +26,7 @@ export class SignedCoinsPF2e {
 		const other = new SignedCoinsPF2e(coins);
 		const totalCopperValue = this.copperValue + other.copperValue;
 		const includePp = this.pp !== 0 || other.pp !== 0;
-		return SignedCoinsPF2e.copperValueToSignedCoins(totalCopperValue, includePp);
+		return SignedCoinsPF2e.copperValueToCoins(totalCopperValue, includePp);
 	}
 
 	subtract(coins: SignedCoins): SignedCoinsPF2e {
@@ -43,7 +40,7 @@ export class SignedCoinsPF2e {
 
 	multiply(multiplier: number): SignedCoinsPF2e {
 		const copperValue = this.copperValue;
-		return SignedCoinsPF2e.copperValueToSignedCoins(Math.floor(multiplier * copperValue));
+		return SignedCoinsPF2e.copperValueToCoins(Math.floor(multiplier * copperValue));
 	}
 
 	negate(): SignedCoinsPF2e {
@@ -62,11 +59,18 @@ export class SignedCoinsPF2e {
 		);
 	}
 
-	toCoinsPF2e(boundCoins: boolean = true): CoinsPF2e {
+	toUnsignedCoins(boundCoins: boolean = true): UnsignedCoins {
 		if (this.copperValue < 0) {
 			console.warn(`${this} converted to CoinsPF2e, sign has been lost in the process`);
 		}
-		return new game.pf2e.Coins(boundCoins ? SignedCoinsPF2e.maxCoins({}, this) : this);
+		const data = (boundCoins ? SignedCoinsPF2e.maxCoins({}, this) : this).toObject();
+		delete data.isNegative;
+
+		return new UnsignedCoinsPF2e(data as UnsignedCoins);
+	}
+
+	clone() {
+		return new SignedCoinsPF2e(this);
 	}
 
 	static fromString(coinString: string, quantity = 1): SignedCoinsPF2e {
@@ -74,7 +78,7 @@ export class SignedCoinsPF2e {
 		return new SignedCoinsPF2e({ ...coins, isNegative: coinString.startsWith("-") });
 	}
 
-	static copperValueToSignedCoins(copperValue: number, includePp: boolean = false): SignedCoinsPF2e {
+	static copperValueToCoins(copperValue: number, includePp: boolean = false): SignedCoinsPF2e {
 		const isNegative = copperValue < 0;
 		const absCopperValue = Math.abs(copperValue);
 		const pp = includePp ? Math.floor(absCopperValue / 1000) : 0;
@@ -117,7 +121,7 @@ export class SignedCoinsPF2e {
 
 	static multiplyCoins(mult: number, coins: SignedCoins): SignedCoinsPF2e {
 		const copperValue = new SignedCoinsPF2e(coins).copperValue;
-		return this.copperValueToSignedCoins(Math.floor(mult * copperValue));
+		return this.copperValueToCoins(Math.floor(mult * copperValue));
 	}
 
 	static minCoins(...coinsList: SignedCoins[]): SignedCoinsPF2e {
@@ -134,8 +138,19 @@ export class SignedCoinsPF2e {
 		return coinsPF2eList[idx];
 	}
 
+	static boundCoins(coin: SignedCoins, min: SignedCoins, max: SignedCoins) {
+		const boundedCopperValue = Math.min(
+			Math.max(SignedCoinsPF2e.getCopperValue(coin), SignedCoinsPF2e.getCopperValue(min)),
+			SignedCoinsPF2e.getCopperValue(max)
+		);
+
+		return SignedCoinsPF2e.copperValueToCoins(boundedCopperValue);
+	}
+
 	toString(): string {
 		const baseCoin = new game.pf2e.Coins(this);
 		return this.isNegative ? `-${baseCoin.toString()}` : baseCoin.toString();
 	}
+
+	static readonly INFINITY = new SignedCoinsPF2e({ pp: Infinity, gp: Infinity, sp: Infinity, cp: Infinity });
 }

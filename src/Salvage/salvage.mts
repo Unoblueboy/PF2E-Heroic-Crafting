@@ -4,13 +4,13 @@ import { CheckRoll } from "../../types/src/module/system/check";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { StatisticRollParameters } from "../../types/src/module/system/statistic";
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
-import { CoinsPF2eUtility } from "../Helper/currency.mjs";
+import { UnsignedCoins } from "../Helper/currency.mjs";
 import { SALVAGE_MATERIAL_UUID } from "../Helper/constants.mjs";
 import { SalvageApplication } from "./Applications/SalvageApplication.mjs";
 import { SalvageApplicationResult } from "./Applications/types.mjs";
-import { CoinsPF2e } from "../../types/src/module/item/physical";
 import { calculateDC } from "../Helper/dc.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 
 export async function salvage(actor: CharacterPF2eHeroicCrafting, item?: PhysicalItemPF2e, lockItem = false) {
 	const salvageDetails = await SalvageApplication.GetSalvageDetails({ actor: actor, item: item, lockItem: lockItem });
@@ -46,14 +46,17 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 					incomeValue = salvageDetails.income.failure;
 					break;
 				default:
-					incomeValue = new game.pf2e.Coins();
+					incomeValue = new UnsignedCoinsPF2e();
 					break;
 			}
 
 			const fullDuration =
-				incomeValue.copperValue === 0
+				UnsignedCoinsPF2e.getCopperValue(incomeValue) === 0
 					? Infinity
-					: Math.ceil(salvageDetails.max.copperValue / incomeValue.copperValue);
+					: Math.ceil(
+							UnsignedCoinsPF2e.getCopperValue(salvageDetails.max) /
+								UnsignedCoinsPF2e.getCopperValue(incomeValue)
+					  );
 			const flavor = await foundry.applications.handlebars.renderTemplate(
 				"modules/pf2e-heroic-crafting/templates/chat/salvage/result.hbs",
 				{
@@ -136,8 +139,8 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 	}
 }
 
-export async function createSalvage(item: PhysicalItemPF2e, priceValue?: CoinsPF2e) {
-	priceValue ??= CoinsPF2eUtility.multCoins(1 / 2, item.price.value); // Use default salvage value of 50%
+export async function createSalvage(item: PhysicalItemPF2e, priceValue?: UnsignedCoins) {
+	priceValue ??= UnsignedCoinsPF2e.multiplyCoins(1 / 2, item.price.value); // Use default salvage value of 50%
 	const genericSalvage = (await fromUuid(SALVAGE_MATERIAL_UUID)) as TreasurePF2e;
 	const genericSalvageClone = genericSalvage.clone({
 		system: {
@@ -151,7 +154,7 @@ export async function createSalvage(item: PhysicalItemPF2e, priceValue?: CoinsPF
 			},
 		},
 	});
-	if (priceValue.copperValue > 0) {
+	if (UnsignedCoinsPF2e.getCopperValue(priceValue) > 0) {
 		await Item.implementation.create(genericSalvageClone.toObject(), { parent: item.actor });
 	} else {
 		ui.notifications.info(`${item.name} fully salvaged`);

@@ -1,6 +1,6 @@
 import { ActorPF2e } from "../../types/src/module/actor";
 import { ContainerPF2e, TreasurePF2e } from "../../types/src/module/item";
-import { Coins, CoinsPF2e, PhysicalItemPF2e } from "../../types/src/module/item/physical";
+import { Coins, PhysicalItemPF2e } from "../../types/src/module/item/physical";
 import { TreasureSource } from "../../types/src/module/item/treasure/data";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import {
@@ -9,14 +9,16 @@ import {
 	CRAFTING_MATERIAL_UUID,
 	HEROIC_CRAFTING_SPENDING_LIMIT,
 } from "../Helper/constants.mjs";
+import { UnsignedCoins } from "../Helper/currency.mjs";
 import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
+import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 
 import { EditMaterialTroveApplication } from "./Applications/EditMaterialTroveApplication.mjs";
 import { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";
 
 export async function useActorCoins(
 	result: EditMaterialTroveApplicationResult,
-	craftingMaterials: CoinsPF2e,
+	craftingMaterials: UnsignedCoins,
 	actor: CharacterPF2eHeroicCrafting
 ) {
 	if (result.updateActorCoins) {
@@ -38,14 +40,14 @@ export class MaterialTrove {
 
 	private readonly actor: CharacterPF2eHeroicCrafting;
 	private readonly materialTrove: ContainerPF2e;
-	value: CoinsPF2e;
+	value: UnsignedCoins;
 	get contents() {
 		return this.materialTrove.contents;
 	}
 	private constructor(actor: CharacterPF2eHeroicCrafting, materialTrove: ContainerPF2e) {
 		this.actor = actor;
 		this.materialTrove = materialTrove;
-		this.value = new game.pf2e.Coins();
+		this.value = new UnsignedCoinsPF2e();
 	}
 
 	private async initializeGenericCraftingMaterials(): Promise<void> {
@@ -57,8 +59,8 @@ export class MaterialTrove {
 			if (!bulkCraftingMaterials) continue;
 
 			bulkCraftingMaterials.forEach((material) => {
-				const addedValue = SignedCoinsPF2e.multiplyCoins(material.quantity, material.price.value);
-				this.value = SignedCoinsPF2e.addCoins(this.value, addedValue).toCoinsPF2e();
+				const addedValue = UnsignedCoinsPF2e.multiplyCoins(material.quantity, material.price.value);
+				this.value = UnsignedCoinsPF2e.addCoins(this.value, addedValue);
 			});
 
 			const bulk = Number.parseFloat(bulkString);
@@ -151,9 +153,9 @@ export class MaterialTrove {
 		await materialTrove.updateCraftingMaterials(result.newMaterialTroveValue);
 	}
 
-	static async getValue(actor: CharacterPF2eHeroicCrafting, notifyOnFailure: boolean = true): Promise<CoinsPF2e> {
+	static async getValue(actor: CharacterPF2eHeroicCrafting, notifyOnFailure: boolean = true): Promise<UnsignedCoins> {
 		const materialTrove = await MaterialTrove.getMaterialTrove(actor, notifyOnFailure);
-		if (!materialTrove) return new game.pf2e.Coins();
+		if (!materialTrove) return new UnsignedCoinsPF2e();
 
 		return materialTrove.value;
 	}
@@ -180,13 +182,13 @@ export class MaterialTrove {
 		console.debug(
 			`HEROIC CRAFTING | DEBUG | updateCraftingMaterials {pp: ${value.pp}, gp: ${value.gp}, sp: ${value.sp}, cp: ${value.cp}}`
 		);
-		const coinValue = new game.pf2e.Coins(value);
+		const coinValue = new UnsignedCoinsPF2e(value);
 
 		const lightBulkCoins = this.getLightBulkCoins();
 		const lightBulkQuantity = Math.floor(coinValue.copperValue / lightBulkCoins.copperValue);
-		const negligibleBulkCoins = SignedCoinsPF2e.copperValueToSignedCoins(
+		const negligibleBulkCoins = UnsignedCoinsPF2e.copperValueToCoins(
 			coinValue.copperValue % lightBulkCoins.copperValue
-		).toCoinsPF2e();
+		);
 
 		const newDetails: Partial<Record<number, { coins: Coins; quantity: number }>> = {
 			0: { coins: negligibleBulkCoins, quantity: 1 },
@@ -197,7 +199,7 @@ export class MaterialTrove {
 			Object.entries(this.getCraftingMaterials()).map(([bulkString, bulkCraftingMaterials]) => {
 				const bulk = Number.parseFloat(bulkString);
 				return this.getGenericCraftingMaterialUpdates(
-					new game.pf2e.Coins(newDetails[bulk]?.coins ?? {}),
+					new UnsignedCoinsPF2e(newDetails[bulk]?.coins ?? {}),
 					newDetails[bulk]?.quantity || 0,
 					bulkCraftingMaterials,
 					bulk
@@ -228,19 +230,19 @@ export class MaterialTrove {
 	private getLightBulkCoins() {
 		const spendingLimitForLevel = HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level);
 		if (!spendingLimitForLevel) {
-			return new game.pf2e.Coins({});
+			return new UnsignedCoinsPF2e({});
 		}
 
-		return SignedCoinsPF2e.multiplyCoins(1 / 20, spendingLimitForLevel.week).toCoinsPF2e();
+		return UnsignedCoinsPF2e.multiplyCoins(1 / 20, spendingLimitForLevel.week);
 	}
 
 	async add(value: Coins) {
-		const newValue = SignedCoinsPF2e.addCoins(this.value, value).toCoinsPF2e();
+		const newValue = UnsignedCoinsPF2e.addCoins(this.value, value);
 		await this.updateCraftingMaterials(newValue);
 	}
 
 	async subtract(value: Coins) {
-		const newValue = SignedCoinsPF2e.subtractCoins(this.value, value).toCoinsPF2e();
+		const newValue = UnsignedCoinsPF2e.subtractCoins(this.value, value);
 		await this.updateCraftingMaterials(newValue);
 	}
 
@@ -267,7 +269,7 @@ export class MaterialTrove {
 	}
 
 	private async getGenericCraftingMaterialUpdates(
-		value: CoinsPF2e,
+		value: UnsignedCoins,
 		quantity: number,
 		genericCraftingMaterials: TreasurePF2e<CharacterPF2eHeroicCrafting>[] | undefined,
 		bulk: number
@@ -283,7 +285,7 @@ export class MaterialTrove {
 			delete?: string[];
 		} = {};
 
-		const canCreateOrUpdate = value.copperValue > 0 && quantity > 0 && bulk < 1;
+		const canCreateOrUpdate = UnsignedCoinsPF2e.getCopperValue(value) > 0 && quantity > 0 && bulk < 1;
 		if (canCreateOrUpdate && !genericCraftingMaterial) {
 			const data = ((await fromUuid(CRAFTING_MATERIAL_UUID)) as TreasurePF2e).toObject();
 			foundry.utils.mergeObject(
@@ -404,7 +406,7 @@ export class MaterialTrove {
 		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove);
 
 		const craftingMaterials = materialTrove.getCraftingMaterials();
-		const addedValue = SignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
+		const addedValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
 
 		const bulkCraftingMaterials = craftingMaterials[item.system.bulk.value];
 		const noCraftingMaterials = !bulkCraftingMaterials || bulkCraftingMaterials.length == 0;
@@ -412,7 +414,7 @@ export class MaterialTrove {
 			item.system.quantity === 1 &&
 			item.system.price.value.copperValue < materialTrove.getLightBulkCoins().copperValue;
 		if (noCraftingMaterials && itemAutoGenerated) {
-			materialTrove.value = SignedCoinsPF2e.addCoins(materialTrove.value, addedValue).toCoinsPF2e();
+			materialTrove.value = UnsignedCoinsPF2e.addCoins(materialTrove.value, addedValue);
 			return;
 		}
 
@@ -424,13 +426,13 @@ export class MaterialTrove {
 		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreCreateLightBulkGenericCraftingMaterial`);
 		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove);
 		const craftingMaterials = materialTrove.getCraftingMaterials();
-		const addedValue = SignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
+		const addedValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
 
 		const bulkCraftingMaterials = craftingMaterials[item.system.bulk.value];
 		const noCraftingMaterials = !bulkCraftingMaterials || bulkCraftingMaterials.length == 0;
 		const itemAutoGenerated = item.system.price.value.copperValue === materialTrove.getLightBulkCoins().copperValue;
 		if (noCraftingMaterials && itemAutoGenerated) {
-			materialTrove.value = SignedCoinsPF2e.addCoins(materialTrove.value, addedValue).toCoinsPF2e();
+			materialTrove.value = UnsignedCoinsPF2e.addCoins(materialTrove.value, addedValue);
 			return;
 		}
 
@@ -515,8 +517,8 @@ export class MaterialTrove {
 			console.debug(`HEROIC CRAFTING | DEBUG | onPreUpdateItemGenericCraftingMaterialIntoMaterialTrove`);
 		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove);
 
-		const baseItemValue = SignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
-		const newValue = SignedCoinsPF2e.addCoins(materialTrove.value, baseItemValue).toCoinsPF2e();
+		const baseItemValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
+		const newValue = UnsignedCoinsPF2e.addCoins(materialTrove.value, baseItemValue);
 		item.delete();
 		materialTrove.updateCraftingMaterials(newValue);
 		return false;
@@ -530,8 +532,8 @@ export class MaterialTrove {
 			console.debug(`HEROIC CRAFTING | DEBUG | onPreUpdateItemGenericCraftingMaterialOutOfMaterialTrove`);
 		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove);
 
-		const baseItemValue = SignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
-		materialTrove.value = SignedCoinsPF2e.subtractCoins(materialTrove.value, baseItemValue).toCoinsPF2e();
+		const baseItemValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
+		materialTrove.value = UnsignedCoinsPF2e.subtractCoins(materialTrove.value, baseItemValue);
 	}
 
 	private static onPreUpdateItemGenericCraftingMaterialInPlace(
@@ -542,13 +544,13 @@ export class MaterialTrove {
 		if (CONFIG.debug.hooks)
 			console.debug(`HEROIC CRAFTING | DEBUG | onPreUpdateItemGenericCraftingMaterialInPlace`);
 		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove, preUpdateData);
-		const baseItemValue = SignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
+		const baseItemValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
 		const newItemSystemData = foundry.utils.mergeObject(item.system, preUpdateData.system, {
 			inplace: false,
 		});
 
-		const newItemValue = SignedCoinsPF2e.multiplyCoins(newItemSystemData.quantity, newItemSystemData.price.value);
-		const difference = SignedCoinsPF2e.subtractCoins(newItemValue, baseItemValue);
+		const newItemValue = UnsignedCoinsPF2e.multiplyCoins(newItemSystemData.quantity, newItemSystemData.price.value);
+		const difference = UnsignedCoinsPF2e.subtractCoins(newItemValue, baseItemValue);
 		const isAutoGeneratedLightBulk =
 			newItemSystemData.bulk.value === 0.1 &&
 			newItemSystemData.price.value.copperValue === materialTrove.getLightBulkCoins().copperValue;
@@ -557,7 +559,7 @@ export class MaterialTrove {
 			newItemSystemData.quantity === 1 &&
 			newItemSystemData.price.value.copperValue < materialTrove.getLightBulkCoins().copperValue;
 		if (isAutoGeneratedLightBulk || isAutoGeneratedNegligibleBulk) {
-			materialTrove.value = SignedCoinsPF2e.addCoins(materialTrove.value, difference).toCoinsPF2e();
+			materialTrove.value = UnsignedCoinsPF2e.addCoins(materialTrove.value, difference);
 		} else {
 			return false;
 		}
@@ -596,10 +598,8 @@ export class MaterialTrove {
 		if (!materialTrove) return;
 
 		if (item.system.containerId === materialTrove.materialTrove.id) {
-			const totalItemValue = SignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
-			materialTrove.value = new game.pf2e.Coins(
-				SignedCoinsPF2e.subtractCoins(materialTrove.value, totalItemValue)
-			);
+			const totalItemValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
+			materialTrove.value = UnsignedCoinsPF2e.subtractCoins(materialTrove.value, totalItemValue);
 		}
 	}
 

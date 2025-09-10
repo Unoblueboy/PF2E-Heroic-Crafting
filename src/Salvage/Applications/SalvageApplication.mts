@@ -7,7 +7,7 @@ import {
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
-import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
+import { DENOMINATION, UnsignedCoins } from "../../Helper/currency.mjs";
 import {
 	CRAFTING_MATERIAL_SLUG,
 	HEROIC_CRAFTING_GATHERED_INCOME,
@@ -18,7 +18,7 @@ import {
 import { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs";
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 import { DegreeOfSuccessString } from "../../../types/src/module/system/degree-of-success";
-import { DENOMINATION, SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
+import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 enum SalvageApplicationPart {
@@ -81,10 +81,10 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		};
 	}
 
-	private getInitialSalvageMax(): Coins {
+	private getInitialSalvageMax(): UnsignedCoins {
 		if (!this.item) return { pp: 0, gp: 0, sp: 0, cp: 0 };
 		if (this.isItemSalvage()) return this.item.price.value;
-		return SignedCoinsPF2e.multiplyCoins(0.5, this.item.price.value).toCoinsPF2e();
+		return UnsignedCoinsPF2e.multiplyCoins(0.5, this.item.price.value);
 	}
 
 	private initialiseRenderData(): SalvageApplicationRenderData {
@@ -151,11 +151,11 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 
 		this.result = {
 			savvyTeardown: this.formData.useSavvyTeardown,
-			max: new game.pf2e.Coins(this.formData.salvageMax),
+			max: new UnsignedCoinsPF2e(this.formData.salvageMax),
 			duration: this.formData.salvageDuration,
 			income: {
-				success: new game.pf2e.Coins(incomeData.success!.value),
-				failure: new game.pf2e.Coins(incomeData.failure!.value),
+				success: new UnsignedCoinsPF2e(incomeData.success!.value),
+				failure: new UnsignedCoinsPF2e(incomeData.failure!.value),
 			},
 			actor: this.actor,
 			item: this.item,
@@ -244,10 +244,10 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		}
 		if (this.isItemSalvage()) return;
 
-		this.formData.salvageMax = SignedCoinsPF2e.minCoins(
-			SignedCoinsPF2e.multiplyCoins(0.75, this.item.price.value),
+		this.formData.salvageMax = UnsignedCoinsPF2e.minCoins(
+			UnsignedCoinsPF2e.multiplyCoins(0.75, this.item.price.value),
 			this.formData.salvageMax
-		).toCoinsPF2e();
+		);
 	}
 
 	/**
@@ -304,7 +304,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 				failure: { content: "", tooltip: "", value: {} },
 			};
 		}
-		const baseIncomeValue = new game.pf2e.Coins(HEROIC_CRAFTING_GATHERED_INCOME.get(this.item.level));
+		const baseIncomeValue = new UnsignedCoinsPF2e(HEROIC_CRAFTING_GATHERED_INCOME.get(this.item.level));
 		if (!baseIncomeValue) {
 			return {
 				success: { content: "", tooltip: "", value: {} },
@@ -319,14 +319,14 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		const dismantlerModifier = hasDismantlerFeat ? 2 : 1;
 
 		const baseIncomeSuccessValue = baseIncomeValue;
-		const baseIncomeFailureValue = CoinsPF2eUtility.multCoins(1 / 2, baseIncomeValue);
-		const incomeSuccessValue = CoinsPF2eUtility.multCoins(
+		const baseIncomeFailureValue = UnsignedCoinsPF2e.multiplyCoins(1 / 2, baseIncomeValue);
+		const incomeSuccessValue = UnsignedCoinsPF2e.multiplyCoins(
 			dismantlerModifier,
-			CoinsPF2eUtility.multCoins(masterCraftingModifier, baseIncomeSuccessValue)
+			UnsignedCoinsPF2e.multiplyCoins(masterCraftingModifier, baseIncomeSuccessValue)
 		);
-		const incomeFailureValue = CoinsPF2eUtility.multCoins(
+		const incomeFailureValue = UnsignedCoinsPF2e.multiplyCoins(
 			dismantlerModifier,
-			CoinsPF2eUtility.multCoins(masterCraftingModifier, baseIncomeFailureValue)
+			UnsignedCoinsPF2e.multiplyCoins(masterCraftingModifier, baseIncomeFailureValue)
 		);
 
 		const incomeSuccessString = incomeSuccessValue.toString();
@@ -359,11 +359,11 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			};
 		}
 
-		const halfSalvageMax = CoinsPF2eUtility.multCoins(0.5, this.formData.salvageMax);
-		const dailySpendingLimit = new game.pf2e.Coins(spendingLimitForLevel.day);
-		const baseIncomeSuccessValue = CoinsPF2eUtility.minCoins(halfSalvageMax, dailySpendingLimit);
+		const halfSalvageMax = UnsignedCoinsPF2e.multiplyCoins(0.5, this.formData.salvageMax);
+		const dailySpendingLimit = new UnsignedCoinsPF2e(spendingLimitForLevel.day);
+		const baseIncomeSuccessValue = UnsignedCoinsPF2e.minCoins(halfSalvageMax, dailySpendingLimit);
 		const incomeSuccessValue = baseIncomeSuccessValue;
-		const incomeFailureValue = new game.pf2e.Coins();
+		const incomeFailureValue = new UnsignedCoinsPF2e();
 
 		const incomeSuccessString = incomeSuccessValue.toString();
 		const incomeFailureString = incomeFailureValue.toString();
@@ -391,14 +391,11 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 	}
 
 	private setDefaultSalvageMax() {
-		if (!this.item) return new game.pf2e.Coins();
+		if (!this.item) return new UnsignedCoinsPF2e();
 
-		const salvageMaxCopper = this.isItemSalvage()
-			? this.item.price.value.copperValue
-			: Math.floor(this.item.price.value.copperValue / 2);
-		const salvageMaxCoins = CoinsPF2eUtility.copperValueToCoins(salvageMaxCopper);
-
-		this.formData.salvageMax = salvageMaxCoins;
+		this.formData.salvageMax = this.isItemSalvage()
+			? new UnsignedCoinsPF2e(this.item.price.value)
+			: UnsignedCoinsPF2e.multiplyCoins(0.5, this.item.price.value);
 		this.renderData.disableMoneyGroupInputs = this.isItemSalvage();
 	}
 

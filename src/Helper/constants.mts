@@ -1,4 +1,5 @@
-import { Coins, CoinsPF2e } from "../../types/src/module/item/physical";
+import { Coins } from "../../types/src/module/item/physical";
+import { UnsignedCoinsPF2e } from "./unsignedCoins.mjs";
 
 export const MATERIAL_TROVE_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.wtpSAjQwSyPOglzU`;
 export const CRAFTING_MATERIAL_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.UFqgBzSfC8XfuKVg`;
@@ -17,10 +18,10 @@ export type HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD = {
 	week: Coins;
 };
 
-export type HEROIC_CRAFTING_SPENDING_LIMIT_COINSPF2E_RECORD = {
-	hour: CoinsPF2e;
-	day: CoinsPF2e;
-	week: CoinsPF2e;
+export type HEROIC_CRAFTING_SPENDING_LIMIT_UNSIGNEDCOINSPF2E_RECORD = {
+	hour: UnsignedCoinsPF2e;
+	day: UnsignedCoinsPF2e;
+	week: UnsignedCoinsPF2e;
 };
 
 export const HEROIC_CRAFTING_SPENDING_LIMIT: Map<number, HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD> = new Map<

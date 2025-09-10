@@ -1,6 +1,6 @@
 import { ActorPF2e } from "../../types/src/module/actor";
 import { ConsumablePF2e } from "../../types/src/module/item";
-import { CoinsPF2eUtility } from "../Helper/currency.mjs";
+import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { createSalvage } from "../Salvage/salvage.mjs";
 
 export async function junkCollectorOnConsume(item: ConsumablePF2e) {
@@ -9,7 +9,7 @@ export async function junkCollectorOnConsume(item: ConsumablePF2e) {
 	if (item.isTemporary) return;
 	if (!item.system.uses.autoDestroy) return;
 
-	await createSalvage(item, CoinsPF2eUtility.multCoins(1 / 4, item.price.value));
+	await createSalvage(item, UnsignedCoinsPF2e.multiplyCoins(1 / 4, item.price.value));
 }
 
 export function CheckFeat(actor: ActorPF2e, slug: string) {

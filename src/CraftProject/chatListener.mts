@@ -2,9 +2,10 @@ import { ChatMessagePF2e } from "../../types/src/module/chat-message/document";
 import { PhysicalItemPF2e } from "../../types/src/module/item";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
-import { CoinsPF2eUtility } from "../Helper/currency.mjs";
+import { UnsignedCoins } from "../Helper/currency.mjs";
 import { fractionToPercent } from "../Helper/generics.mjs";
-import { SignedCoins, SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
+import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
+import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { AProject, Projects } from "../Projects/projects.mjs";
 import { CraftProjectUtility } from "./craftProjectUtility.mjs";
@@ -40,14 +41,14 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	const totalSpent = await CraftProjectUtility.getTotalCost(craftDetails.materialsSpent);
 	const newProjectTotal: SignedCoinsPF2e = getNewProjectTotal(outcome, project, totalSpent);
 
-	const projectMax = new game.pf2e.Coins(await project.max);
+	const projectMax = new UnsignedCoinsPF2e(await project.max);
 	if (newProjectTotal.copperValue < 0) {
 		await Projects.deleteProject(actor, projectId);
 	} else if (newProjectTotal.copperValue >= projectMax.copperValue) {
 		await project.createItem();
 		await project.delete();
 	} else {
-		await project.setValue(newProjectTotal);
+		await project.setValue(newProjectTotal.toUnsignedCoins());
 	}
 
 	const projectProgressPercent = fractionToPercent(newProjectTotal.copperValue, projectMax.copperValue);
@@ -71,15 +72,15 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	if (flavorHtml) message.update({ flavor: flavorHtml });
 }
 
-function getNewProjectTotal(outcome: string, project: AProject, totalSpent: SignedCoins): SignedCoinsPF2e {
+function getNewProjectTotal(outcome: string, project: AProject, totalSpent: UnsignedCoins): SignedCoinsPF2e {
 	switch (outcome) {
 		case "criticalFailure":
 			return SignedCoinsPF2e.subtractCoins(project.value, totalSpent);
 		case "failure":
-			return SignedCoinsPF2e.addCoins(project.value, SignedCoinsPF2e.multiplyCoins(0.5, totalSpent));
+			return SignedCoinsPF2e.addCoins(project.value, UnsignedCoinsPF2e.multiplyCoins(0.5, totalSpent));
 		case "criticalSuccess":
 		case "success":
-			return SignedCoinsPF2e.addCoins(project.value, SignedCoinsPF2e.multiplyCoins(2, totalSpent));
+			return SignedCoinsPF2e.addCoins(project.value, UnsignedCoinsPF2e.multiplyCoins(2, totalSpent));
 		default:
 			return new SignedCoinsPF2e();
 	}
@@ -117,11 +118,7 @@ async function updateSpentTreasure(item: PhysicalItemPF2e, material: TreasureMat
 async function decreaseTreasureValue(item: PhysicalItemPF2e, material: TreasureMaterialSpent) {
 	const basePrice = item.price.value;
 	const materialSpent = material.value;
-	const newPrice = CoinsPF2eUtility.maxCoins(
-		CoinsPF2eUtility.subCoins(basePrice, materialSpent),
-		new game.pf2e.Coins()
-	);
-
+	const newPrice = UnsignedCoinsPF2e.subtractCoins(basePrice, materialSpent);
 	const baseQuantity = item.quantity;
 	const quantitySpent = material.quantity ?? 1;
 	if (newPrice.copperValue === 0 && baseQuantity === quantitySpent) {

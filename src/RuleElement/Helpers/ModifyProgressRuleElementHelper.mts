@@ -1,4 +1,5 @@
-import { SignedCoins, SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
+import { SignedCoins } from "../../Helper/currency.mjs";
+import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { ModifyProgressSynthetic } from "../modifyProgressElement.mjs";
 
 export class ModifyProgressRuleElementHelper {

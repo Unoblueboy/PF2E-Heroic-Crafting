@@ -4,6 +4,7 @@ import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-s
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { HEROIC_CRAFTING_GATHERED_INCOME } from "../Helper/constants.mjs";
+import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { ForageDcDialog } from "./Applications/ForageDcDialog.mjs";
 import { ForageLocationLevelDialog } from "./Applications/ForageLocationLevelDialog.mjs";
 import { ForageCraftingResourcesRequest, GetDCMessage, RollCheckMessage, SocketMessage } from "./types.mjs";
@@ -83,8 +84,8 @@ async function rollForageCheck(actor: CharacterPF2eHeroicCrafting, data: { dc: n
 	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
 			const forage = ["success", "criticalSuccess"].includes(_outcome ?? "")
-				? new game.pf2e.Coins(HEROIC_CRAFTING_GATHERED_INCOME.get(actor.level))
-				: new game.pf2e.Coins();
+				? new UnsignedCoinsPF2e(HEROIC_CRAFTING_GATHERED_INCOME.get(actor.level))
+				: new UnsignedCoinsPF2e();
 			const flavor = await foundry.applications.handlebars.renderTemplate(
 				"modules/pf2e-heroic-crafting/templates/chat/forage/result.hbs",
 				{

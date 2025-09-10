@@ -1,11 +1,12 @@
-import { Coins, PhysicalItemPF2e } from "../../types/src/module/item/physical";
+import { PhysicalItemPF2e } from "../../types/src/module/item/physical";
+import { UnsignedCoins } from "../Helper/currency.mjs";
 import { Either } from "../Helper/generics.mjs";
 
 export interface ProjectItemDetails {
 	dc: number;
 	batchSize: number;
 	itemData: itemDataUuid;
-	value: Coins;
+	value: UnsignedCoins;
 }
 
 export type itemDataUuid = {
@@ -29,8 +30,8 @@ export type BeginProjectFullDetails = {
 	startingValue: BeginProjectStartingValues;
 };
 export type BeginProjectStartingValues = {
-	currency?: Coins;
-	trove?: Coins;
+	currency?: UnsignedCoins;
+	trove?: UnsignedCoins;
 };
 export type BeginProjectPartialDetails = {
 	type: BeginProjectDetailsType.PARTIAL;

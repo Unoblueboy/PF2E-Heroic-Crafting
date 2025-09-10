@@ -1,6 +1,6 @@
-import { SignedCoins } from "../../Helper/signedCoins.mjs";
+import { UnsignedCoins } from "../../Helper/currency.mjs";
 
 export type EditMaterialTroveApplicationResult = {
-	newMaterialTroveValue: SignedCoins;
+	newMaterialTroveValue: UnsignedCoins;
 	updateActorCoins: boolean;
 };
