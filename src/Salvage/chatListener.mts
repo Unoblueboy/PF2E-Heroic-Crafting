@@ -47,7 +47,7 @@ async function gainSalvageMaterials(data: DOMStringMap) {
 	const income = UnsignedCoinsPF2e.fromString(data.salvageIncome ?? "");
 	const totalIncome = UnsignedCoinsPF2e.multiplyCoins(duration, income);
 
-	const remainingSalvagePrice = UnsignedCoinsPF2e.subtractCoins(salvageMaxCoins, totalIncome);
+	const remainingSalvagePrice = UnsignedCoinsPF2e.subtractCoins(salvageMaxCoins, totalIncome, true);
 	if (item.slug != SALVAGE_MATERIAL_SLUG) {
 		await createSalvage(item, remainingSalvagePrice);
 	} else if (remainingSalvagePrice.copperValue > 0) {

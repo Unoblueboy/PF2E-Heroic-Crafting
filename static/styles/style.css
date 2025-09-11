@@ -67,21 +67,6 @@
 			}
 		}
 	}
-
-	.money-form {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: nowrap;
-		gap: 0.5rem;
-		align-items: flex-end;
-
-		.form-group {
-			display: flex;
-			flex-direction: column;
-			flex-wrap: nowrap;
-			align-items: center;
-		}
-	}
 }
 
 .salvage-dialog {
@@ -149,10 +134,8 @@
 			}
 		}
 
-		.maximum {
-			h4 {
-				margin: 0;
-			}
+		.maximum h4 {
+			margin: 0.5rem 0;
 		}
 
 		.income {
@@ -162,7 +145,7 @@
 
 			.result-details {
 				display: flex;
-				gap: 1em;
+				gap: 0.5rem;
 
 				--input-background-color: var(--color-cool-5);
 				--input-border-color: var(--color-cool-4);
@@ -173,11 +156,13 @@
 					display: flex;
 					flex: 1;
 					flex-direction: column;
+					justify-content: space-between;
 					align-items: center;
 
 					span {
 						color: var(--color-form-label);
 						font-weight: bold;
+						text-align: center;
 					}
 
 					div {
@@ -188,6 +173,7 @@
 						padding: 0 0.5rem;
 						line-height: var(--input-height);
 						width: 100%;
+						flex: 1;
 					}
 				}
 			}
@@ -233,8 +219,8 @@
 	}
 }
 
-.begin-project-dialog div.begin-project-summary .begin-project-craft-summary div.input-group,
-.edit-project-dialog div.edit-project-summary .edit-project-check-summary div.input-group {
+.begin-project-dialog div.begin-project-summary .begin-project-craft-summary div.form-group,
+.edit-project-dialog div.edit-project-summary .edit-project-check-summary div.form-group {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -244,7 +230,7 @@
 		flex: 1;
 	}
 
-	div.input-fields {
+	div.form-fields {
 		flex: 2;
 
 		&.batch-fields {
@@ -351,18 +337,22 @@
 	}
 }
 
-.begin-project-dialog .money-group,
-.craft-project-dialog .money-group,
-.edit-project-dialog .money-group {
+.edit-material-trove-dialog .money-form,
+.begin-project-dialog .money-form,
+.craft-project-dialog .money-form,
+.edit-project-dialog .money-form,
+.salvage-dialog .money-form {
 	display: flex;
 	flex-direction: row;
+	flex-wrap: nowrap;
 	gap: 0.5rem;
 	align-items: center;
 	color: var(--color-form-label);
 
-	.input-group {
+	.form-group {
 		display: flex;
 		flex-direction: column;
+		flex-wrap: nowrap;
 		align-items: center;
 		flex: 1;
 
@@ -370,15 +360,23 @@
 			font-weight: 700;
 		}
 
-		.input-fields {
+		.form-fields {
 			width: 100%;
 		}
 	}
 
-	.input-group:hover {
+	.form-group:hover {
 		label {
 			color: var(--color-form-label-hover);
 		}
+	}
+
+	.no-flex {
+		flex: 0;
+	}
+
+	.align-self-end {
+		align-self: flex-end;
 	}
 }
 

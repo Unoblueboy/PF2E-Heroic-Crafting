@@ -4,9 +4,9 @@
     <div class="begin-project-craft-summary">
         <h4>Crafting Summary</h4>
         {{#if includeIsFormula}}
-            <div class="input-group">
+            <div class="form-group">
                 <label for="summary-is-formula">Is Formula?</label>
-                <div class="input-fields">
+                <div class="form-fields">
                     <input data-action="update-input-manual"
                            class="summary-is-formula"
                            type="checkbox"
@@ -16,9 +16,9 @@
                 </div>
             </div>
         {{/if}}
-        <div class="input-group">
+        <div class="form-group">
             <label for="summary-dc">DC</label>
-            <div class="input-fields">
+            <div class="form-fields">
                 <input data-action="update-input-manual"
                        class="summary-dc"
                        type="number"
@@ -30,9 +30,9 @@
                        required>
             </div>
         </div>
-        <div class="input-group">
+        <div class="form-group">
             <label for="summary-batch-size">Batch Size</label>
-            <div class="input-fields batch-fields">
+            <div class="form-fields batch-fields">
                 <button type="button"
                         data-action="decrease-summary-batch-size">-</button>
                 <input data-action="update-input-manual"
@@ -67,12 +67,11 @@
                          class="item-icon">
                     <span class="item-name">Currency</span>
                 </div>
-                <div class="money-group"
-                     data-action="update-money-group"
+                <div class="money-form"
                      data-item="currency">
-                    <div class="input-group">
+                    <div class="form-group">
                         <label for="beginProject-summary-currency-pp">Platinum</label>
-                        <div class="input-fields">
+                        <div class="form-fields">
                             <input data-action="update-input-manual"
                                    type="number"
                                    min="0"
@@ -82,9 +81,9 @@
                                    id="{{id}}-summary-currency-pp">
                         </div>
                     </div>
-                    <div class="input-group">
+                    <div class="form-group">
                         <label for="beginProject-summary-currency-gp">Gold</label>
-                        <div class="input-fields">
+                        <div class="form-fields">
                             <input data-action="update-input-manual"
                                    type="number"
                                    min="0"
@@ -94,9 +93,9 @@
                                    id="{{id}}-summary-currency-gp">
                         </div>
                     </div>
-                    <div class="input-group">
+                    <div class="form-group">
                         <label for="beginProject-summary-currency-sp">Silver</label>
-                        <div class="input-fields">
+                        <div class="form-fields">
                             <input data-action="update-input-manual"
                                    type="number"
                                    min="0"
@@ -106,9 +105,9 @@
                                    id="{{id}}-summary-currency-sp">
                         </div>
                     </div>
-                    <div class="input-group">
+                    <div class="form-group">
                         <label for="beginProject-summary-currency-cp">Copper</label>
-                        <div class="input-fields">
+                        <div class="form-fields">
                             <input data-action="update-input-manual"
                                    type="number"
                                    min="0"
@@ -128,12 +127,11 @@
                              class="item-icon">
                         <span class="item-name">Generic Crafting Materials</span>
                     </div>
-                    <div class="money-group"
-                         data-action="update-money-group"
+                    <div class="money-form"
                          data-item="trove">
-                        <div class="input-group">
+                        <div class="form-group">
                             <label for="beginProject-summary-trove-pp">Platinum</label>
-                            <div class="input-fields">
+                            <div class="form-fields">
                                 <input data-action="update-input-manual"
                                        type="number"
                                        min="0"
@@ -143,9 +141,9 @@
                                        id="{{id}}-summary-trove-pp">
                             </div>
                         </div>
-                        <div class="input-group">
+                        <div class="form-group">
                             <label for="beginProject-summary-trove-gp">Gold</label>
-                            <div class="input-fields">
+                            <div class="form-fields">
                                 <input data-action="update-input-manual"
                                        type="number"
                                        min="0"
@@ -155,9 +153,9 @@
                                        id="{{id}}-summary-trove-gp">
                             </div>
                         </div>
-                        <div class="input-group">
+                        <div class="form-group">
                             <label for="beginProject-summary-trove-sp">Silver</label>
-                            <div class="input-fields">
+                            <div class="form-fields">
                                 <input data-action="update-input-manual"
                                        type="number"
                                        min="0"
@@ -167,9 +165,9 @@
                                        id="{{id}}-summary-trove-sp">
                             </div>
                         </div>
-                        <div class="input-group">
+                        <div class="form-group">
                             <label for="beginProject-summary-trove-cp">Copper</label>
-                            <div class="input-fields">
+                            <div class="form-fields">
                                 <input data-action="update-input-manual"
                                        type="number"
                                        min="0"

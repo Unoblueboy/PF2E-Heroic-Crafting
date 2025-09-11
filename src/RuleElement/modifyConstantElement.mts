@@ -165,7 +165,7 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 		options = foundry.utils.mergeObject(options ?? {}, {
 			injectables: { heroiccrafting: heroicCraftingInjectables },
 		});
-		console.log("Heroic Crafting | ModifyConstantRuleElement", options);
+		if (CONFIG.debug.ruleElement) console.debug("HEROIC CRAFTING | DEBUG | ModifyConstantRuleElement", options);
 		return super.resolveInjectedProperties(source, options);
 	}
 
@@ -203,7 +203,8 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 			case "upgrade":
 			case "downgrade":
 			case "override": {
-				console.log(`Heroic Crafting | change ${change} ${typeof change}`);
+				if (CONFIG.debug.ruleElement)
+					console.debug(`HEROIC CRAFTING | DEBUG | change ${change} ${typeof change}`);
 				if (typeof change === "string" && Number.isNumeric(change)) {
 					change = Number.parseFloat(change);
 				}
@@ -236,7 +237,7 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 
 		switch (this.operation) {
 			case "override": {
-				console.debug(`Heroic Crafting | change ${change} ${typeof change}`);
+				console.debug(`HEROIC CRAFTING | DEBUG | change ${change} ${typeof change}`);
 				if (typeof change !== "boolean") {
 					this.failValidation(`${this.value} (${change}) could not resolve to a boolean`);
 					return;
@@ -267,7 +268,7 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 		switch (this.operation) {
 			case "multiply":
 			case "divide": {
-				console.log(`Heroic Crafting | change ${change} ${typeof change}`);
+				console.debug(`HEROIC CRAFTING | DEBUG | change ${change} ${typeof change}`);
 				if (typeof change === "string" && Number.isNumeric(change)) {
 					change = Number.parseFloat(change);
 				}

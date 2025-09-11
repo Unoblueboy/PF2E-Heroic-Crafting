@@ -9,6 +9,7 @@ import { FormDataExtended } from "../../../types/types/foundry/client/applicatio
 import { DENOMINATION, UnsignedCoins } from "../../Helper/currency.mjs";
 import {
 	CRAFTING_MATERIAL_SLUG,
+	DEGREE_OF_SUCCESS_STRINGS,
 	HEROIC_CRAFTING_GATHERED_INCOME,
 	HEROIC_CRAFTING_SPENDING_LIMIT,
 	MATERIAL_TROVE_SLUG,
@@ -18,6 +19,8 @@ import { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 import { DegreeOfSuccessString } from "../../../types/src/module/system/degree-of-success";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
+import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
+import { HeroicCraftingProjectHelper } from "../../Projects/helper.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 enum SalvageApplicationPart {
@@ -32,16 +35,28 @@ type SalvageApplicationFormData = {
 	salvageDuration: number;
 };
 
-type SalvageApplicationRenderDataIncomeData = Partial<
-	Record<
-		DegreeOfSuccessString,
-		{
-			content: string;
-			tooltip: string;
-			value: UnsignedCoins;
-		}
-	>
->;
+type SalvageApplicationRenderDataIncomeData = {
+	criticalSuccess?: {
+		content: string;
+		tooltip: string;
+		value: UnsignedCoins;
+	};
+	success: {
+		content: string;
+		tooltip: string;
+		value: UnsignedCoins;
+	};
+	failure: {
+		content: string;
+		tooltip: string;
+		value: UnsignedCoins;
+	};
+	criticalFailure?: {
+		content: string;
+		tooltip: string;
+		value: UnsignedCoins;
+	};
+};
 
 type SalvageApplicationRenderData = {
 	hideDetails: boolean;
@@ -103,7 +118,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 
 	static override readonly DEFAULT_OPTIONS = {
 		classes: ["salvage-dialog"],
-		position: { width: 350 },
+		position: { width: 550 },
 		tag: "form",
 		window: {
 			title: "Select item to salvage",
@@ -153,8 +168,8 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			max: new UnsignedCoinsPF2e(this.formData.salvageMax),
 			duration: this.formData.salvageDuration,
 			income: {
-				success: new UnsignedCoinsPF2e(incomeData.success!.value),
-				failure: new UnsignedCoinsPF2e(incomeData.failure!.value),
+				success: new UnsignedCoinsPF2e(incomeData.success.value),
+				failure: new UnsignedCoinsPF2e(incomeData.failure.value),
 			},
 			actor: this.actor,
 			item: this.item,
@@ -205,7 +220,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			input.addEventListener(input.type === "checkbox" ? "click" : "change", this.manualUpdateInput.bind(this));
 		}
 
-		this.updateDetails({ setDefaultSalvageMax: true });
+		this.updateDetails();
 	}
 
 	private manualUpdateInput(event: Event) {
@@ -313,34 +328,65 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 
 		const craftingRank = this.actor.skills?.crafting?.rank ?? 0;
 		const hasMasterCrafting = craftingRank >= 3;
-		const hasDismantlerFeat = this.actor.items.some((x) => x.slug === "dismantler" && x.type === "feat");
-		const masterCraftingModifier = hasMasterCrafting ? 2 : 1;
-		const dismantlerModifier = hasDismantlerFeat ? 2 : 1;
 
 		const baseIncomeSuccessValue = baseIncomeValue;
 		const baseIncomeFailureValue = UnsignedCoinsPF2e.multiplyCoins(1 / 2, baseIncomeValue);
-		const incomeSuccessValue = UnsignedCoinsPF2e.multiplyCoins(
-			dismantlerModifier,
-			UnsignedCoinsPF2e.multiplyCoins(masterCraftingModifier, baseIncomeSuccessValue)
+
+		const progress = HeroicCraftingProjectHelper.getProjectProgress(
+			this.actor,
+			{
+				criticalSuccess: UnsignedCoinsPF2e.multiplyCoins(hasMasterCrafting ? 2 : 1, baseIncomeSuccessValue),
+				success: UnsignedCoinsPF2e.multiplyCoins(hasMasterCrafting ? 2 : 1, baseIncomeSuccessValue),
+				failure: UnsignedCoinsPF2e.multiplyCoins(hasMasterCrafting ? 2 : 1, baseIncomeFailureValue),
+				criticalFailure: UnsignedCoinsPF2e.multiplyCoins(hasMasterCrafting ? 2 : 1, baseIncomeFailureValue),
+			},
+			new Set(["action:salvage"]),
+			true
 		);
-		const incomeFailureValue = UnsignedCoinsPF2e.multiplyCoins(
-			dismantlerModifier,
-			UnsignedCoinsPF2e.multiplyCoins(masterCraftingModifier, baseIncomeFailureValue)
-		);
 
-		const incomeSuccessString = incomeSuccessValue.toString();
-		const incomeFailureString = incomeFailureValue.toString();
+		const tooltipArrays = Object.fromEntries(
+			DEGREE_OF_SUCCESS_STRINGS.map((degree) => [degree, progress.rundownSummary[degree]])
+		) as { [x in DegreeOfSuccessString]: string[] };
 
-		const tooltipTextArray = [];
-		if (hasMasterCrafting) tooltipTextArray.push("Master Crafting Proficiency: (×2)");
-		if (hasDismantlerFeat) tooltipTextArray.push("Dismantler Feat (×2)");
-		const tooltipSuccessText = [`Base: ${baseIncomeSuccessValue}`].concat(tooltipTextArray).join("<br>");
-		const tooltipFailureText = [`Base: ${baseIncomeFailureValue}`].concat(tooltipTextArray).join("<br>");
+		tooltipArrays.criticalSuccess.splice(0, 0, `Base: ${SignedCoinsPF2e.toString(baseIncomeSuccessValue)}`);
+		tooltipArrays.success.splice(0, 0, `Base: ${SignedCoinsPF2e.toString(baseIncomeSuccessValue)}`);
+		tooltipArrays.failure.splice(0, 0, `Base: ${SignedCoinsPF2e.toString(baseIncomeFailureValue)}`);
+		tooltipArrays.criticalFailure.splice(0, 0, `Base: ${SignedCoinsPF2e.toString(baseIncomeFailureValue)}`);
+		if (hasMasterCrafting) {
+			tooltipArrays.criticalSuccess.splice(1, 0, "Master Crafting Proficiency: (×2)");
+			tooltipArrays.success.splice(1, 0, "Master Crafting Proficiency: (×2)");
+			tooltipArrays.failure.splice(1, 0, "Master Crafting Proficiency: (×2)");
+			tooltipArrays.criticalFailure.splice(1, 0, "Master Crafting Proficiency: (×2)");
+		}
 
-		return {
-			success: { content: incomeSuccessString, tooltip: tooltipSuccessText, value: incomeSuccessValue },
-			failure: { content: incomeFailureString, tooltip: tooltipFailureText, value: incomeFailureValue },
+		const incomeData: SalvageApplicationRenderDataIncomeData = {
+			success: {
+				content: new SignedCoinsPF2e(progress.success).toString(),
+				tooltip: tooltipArrays.success.join("<br>"),
+				value: new SignedCoinsPF2e(progress.success).toUnsignedCoins(),
+			},
+			failure: {
+				content: new SignedCoinsPF2e(progress.failure).toString(),
+				tooltip: tooltipArrays.failure.join("<br>"),
+				value: new SignedCoinsPF2e(progress.failure).toUnsignedCoins(),
+			},
 		};
+
+		if (!SignedCoinsPF2e.equal(progress.success, progress.criticalSuccess)) {
+			incomeData.criticalSuccess = {
+				content: new SignedCoinsPF2e(progress.criticalSuccess).toString(),
+				tooltip: tooltipArrays.criticalSuccess.join("<br>"),
+				value: new SignedCoinsPF2e(progress.criticalSuccess).toUnsignedCoins(),
+			};
+		}
+		if (!SignedCoinsPF2e.equal(progress.failure, progress.criticalFailure)) {
+			incomeData.criticalFailure = {
+				content: new SignedCoinsPF2e(progress.criticalFailure).toString(),
+				tooltip: tooltipArrays.criticalFailure.join("<br>"),
+				value: new SignedCoinsPF2e(progress.criticalFailure).toUnsignedCoins(),
+			};
+		}
+		return incomeData;
 	}
 
 	private getSavvyTeardownIncomeData(): SalvageApplicationRenderDataIncomeData {
@@ -361,26 +407,78 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		const halfSalvageMax = UnsignedCoinsPF2e.multiplyCoins(0.5, this.formData.salvageMax);
 		const dailySpendingLimit = new UnsignedCoinsPF2e(spendingLimitForLevel.day);
 		const baseIncomeSuccessValue = UnsignedCoinsPF2e.minCoins(halfSalvageMax, dailySpendingLimit);
-		const incomeSuccessValue = baseIncomeSuccessValue;
-		const incomeFailureValue = new UnsignedCoinsPF2e();
+		const baseIncomeFailureValue = new UnsignedCoinsPF2e();
 
-		const incomeSuccessString = incomeSuccessValue.toString();
-		const incomeFailureString = incomeFailureValue.toString();
+		const progress = HeroicCraftingProjectHelper.getProjectProgress(
+			this.actor,
+			{
+				criticalSuccess: baseIncomeSuccessValue,
+				success: baseIncomeSuccessValue,
+				failure: baseIncomeFailureValue,
+				criticalFailure: baseIncomeFailureValue,
+			},
+			new Set(["action:savvy-teardown"]),
+			true
+		);
 
-		let tooltipSuccessText = `Base: `;
+		const tooltipArrays = Object.fromEntries(
+			DEGREE_OF_SUCCESS_STRINGS.map((degree) => [degree, progress.rundownSummary[degree]])
+		) as { [x in DegreeOfSuccessString]: string[] };
+
 		if (halfSalvageMax.copperValue <= dailySpendingLimit.copperValue) {
-			tooltipSuccessText += `${halfSalvageMax.toString()} `;
-			tooltipSuccessText += `<s>${dailySpendingLimit.toString()}</s>`;
+			tooltipArrays.success.splice(
+				0,
+				0,
+				`Base: ${halfSalvageMax.toString()} <s>${dailySpendingLimit.toString()}</s>`
+			);
+			tooltipArrays.criticalSuccess.splice(
+				0,
+				0,
+				`Base: ${halfSalvageMax.toString()} <s>${dailySpendingLimit.toString()}</s>`
+			);
 		} else {
-			tooltipSuccessText += `<s>${halfSalvageMax.toString()}</s> `;
-			tooltipSuccessText += `${dailySpendingLimit.toString()}`;
+			tooltipArrays.success.splice(
+				0,
+				0,
+				`Base: <s>${halfSalvageMax.toString()}</s> ${dailySpendingLimit.toString()}`
+			);
+			tooltipArrays.criticalSuccess.splice(
+				0,
+				0,
+				`Base: <s>${halfSalvageMax.toString()}</s> ${dailySpendingLimit.toString()}`
+			);
 		}
-		const tooltipFailureText = `Base: ${incomeFailureString}`;
+		tooltipArrays.failure.splice(0, 0, `Base: ${baseIncomeFailureValue.toString()}`);
+		tooltipArrays.criticalFailure.splice(0, 0, `Base: ${baseIncomeFailureValue.toString()}`);
 
-		return {
-			success: { content: incomeSuccessString, tooltip: tooltipSuccessText, value: incomeSuccessValue },
-			failure: { content: incomeFailureString, tooltip: tooltipFailureText, value: incomeFailureValue },
+		const incomeData: SalvageApplicationRenderDataIncomeData = {
+			success: {
+				content: new SignedCoinsPF2e(progress.success).toString(),
+				tooltip: tooltipArrays.success.join("<br>"),
+				value: new SignedCoinsPF2e(progress.success).toUnsignedCoins(),
+			},
+			failure: {
+				content: new SignedCoinsPF2e(progress.failure).toString(),
+				tooltip: tooltipArrays.failure.join("<br>"),
+				value: new SignedCoinsPF2e(progress.failure).toUnsignedCoins(),
+			},
 		};
+
+		if (!SignedCoinsPF2e.equal(progress.success, progress.criticalSuccess)) {
+			incomeData.criticalSuccess = {
+				content: new SignedCoinsPF2e(progress.criticalSuccess).toString(),
+				tooltip: tooltipArrays.criticalSuccess.join("<br>"),
+				value: new SignedCoinsPF2e(progress.criticalSuccess).toUnsignedCoins(),
+			};
+		}
+		if (!SignedCoinsPF2e.equal(progress.failure, progress.criticalFailure)) {
+			incomeData.criticalFailure = {
+				content: new SignedCoinsPF2e(progress.criticalFailure).toString(),
+				tooltip: tooltipArrays.criticalFailure.join("<br>"),
+				value: new SignedCoinsPF2e(progress.criticalFailure).toUnsignedCoins(),
+			};
+		}
+		return incomeData;
 	}
 
 	private updateSavvyTeardownData() {

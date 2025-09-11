@@ -263,21 +263,20 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		const preMaterialContribution = UnsignedCoinsPF2e.subtractCoins(curValue, breakdownData);
 		const remainingBudgetCopper = UnsignedCoinsPF2e.subtractCoins(maxStartingValue, preMaterialContribution);
 
-		let maxSpend: UnsignedCoinsPF2e;
-		switch (key) {
-			case "currency":
-				maxSpend = UnsignedCoinsPF2e.minCoins(this.actor.inventory.coins, remainingBudgetCopper);
-				break;
-			case "trove":
-				maxSpend = UnsignedCoinsPF2e.minCoins(await MaterialTrove.getValue(this.actor), remainingBudgetCopper);
-				break;
-			default:
-				maxSpend = maxStartingValue;
-				break;
-		}
-		if (breakdownData.copperValue <= maxSpend.copperValue) return;
+		const maxSpend: UnsignedCoinsPF2e = await (async () => {
+			switch (key) {
+				case "currency":
+					return UnsignedCoinsPF2e.minCoins(this.actor.inventory.coins, remainingBudgetCopper);
 
-		this.formData[key] = maxSpend;
+				case "trove":
+					return UnsignedCoinsPF2e.minCoins(await MaterialTrove.getValue(this.actor), remainingBudgetCopper);
+
+				default:
+					return maxStartingValue;
+			}
+		})();
+
+		this.formData[key] = UnsignedCoinsPF2e.minCoins(this.formData[key], maxSpend);
 	}
 
 	private ResetStartingValue() {

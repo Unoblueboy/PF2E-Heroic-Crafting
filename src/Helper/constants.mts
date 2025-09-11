@@ -267,3 +267,4 @@ export const FORMULA_PRICE: Map<number, Coins> = new Map<number, Coins>([
 	[19, { gp: 2000 }],
 	[20, { gp: 3500 }],
 ]);
+export const DEGREE_OF_SUCCESS_STRINGS = ["criticalFailure", "failure", "success", "criticalSuccess"] as const;

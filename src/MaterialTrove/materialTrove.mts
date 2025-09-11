@@ -52,7 +52,7 @@ export class MaterialTrove {
 
 	private async initializeGenericCraftingMaterials(): Promise<void> {
 		const craftingMaterials: Partial<Record<number, TreasurePF2e<CharacterPF2eHeroicCrafting>[]>> =
-			this.getCraftingMaterials();
+			this.getGroupedCraftingMaterials();
 		const deleteIds = [];
 
 		for (const [bulkString, bulkCraftingMaterials] of Object.entries(craftingMaterials)) {
@@ -71,10 +71,14 @@ export class MaterialTrove {
 		await this.updateCraftingMaterials(this.value);
 	}
 
-	private getCraftingMaterials(): Partial<Record<number, TreasurePF2e<CharacterPF2eHeroicCrafting>[]>> {
-		const craftingMaterials = this.materialTrove.contents.filter<TreasurePF2e<CharacterPF2eHeroicCrafting>>(
+	private getCraftingMaterials(): TreasurePF2e<CharacterPF2eHeroicCrafting>[] {
+		return this.materialTrove.contents.filter<TreasurePF2e<CharacterPF2eHeroicCrafting>>(
 			(x) => x?.slug === CRAFTING_MATERIAL_SLUG
 		);
+	}
+
+	private getGroupedCraftingMaterials(): Partial<Record<number, TreasurePF2e<CharacterPF2eHeroicCrafting>[]>> {
+		const craftingMaterials = this.getCraftingMaterials();
 		const groupedCraftingMaterials = Object.groupBy(craftingMaterials, (item) => item.system.bulk.value);
 		for (const bulk of [0, 0.1]) {
 			if (!(bulk in groupedCraftingMaterials)) groupedCraftingMaterials[bulk] = [];
@@ -178,17 +182,14 @@ export class MaterialTrove {
 		await materialTrove.subtract(value);
 	}
 
-	async syncValue() {
-		await this.updateCraftingMaterials(this.value);
-	}
-
-	async updateCraftingMaterials(value: UnsignedCoins) {
+	async updateCraftingMaterials(value?: UnsignedCoins, actorLevel: number = this.actor.level) {
+		value ??= this.value;
 		console.debug(
 			`HEROIC CRAFTING | DEBUG | updateCraftingMaterials {pp: ${value.pp}, gp: ${value.gp}, sp: ${value.sp}, cp: ${value.cp}}`
 		);
 		const coinValue = new UnsignedCoinsPF2e(value);
 
-		const lightBulkCoins = this.getLightBulkCoins();
+		const lightBulkCoins = this.getLightBulkCoins(actorLevel);
 		const lightBulkQuantity = Math.floor(coinValue.copperValue / lightBulkCoins.copperValue);
 		const negligibleBulkCoins = UnsignedCoinsPF2e.copperValueToCoins(
 			coinValue.copperValue % lightBulkCoins.copperValue
@@ -200,13 +201,14 @@ export class MaterialTrove {
 		};
 
 		const operationsByBulk = await Promise.all(
-			Object.entries(this.getCraftingMaterials()).map(([bulkString, bulkCraftingMaterials]) => {
+			Object.entries(this.getGroupedCraftingMaterials()).map(([bulkString, bulkCraftingMaterials]) => {
 				const bulk = Number.parseFloat(bulkString);
 				return this.getGenericCraftingMaterialUpdates(
 					new UnsignedCoinsPF2e(newDetails[bulk]?.coins ?? {}),
 					newDetails[bulk]?.quantity || 0,
 					bulkCraftingMaterials,
-					bulk
+					bulk,
+					actorLevel
 				);
 			})
 		);
@@ -231,8 +233,8 @@ export class MaterialTrove {
 		await this.actor.deleteEmbeddedDocuments("Item", operations.delete);
 	}
 
-	private getLightBulkCoins() {
-		const spendingLimitForLevel = HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level);
+	private getLightBulkCoins(actorLevel: number = this.actor.level) {
+		const spendingLimitForLevel = HEROIC_CRAFTING_SPENDING_LIMIT.get(actorLevel);
 		if (!spendingLimitForLevel) {
 			return new UnsignedCoinsPF2e({});
 		}
@@ -250,12 +252,18 @@ export class MaterialTrove {
 		await this.updateCraftingMaterials(newValue);
 	}
 
-	private getUpdateDetails(price: UnsignedCoins, quantity: number, bulk: number, id?: string) {
+	private getUpdateDetails(
+		price: UnsignedCoins,
+		quantity: number,
+		bulk: number,
+		id?: string,
+		actorLevel: number = this.actor.level
+	) {
 		const updateDetails: EmbeddedDocumentUpdateData = {
 			_id: id ?? foundry.utils.randomID(),
 			system: {
 				level: {
-					value: this.actor.level,
+					value: actorLevel,
 				},
 				price: {
 					value: price,
@@ -276,7 +284,8 @@ export class MaterialTrove {
 		value: UnsignedCoins,
 		quantity: number,
 		genericCraftingMaterials: TreasurePF2e<CharacterPF2eHeroicCrafting>[] | undefined,
-		bulk: number
+		bulk: number,
+		actorLevel: number = this.actor.level
 	): Promise<{
 		create?: TreasureSource;
 		update?: EmbeddedDocumentUpdateData;
@@ -302,7 +311,7 @@ export class MaterialTrove {
 				},
 				{ inplace: true }
 			);
-			foundry.utils.mergeObject(data, this.getUpdateDetails(value, quantity, bulk), {
+			foundry.utils.mergeObject(data, this.getUpdateDetails(value, quantity, bulk, undefined, actorLevel), {
 				inplace: true,
 			});
 			operations.create = data;
@@ -312,7 +321,8 @@ export class MaterialTrove {
 				value,
 				quantity,
 				bulk,
-				genericCraftingMaterial.id
+				genericCraftingMaterial.id,
+				actorLevel
 			);
 			operations.update = updateDetails;
 		} else if (!canCreateOrUpdate) {
@@ -328,6 +338,19 @@ export class MaterialTrove {
 		return operations;
 	}
 
+	private syncValueToContents() {
+		const craftingMaterials: TreasurePF2e<CharacterPF2eHeroicCrafting>[] = this.getCraftingMaterials();
+
+		const value = craftingMaterials.reduce<UnsignedCoins>((accumulator, currentValue) => {
+			return UnsignedCoinsPF2e.addCoins(
+				accumulator,
+				UnsignedCoinsPF2e.multiplyCoins(currentValue.quantity, currentValue.price.value)
+			);
+		}, {});
+
+		this.value = value;
+	}
+
 	static onInit() {
 		MaterialTrove.initialiseHooks();
 	}
@@ -337,7 +360,10 @@ export class MaterialTrove {
 		Hooks.on("preCreateItem", MaterialTrove.onPreCreateItem);
 		Hooks.on("createItem", MaterialTrove.onCreateItem);
 		Hooks.on("preUpdateItem", MaterialTrove.onPreUpdateItem);
+		Hooks.on("updateItem", MaterialTrove.onUpdateItem);
 		Hooks.on("preDeleteItem", MaterialTrove.onPreDeleteItem);
+		Hooks.on("deleteItem", MaterialTrove.onDeleteItem);
+		Hooks.on("preUpdateActor", MaterialTrove.onPreUpdateActor);
 		Hooks.on("updateActor", MaterialTrove.onUpdateActor);
 	}
 
@@ -409,7 +435,7 @@ export class MaterialTrove {
 			console.debug(`HEROIC CRAFTING | DEBUG | onPreCreateNegligibleBulkGenericCraftingMaterial`);
 		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove);
 
-		const craftingMaterials = materialTrove.getCraftingMaterials();
+		const craftingMaterials = materialTrove.getGroupedCraftingMaterials();
 		const addedValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
 
 		const bulkCraftingMaterials = craftingMaterials[item.system.bulk.value];
@@ -429,7 +455,7 @@ export class MaterialTrove {
 	private static onPreCreateLightBulkGenericCraftingMaterial(item: PhysicalItemPF2e, materialTrove: MaterialTrove) {
 		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreCreateLightBulkGenericCraftingMaterial`);
 		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove);
-		const craftingMaterials = materialTrove.getCraftingMaterials();
+		const craftingMaterials = materialTrove.getGroupedCraftingMaterials();
 		const addedValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
 
 		const bulkCraftingMaterials = craftingMaterials[item.system.bulk.value];
@@ -468,6 +494,12 @@ export class MaterialTrove {
 				actor as CharacterPF2eHeroicCrafting,
 				item as ContainerPF2e<CharacterPF2eHeroicCrafting>
 			);
+		}
+		if (item.system.slug === CRAFTING_MATERIAL_SLUG) {
+			const materialTrove = MaterialTrove.troves.get(actor.uuid);
+			if (!materialTrove) return;
+
+			materialTrove.syncValueToContents();
 		}
 	}
 
@@ -554,7 +586,7 @@ export class MaterialTrove {
 		});
 
 		const newItemValue = UnsignedCoinsPF2e.multiplyCoins(newItemSystemData.quantity, newItemSystemData.price.value);
-		const difference = UnsignedCoinsPF2e.subtractCoins(newItemValue, baseItemValue);
+		const difference = SignedCoinsPF2e.subtractCoins(newItemValue, baseItemValue);
 		const isAutoGeneratedLightBulk =
 			newItemSystemData.bulk.value === 0.1 &&
 			newItemSystemData.price.value.copperValue === materialTrove.getLightBulkCoins().copperValue;
@@ -563,9 +595,26 @@ export class MaterialTrove {
 			newItemSystemData.quantity === 1 &&
 			newItemSystemData.price.value.copperValue < materialTrove.getLightBulkCoins().copperValue;
 		if (isAutoGeneratedLightBulk || isAutoGeneratedNegligibleBulk) {
-			materialTrove.value = UnsignedCoinsPF2e.addCoins(materialTrove.value, difference);
+			materialTrove.value = SignedCoinsPF2e.addCoins(materialTrove.value, difference).toUnsignedCoins();
 		} else {
 			return false;
+		}
+	}
+
+	private static onUpdateItem(...args: unknown[]) {
+		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onUpdateItem`);
+		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", ...args);
+
+		const item = args[0] as PhysicalItemPF2e;
+
+		const actor = item.actor;
+		if (!actor) return;
+
+		if (item.system.slug === CRAFTING_MATERIAL_SLUG) {
+			const materialTrove = MaterialTrove.troves.get(actor.uuid);
+			if (!materialTrove) return;
+
+			materialTrove.syncValueToContents();
 		}
 	}
 
@@ -607,19 +656,50 @@ export class MaterialTrove {
 		}
 	}
 
+	private static onDeleteItem(...args: unknown[]) {
+		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onDeleteItem`);
+		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", ...args);
+
+		const item = args[0] as PhysicalItemPF2e;
+
+		const actor = item.actor;
+		if (!actor) return;
+
+		if (item.system.slug === CRAFTING_MATERIAL_SLUG) {
+			const materialTrove = MaterialTrove.troves.get(actor.uuid);
+			if (!materialTrove) return;
+
+			materialTrove.syncValueToContents();
+		}
+	}
+
+	private static onPreUpdateActor(...args: unknown[]) {
+		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreUpdateActor`);
+		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", ...args);
+
+		const actor = args[0] as ActorPF2e;
+		const preUpdateData = args[1] as { system?: { details?: { level?: { value?: number } } } };
+		const _databaseOperation = args[2];
+
+		if (!actor.isOwner) return;
+
+		const materialTrove = MaterialTrove.troves.get(actor.uuid);
+		if (!materialTrove) return;
+
+		const newActorSystemData = foundry.utils.mergeObject(actor.system, preUpdateData.system);
+		materialTrove.updateCraftingMaterials(undefined, newActorSystemData.details.level.value);
+	}
+
 	private static onUpdateActor(...args: unknown[]) {
 		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onUpdateActor`);
 		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", ...args);
 
 		const actor = args[0] as ActorPF2e;
-		const _preUpdateData = args[1] as { system?: { details?: { level?: { value?: number } } } };
-		const _databaseOperation = args[2];
-		const _id = args[3];
 
 		const materialTrove = MaterialTrove.troves.get(actor.uuid);
 		if (!materialTrove) return;
 
-		materialTrove.syncValue();
+		materialTrove.syncValueToContents();
 	}
 
 	static onReady() {
@@ -627,6 +707,7 @@ export class MaterialTrove {
 
 		game.actors.forEach((actor) => {
 			if (actor.type !== "character") return;
+			if (!actor.isOwner) return;
 			MaterialTrove.getMaterialTrove(actor, false);
 		});
 	}

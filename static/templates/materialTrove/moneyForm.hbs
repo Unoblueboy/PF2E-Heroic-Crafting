@@ -1,7 +1,7 @@
 {{log "Heroic Crafting | Money Form" this}}
 <div class="money-form">
     {{#if includeSign}}
-        <div class="form-group">
+        <div class="form-group no-flex align-self-end">
             <button type="button"
                     data-action="negate-cur-value"
                     {{#if (eq trove.baseValue.copperValue 0)}}disabled{{/if}}>{{#if curValue.isNegative}}-{{else}}+{{/if}}</button>

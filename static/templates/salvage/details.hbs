@@ -19,58 +19,60 @@
         </div>
     </div>
     <hr style="margin:0.5rem 0;">
-    <div class="maximum standard-form">
+    <div class="maximum">
         <h4>Salvage Maximum</h4>
-        <div class="form-group">
-            <label for="{{partId}}-salvage-max-pp">{{localize 'PF2E.CurrencyPP'}}</label>
-            <div class="form-fields">
-                <input data-action="update-input-manual"
-                       type="number"
-                       name="salvageMax.pp"
-                       value="{{formData.salvageMax.pp}}"
-                       min="0"
-                       step="1"
-                       id="{{partId}}-salvage-max-pp"
-                       {{#if renderData.disableMoneyGroupInputs}}disabled{{/if}}>
+        <div class="money-form">
+            <div class="form-group">
+                <label for="{{partId}}-salvage-max-pp">{{localize 'PF2E.CurrencyPP'}}</label>
+                <div class="form-fields">
+                    <input data-action="update-input-manual"
+                           type="number"
+                           name="salvageMax.pp"
+                           value="{{formData.salvageMax.pp}}"
+                           min="0"
+                           step="1"
+                           id="{{partId}}-salvage-max-pp"
+                           {{#if renderData.disableMoneyGroupInputs}}disabled{{/if}}>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label for="{{partId}}-salvage-max-gp">{{localize 'PF2E.CurrencyGP'}}</label>
-            <div class="form-fields">
-                <input data-action="update-input-manual"
-                       type="number"
-                       name="salvageMax.gp"
-                       value="{{formData.salvageMax.gp}}"
-                       min="0"
-                       step="1"
-                       id="{{partId}}-salvage-max-gp"
-                       {{#if renderData.disableMoneyGroupInputs}}disabled{{/if}}>
+            <div class="form-group">
+                <label for="{{partId}}-salvage-max-gp">{{localize 'PF2E.CurrencyGP'}}</label>
+                <div class="form-fields">
+                    <input data-action="update-input-manual"
+                           type="number"
+                           name="salvageMax.gp"
+                           value="{{formData.salvageMax.gp}}"
+                           min="0"
+                           step="1"
+                           id="{{partId}}-salvage-max-gp"
+                           {{#if renderData.disableMoneyGroupInputs}}disabled{{/if}}>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label for="{{partId}}-salvage-max-sp">{{localize 'PF2E.CurrencySP'}}</label>
-            <div class="form-fields">
-                <input data-action="update-input-manual"
-                       type="number"
-                       name="salvageMax.sp"
-                       value="{{formData.salvageMax.sp}}"
-                       min="0"
-                       step="1"
-                       id="{{partId}}-salvage-max-sp"
-                       {{#if renderData.disableMoneyGroupInputs}}disabled{{/if}}>
+            <div class="form-group">
+                <label for="{{partId}}-salvage-max-sp">{{localize 'PF2E.CurrencySP'}}</label>
+                <div class="form-fields">
+                    <input data-action="update-input-manual"
+                           type="number"
+                           name="salvageMax.sp"
+                           value="{{formData.salvageMax.sp}}"
+                           min="0"
+                           step="1"
+                           id="{{partId}}-salvage-max-sp"
+                           {{#if renderData.disableMoneyGroupInputs}}disabled{{/if}}>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label for="{{partId}}-salvage-max-cp">{{localize 'PF2E.CurrencyCP'}}</label>
-            <div class="form-fields">
-                <input data-action="update-input-manual"
-                       type="number"
-                       name="salvageMax.cp"
-                       value="{{formData.salvageMax.cp}}"
-                       min="0"
-                       step="1"
-                       id="{{partId}}-salvage-max-cp"
-                       {{#if renderData.disableMoneyGroupInputs}}disabled{{/if}}>
+            <div class="form-group">
+                <label for="{{partId}}-salvage-max-cp">{{localize 'PF2E.CurrencyCP'}}</label>
+                <div class="form-fields">
+                    <input data-action="update-input-manual"
+                           type="number"
+                           name="salvageMax.cp"
+                           value="{{formData.salvageMax.cp}}"
+                           min="0"
+                           step="1"
+                           id="{{partId}}-salvage-max-cp"
+                           {{#if renderData.disableMoneyGroupInputs}}disabled{{/if}}>
+                </div>
             </div>
         </div>
     </div>
@@ -79,12 +81,22 @@
         <h4>Salvage Income</h4>
         <div class="result-details"
              data-tooltip-direction="UP">
+            {{#if renderData.incomeData.criticalSuccess}}
+                <div class="result-group">
+                    <span>Critical Success</span>
+                    <div class="tooltip"
+                         data-tooltip="{{renderData.incomeData.criticalSuccess.tooltip}}"
+                         id="{{partId}}-critical-success-income">
+                        {{renderData.incomeData.criticalSuccess.content}}
+                    </div>
+                </div>
+            {{/if}}
             {{#if renderData.incomeData.success}}
                 <div class="result-group">
                     <span>Success</span>
                     <div class="tooltip"
                          data-tooltip="{{renderData.incomeData.success.tooltip}}"
-                         id="salvage-success-income">
+                         id="{{partId}}-success-income">
                         {{renderData.incomeData.success.content}}
                     </div>
                 </div>
@@ -94,8 +106,18 @@
                     <span>Failure</span>
                     <div class="tooltip"
                          data-tooltip="{{renderData.incomeData.failure.tooltip}}"
-                         id="salvage-failure-income">
+                         id="{{partId}}-failure-income">
                         {{renderData.incomeData.failure.content}}
+                    </div>
+                </div>
+            {{/if}}
+            {{#if renderData.incomeData.criticalFailure}}
+                <div class="result-group">
+                    <span>Critical Failure</span>
+                    <div class="tooltip"
+                         data-tooltip="{{renderData.incomeData.criticalFailure.tooltip}}"
+                         id="{{partId}}-critical-failure-income">
+                        {{renderData.incomeData.criticalFailure.content}}
                     </div>
                 </div>
             {{/if}}

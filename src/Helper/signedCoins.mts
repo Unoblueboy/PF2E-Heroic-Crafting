@@ -142,6 +142,14 @@ export class SignedCoinsPF2e implements SignedCoins {
 		return SignedCoinsPF2e.copperValueToCoins(boundedCopperValue);
 	}
 
+	static equal(coins: SignedCoins, otherCoins: SignedCoins, strict: boolean = false): boolean {
+		if (!strict) return SignedCoinsPF2e.getCopperValue(coins) === SignedCoinsPF2e.getCopperValue(otherCoins);
+		return (
+			DENOMINATIONS.every((d) => (coins[d] || 0) === (otherCoins[d] || 0)) &&
+			!!coins.isNegative === !!otherCoins.isNegative
+		);
+	}
+
 	toString(): string {
 		if (DENOMINATIONS.every((denomination) => !this[denomination])) {
 			return `0 ${game.i18n.localize("PF2E.CurrencyAbbreviations.gp")}`;
@@ -156,6 +164,10 @@ export class SignedCoinsPF2e implements SignedCoins {
 
 		const string = parts.join(", ");
 		return this.isNegative ? `-${string}` : string;
+	}
+
+	static toString(coins: SignedCoins) {
+		return new SignedCoinsPF2e(coins).toString();
 	}
 
 	static readonly INFINITY = new SignedCoinsPF2e({ pp: Infinity, gp: Infinity, sp: Infinity, cp: Infinity });

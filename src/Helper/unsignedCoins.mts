@@ -26,11 +26,12 @@ export class UnsignedCoinsPF2e implements UnsignedCoins {
 		return UnsignedCoinsPF2e.copperValueToCoins(totalCopperValue, includePp);
 	}
 
-	subtract(coins: UnsignedCoins): UnsignedCoinsPF2e {
+	subtract(coins: UnsignedCoins, boundBelow = false): UnsignedCoinsPF2e {
 		const other = new UnsignedCoinsPF2e(coins);
 		const totalCopperValue = this.copperValue - other.copperValue;
+		const boundedCopperValue = boundBelow ? Math.max(totalCopperValue, 0) : totalCopperValue;
 		const includePp = this.pp !== 0 || other.pp !== 0;
-		return UnsignedCoinsPF2e.copperValueToCoins(totalCopperValue, includePp);
+		return UnsignedCoinsPF2e.copperValueToCoins(boundedCopperValue, includePp);
 	}
 
 	multiply(multiplier: number): UnsignedCoinsPF2e {
@@ -92,10 +93,10 @@ export class UnsignedCoinsPF2e implements UnsignedCoins {
 		);
 	}
 
-	static subtractCoins(coins: UnsignedCoins, otherCoins: UnsignedCoins): UnsignedCoinsPF2e {
+	static subtractCoins(coins: UnsignedCoins, otherCoins: UnsignedCoins, boundBelow = false): UnsignedCoinsPF2e {
 		const unsignedCoins = new UnsignedCoinsPF2e(coins);
 		const unsignedOtherCoins = new UnsignedCoinsPF2e(otherCoins);
-		return unsignedCoins.subtract(unsignedOtherCoins);
+		return unsignedCoins.subtract(unsignedOtherCoins, boundBelow);
 	}
 
 	static multiplyCoins(mult: number, coins: UnsignedCoins): UnsignedCoinsPF2e {
@@ -130,5 +131,9 @@ export class UnsignedCoinsPF2e implements UnsignedCoins {
 		}
 
 		return parts.join(", ");
+	}
+
+	static toString(coins: UnsignedCoins): string {
+		return new UnsignedCoinsPF2e(coins).toString();
 	}
 }

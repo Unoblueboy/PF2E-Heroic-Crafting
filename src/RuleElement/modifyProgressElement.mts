@@ -27,6 +27,7 @@ type ModifyProgressMultDivSynthetic = {
 	operation: "multiply" | "divide";
 	change: number;
 	outcome: DegreeOfSuccessString[];
+	label: string;
 };
 
 type ModifyProgressAddSubSynthetic = {
@@ -34,6 +35,7 @@ type ModifyProgressAddSubSynthetic = {
 	operation: "add" | "subtract" | "upgrade" | "downgrade" | "override";
 	change: UnsignedCoins;
 	outcome: DegreeOfSuccessString[];
+	label: string;
 };
 
 export type ModifyProgressSynthetic = ModifyProgressMultDivSynthetic | ModifyProgressAddSubSynthetic;
@@ -127,7 +129,7 @@ export class ModifyProgressRuleElement extends game.pf2e.RuleElement<ModifyProgr
 		options = foundry.utils.mergeObject(options ?? {}, {
 			injectables: { heroiccrafting: heroicCraftingInjectables },
 		});
-		console.log("Heroic Crafting | ModifyProgressRuleElement", options);
+		if (CONFIG.debug.ruleElement) console.debug("HEROIC CRAFTING | DEBUG | ModifyProgressRuleElement", options);
 		return super.resolveInjectedProperties(source, options);
 	}
 
@@ -142,7 +144,8 @@ export class ModifyProgressRuleElement extends game.pf2e.RuleElement<ModifyProgr
 		switch (this.operation) {
 			case "multiply":
 			case "divide": {
-				console.log(`Heroic Crafting | change ${change} ${typeof change}`);
+				if (CONFIG.debug.ruleElement)
+					console.debug(`HEROIC CRAFTING | DEBUG | change ${change} ${typeof change}`);
 				if (typeof change === "string" && Number.isNumeric(change)) {
 					change = Number.parseFloat(change);
 				}
@@ -155,6 +158,7 @@ export class ModifyProgressRuleElement extends game.pf2e.RuleElement<ModifyProgr
 					operation: this.operation,
 					change,
 					outcome: this.outcome,
+					label: this.label,
 				};
 				synthetics.push(synthetic);
 				break;
@@ -179,6 +183,7 @@ export class ModifyProgressRuleElement extends game.pf2e.RuleElement<ModifyProgr
 					operation: this.operation,
 					change,
 					outcome: this.outcome,
+					label: this.label,
 				};
 				synthetics.push(synthetic);
 				break;

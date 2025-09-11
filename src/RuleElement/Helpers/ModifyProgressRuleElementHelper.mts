@@ -1,5 +1,6 @@
 import { SignedCoins } from "../../Helper/currency.mjs";
 import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
+import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 import { ModifyProgressSynthetic } from "../modifyProgressElement.mjs";
 
 export class ModifyProgressRuleElementHelper {
@@ -29,5 +30,26 @@ export class ModifyProgressRuleElementHelper {
 				break;
 		}
 		return {};
+	}
+
+	static getSyntheticSummary(synthetic: ModifyProgressSynthetic): string | undefined {
+		switch (synthetic.operation) {
+			case "multiply":
+				return `${synthetic.label}: ×${synthetic.change}`;
+			case "divide":
+				return `${synthetic.label}: /${synthetic.change}`;
+			case "add":
+				return `${synthetic.label}: +${UnsignedCoinsPF2e.toString(synthetic.change)}`;
+			case "subtract":
+				return `${synthetic.label}: -${UnsignedCoinsPF2e.toString(synthetic.change)}`;
+			case "downgrade":
+				return `${synthetic.label}: ↓${UnsignedCoinsPF2e.toString(synthetic.change)}`;
+			case "upgrade":
+				return `${synthetic.label}: ↑${UnsignedCoinsPF2e.toString(synthetic.change)}`;
+			case "override":
+				return `${synthetic.label}: =${UnsignedCoinsPF2e.toString(synthetic.change)}`;
+			default:
+				return;
+		}
 	}
 }

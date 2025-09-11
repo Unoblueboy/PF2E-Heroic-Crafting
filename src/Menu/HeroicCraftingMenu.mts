@@ -21,6 +21,7 @@ import {
 } from "../Helper/constants.mjs";
 import { UnsignedCoins } from "../Helper/currency.mjs";
 import { calculateDC } from "../Helper/dc.mjs";
+import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { ProjectContextData, Projects } from "../Projects/projects.mjs";
 import { reverseEngineer } from "../ReverseEngineer/reverseEngineer.mjs";
@@ -420,7 +421,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		return {
 			actor: this.actor,
 			money: {
-				coinage: this.actor.inventory.coins,
+				coinage: new UnsignedCoinsPF2e(this.actor.inventory.coins),
 				materials: (await MaterialTrove.getMaterialTrove(this.actor, false))?.value,
 			},
 		};

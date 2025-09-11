@@ -6,7 +6,7 @@ import {
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
-import { CharacterPF2eHeroicCrafting, HeroicCraftingProjectHelper } from "../../character.mjs";
+import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 import {
 	CRAFTING_MATERIAL_SLUG,
 	HEROIC_CRAFTING_SPENDING_LIMIT,
@@ -18,6 +18,7 @@ import { fractionToPercent } from "../../Helper/generics.mjs";
 import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
+import { HeroicCraftingProjectHelper } from "../../Projects/helper.mjs";
 import { AProject, Projects } from "../../Projects/projects.mjs";
 import { CraftProjectUtility } from "../craftProjectUtility.mjs";
 import {

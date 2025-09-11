@@ -261,16 +261,21 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 					this.formData.curValue.edit,
 					this.materialTrove.value
 				);
-				const newActorValue = SignedCoinsPF2e.subtractCoins(this.actor.inventory.coins, coinDifference);
+				const newActorValue = SignedCoinsPF2e.subtractCoins(
+					this.actor.inventory.coins,
+					coinDifference
+				).toUnsignedCoins();
 				context = {
 					...context,
 					trove: {
-						newValue: new SignedCoinsPF2e(this.formData.curValue.edit),
+						newValue: new UnsignedCoinsPF2e(this.formData.curValue.edit),
 						baseValue: this.materialTrove.value,
 					},
 					currency: {
-						newValue: this.formData.updateActorCoins ? newActorValue : this.actor.inventory.coins,
-						baseValue: this.actor.inventory.coins,
+						newValue: this.formData.updateActorCoins
+							? newActorValue
+							: new UnsignedCoinsPF2e(this.actor.inventory.coins),
+						baseValue: new UnsignedCoinsPF2e(this.actor.inventory.coins),
 					},
 					curValue: this.formData.curValue[EditMaterialTroveApplicationTab.EDIT],
 					updateActorCoins: this.formData.updateActorCoins,
@@ -282,7 +287,10 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 				context = {
 					...context,
 					trove: {
-						newValue: SignedCoinsPF2e.addCoins(this.materialTrove.value, this.formData.curValue["add-sub"]),
+						newValue: SignedCoinsPF2e.addCoins(
+							this.materialTrove.value,
+							this.formData.curValue["add-sub"]
+						).toUnsignedCoins(),
 						baseValue: this.materialTrove.value,
 					},
 					currency: {
@@ -290,9 +298,9 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 							? SignedCoinsPF2e.subtractCoins(
 									this.actor.inventory.coins,
 									this.formData.curValue["add-sub"]
-							  )
-							: this.actor.inventory.coins,
-						baseValue: this.actor.inventory.coins,
+							  ).toUnsignedCoins()
+							: new UnsignedCoinsPF2e(this.actor.inventory.coins),
+						baseValue: new UnsignedCoinsPF2e(this.actor.inventory.coins),
 					},
 					curValue: this.formData.curValue[EditMaterialTroveApplicationTab.ADD_SUB],
 					updateActorCoins: this.formData.updateActorCoins,
