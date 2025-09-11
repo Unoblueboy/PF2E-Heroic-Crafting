@@ -35,20 +35,21 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 		_event: Event | null
 	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
-			let incomeValue;
-			switch (outcome) {
-				case "criticalSuccess":
-				case "success":
-					incomeValue = salvageDetails.income.success;
-					break;
-				case "failure":
-				case "criticalFailure":
-					incomeValue = salvageDetails.income.failure;
-					break;
-				default:
-					incomeValue = new UnsignedCoinsPF2e();
-					break;
-			}
+			const incomeValue = (() => {
+				switch (outcome) {
+					case "criticalSuccess":
+						return salvageDetails.income.criticalSuccess ?? salvageDetails.income.success;
+					case "success":
+						return salvageDetails.income.success;
+					case "failure":
+						return salvageDetails.income.failure;
+					case "criticalFailure":
+						return salvageDetails.income.criticalFailure ?? salvageDetails.income.failure;
+
+					default:
+						return new UnsignedCoinsPF2e();
+				}
+			})();
 
 			const fullDuration =
 				UnsignedCoinsPF2e.getCopperValue(incomeValue) === 0
@@ -69,7 +70,6 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 						duration: { given: salvageDetails.duration, full: fullDuration },
 						max: salvageDetails.max,
 					},
-					success: ["success", "criticalSuccess"].includes(outcome ?? ""),
 					savvyTeardown: salvageDetails.savvyTeardown,
 				}
 			);

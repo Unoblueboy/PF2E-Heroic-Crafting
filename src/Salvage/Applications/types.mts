@@ -1,4 +1,5 @@
 import { PhysicalItemPF2e } from "../../../types/src/module/item/physical";
+import { DegreeOfSuccessString } from "../../../types/src/module/system/degree-of-success";
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 import { UnsignedCoins } from "../../Helper/currency.mjs";
 
@@ -9,7 +10,7 @@ export type SalvageApplicationResult = {
 	income: {
 		success: UnsignedCoins;
 		failure: UnsignedCoins;
-	};
+	} & { [x in DegreeOfSuccessString]?: UnsignedCoins };
 	actor: CharacterPF2eHeroicCrafting;
 	item: PhysicalItemPF2e;
 };

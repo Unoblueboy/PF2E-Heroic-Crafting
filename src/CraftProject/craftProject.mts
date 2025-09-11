@@ -33,7 +33,7 @@ export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId
 		_event: Event | null
 	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
-			if (!project) return; // this should never happen
+			if (!project || !craftDetails) return; // this should never happen
 			const materials = await getMaterialsContext(craftDetails);
 
 			const projectProgress = HeroicCraftingProjectHelper.getProjectProgress(
@@ -44,7 +44,13 @@ export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId
 					success: totalCost,
 					criticalSuccess: totalCost,
 				},
-				[...item.getRollOptions(item.type), ...actor.getRollOptions(), "action:craft", "action:craft-project"]
+				[
+					...item.getRollOptions(item.type),
+					...actor.getRollOptions(),
+					"action:craft",
+					"action:craft-project",
+					`heroic:crafting:duration:${craftDetails.duration}`,
+				]
 			);
 			console.log("Heroic Crafting |", projectProgress);
 

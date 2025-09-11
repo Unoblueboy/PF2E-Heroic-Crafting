@@ -4,7 +4,9 @@ import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-s
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { HEROIC_CRAFTING_GATHERED_INCOME } from "../Helper/constants.mjs";
+import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
+import { HeroicCraftingProjectHelper } from "../Projects/helper.mjs";
 import { ForageDcDialog } from "./Applications/ForageDcDialog.mjs";
 import { ForageLocationLevelDialog } from "./Applications/ForageLocationLevelDialog.mjs";
 import { ForageCraftingResourcesRequest, GetDCMessage, RollCheckMessage, SocketMessage } from "./types.mjs";
@@ -78,14 +80,23 @@ async function rollForageCheckSocket(message: RollCheckMessage, _userId: string)
 async function rollForageCheck(actor: CharacterPF2eHeroicCrafting, data: { dc: number; locationLevel: number }) {
 	async function getStatisticRollCallback(
 		_roll: Rolled<CheckRoll>,
-		_outcome: DegreeOfSuccessString | null | undefined,
+		outcome: DegreeOfSuccessString | null | undefined,
 		message: ChatMessagePF2e,
 		_event: Event | null
 	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
-			const forage = ["success", "criticalSuccess"].includes(_outcome ?? "")
-				? new UnsignedCoinsPF2e(HEROIC_CRAFTING_GATHERED_INCOME.get(actor.level))
-				: new UnsignedCoinsPF2e();
+			const gatheredIncome = new UnsignedCoinsPF2e(HEROIC_CRAFTING_GATHERED_INCOME.get(actor.level));
+			const progress = HeroicCraftingProjectHelper.getProjectProgress(
+				actor,
+				{
+					criticalSuccess: gatheredIncome,
+					success: gatheredIncome,
+					failure: {},
+					criticalFailure: {},
+				},
+				new Set(["action:forage"])
+			);
+			const forage = outcome ? new SignedCoinsPF2e(progress[outcome]).toUnsignedCoins() : new UnsignedCoinsPF2e();
 			const flavor = await foundry.applications.handlebars.renderTemplate(
 				"modules/pf2e-heroic-crafting/templates/chat/forage/result.hbs",
 				{

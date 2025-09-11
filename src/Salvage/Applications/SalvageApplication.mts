@@ -129,9 +129,6 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			submitOnChange: false,
 			closeOnSubmit: true,
 		},
-		actions: {
-			"on-use-savvy-teardown-click": SalvageApplication.useSavvyTeardownClick,
-		},
 	};
 
 	static override readonly PARTS = {
@@ -174,11 +171,12 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			actor: this.actor,
 			item: this.item,
 		};
-	}
-
-	private static async useSavvyTeardownClick(this: SalvageApplication, event: Event, _target: HTMLElement) {
-		if (event.type != "click") return;
-		this.updateDetails();
+		if (incomeData.criticalSuccess) {
+			this.result.income.criticalSuccess = new UnsignedCoinsPF2e(incomeData.criticalSuccess.value);
+		}
+		if (incomeData.criticalFailure) {
+			this.result.income.criticalFailure = new UnsignedCoinsPF2e(incomeData.criticalFailure.value);
+		}
 	}
 
 	static async GetSalvageDetails(options: Omit<SalvageApplicationOptions, "callback">) {

@@ -14,11 +14,11 @@ export async function forageCraftingResourcesChatButtonListener(
 	if (forageResults) forageResults.addEventListener("click", (e: Event) => addResourcesToTrove(e, message));
 }
 
-async function addResourcesToTrove(_e: Event, _message: ChatMessagePF2e): Promise<void> {
-	const actor = _message.actor as CharacterPF2eHeroicCrafting;
+async function addResourcesToTrove(event: Event, message: ChatMessagePF2e): Promise<void> {
+	const actor = message.actor as CharacterPF2eHeroicCrafting;
 
-	const button = _e.target as HTMLButtonElement;
-	const div = _e.currentTarget as HTMLDivElement;
+	const button = event.target as HTMLButtonElement;
+	const div = event.currentTarget as HTMLDivElement;
 	const data = { ...button.dataset, ...div.dataset };
 
 	const forage = UnsignedCoinsPF2e.fromString(data.forageAmount ?? "");
