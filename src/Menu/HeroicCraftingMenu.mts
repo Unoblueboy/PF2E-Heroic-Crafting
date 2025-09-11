@@ -1,6 +1,5 @@
 import { CraftingFormula } from "../../types/src/module/actor/character/crafting";
 import { PhysicalItemPF2e, TreasurePF2e } from "../../types/src/module/item";
-import { CoinsPF2e } from "../../types/src/module/item/physical";
 import { ItemInstances } from "../../types/src/module/item/types";
 import {
 	ApplicationConfiguration,
@@ -75,7 +74,7 @@ type HeroCraftingMenuSalvageData = {
 	level: number;
 	name: string;
 	dc: number;
-	max: CoinsPF2e;
+	max: UnsignedCoins;
 };
 
 export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) {

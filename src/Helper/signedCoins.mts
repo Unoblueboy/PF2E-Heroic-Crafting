@@ -33,11 +33,6 @@ export class SignedCoinsPF2e implements SignedCoins {
 		return this.plus({ ...coins, isNegative: !coins.isNegative });
 	}
 
-	scale(factor: number): SignedCoinsPF2e {
-		const coinPF2eResult = new game.pf2e.Coins(this).scale(Math.abs(factor));
-		return new SignedCoinsPF2e({ ...coinPF2eResult, isNegative: factor < 0 ? !this.isNegative : this.isNegative });
-	}
-
 	multiply(multiplier: number): SignedCoinsPF2e {
 		const copperValue = this.copperValue;
 		return SignedCoinsPF2e.copperValueToCoins(Math.floor(multiplier * copperValue));
@@ -61,7 +56,7 @@ export class SignedCoinsPF2e implements SignedCoins {
 
 	toUnsignedCoins(boundCoins: boolean = true): UnsignedCoins {
 		if (this.copperValue < 0) {
-			console.warn(`${this} converted to CoinsPF2e, sign has been lost in the process`);
+			console.warn(`${this} converted to UnsignedCoins, sign has been lost in the process`);
 		}
 		const data = (boundCoins ? SignedCoinsPF2e.maxCoins({}, this) : this).toObject();
 		delete data.isNegative;
@@ -148,8 +143,19 @@ export class SignedCoinsPF2e implements SignedCoins {
 	}
 
 	toString(): string {
-		const baseCoin = new game.pf2e.Coins(this);
-		return this.isNegative ? `-${baseCoin.toString()}` : baseCoin.toString();
+		if (DENOMINATIONS.every((denomination) => !this[denomination])) {
+			return `0 ${game.i18n.localize("PF2E.CurrencyAbbreviations.gp")}`;
+		}
+
+		const parts: string[] = [];
+		for (const denomination of DENOMINATIONS) {
+			if (this[denomination]) {
+				parts.push(`${this[denomination]} ${game.i18n.localize(`PF2E.CurrencyAbbreviations.${denomination}`)}`);
+			}
+		}
+
+		const string = parts.join(", ");
+		return this.isNegative ? `-${string}` : string;
 	}
 
 	static readonly INFINITY = new SignedCoinsPF2e({ pp: Infinity, gp: Infinity, sp: Infinity, cp: Infinity });

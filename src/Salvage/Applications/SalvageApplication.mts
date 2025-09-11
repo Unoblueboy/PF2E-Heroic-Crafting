@@ -1,5 +1,4 @@
 import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../../types/src/module/item";
-import { Coins } from "../../../types/src/module/item/physical";
 import {
 	ApplicationClosingOptions,
 	ApplicationConfiguration,
@@ -28,7 +27,7 @@ enum SalvageApplicationPart {
 }
 
 type SalvageApplicationFormData = {
-	salvageMax: Coins;
+	salvageMax: UnsignedCoins;
 	useSavvyTeardown: boolean;
 	salvageDuration: number;
 };
@@ -39,7 +38,7 @@ type SalvageApplicationRenderDataIncomeData = Partial<
 		{
 			content: string;
 			tooltip: string;
-			value: Coins;
+			value: UnsignedCoins;
 		}
 	>
 >;

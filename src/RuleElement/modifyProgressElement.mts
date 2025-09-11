@@ -1,4 +1,3 @@
-import { Coins } from "../../types/src/module/item/physical";
 import { ResolvableValueField, RuleElementSchema } from "../../types/src/module/rules/rule-element";
 import { RollOptionRuleElement } from "../../types/src/module/rules/rule-element/roll-option/rule-element";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
@@ -33,7 +32,7 @@ type ModifyProgressMultDivSynthetic = {
 type ModifyProgressAddSubSynthetic = {
 	predicate: Predicate;
 	operation: "add" | "subtract" | "upgrade" | "downgrade" | "override";
-	change: Coins;
+	change: UnsignedCoins;
 	outcome: DegreeOfSuccessString[];
 };
 

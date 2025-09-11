@@ -118,7 +118,17 @@ export class UnsignedCoinsPF2e implements UnsignedCoins {
 	}
 
 	toString(): string {
-		const baseCoin = new game.pf2e.Coins(this);
-		return baseCoin.toString();
+		if (DENOMINATIONS.every((denomination) => !this[denomination])) {
+			return `0 ${game.i18n.localize("PF2E.CurrencyAbbreviations.gp")}`;
+		}
+
+		const parts: string[] = [];
+		for (const denomination of DENOMINATIONS) {
+			if (this[denomination]) {
+				parts.push(`${this[denomination]} ${game.i18n.localize(`PF2E.CurrencyAbbreviations.${denomination}`)}`);
+			}
+		}
+
+		return parts.join(", ");
 	}
 }

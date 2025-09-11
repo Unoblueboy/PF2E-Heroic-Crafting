@@ -1,5 +1,4 @@
 import { PhysicalItemPF2e } from "../../../types/src/module/item";
-import { Coins } from "../../../types/src/module/item/physical";
 import {
 	ApplicationClosingOptions,
 	ApplicationConfiguration,
@@ -53,8 +52,8 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	formData: {
 		craftDuration: ProjectCraftDuration;
 		materialList: {
-			currency: Coins;
-			trove: Coins;
+			currency: UnsignedCoins;
+			trove: UnsignedCoins;
 			treasures: Record<string, CraftProjectApplicationTeasureRecord>;
 		};
 	};
@@ -402,7 +401,8 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 		const quantity = Math.min(treasureFromData.quantity ?? 1, item.quantity);
 		const finalSpend = UnsignedCoinsPF2e.minCoins(treasureCoinsTotal, maxSpendTotal);
-		const maxSpendPer: Coins = quantity === 0 ? {} : UnsignedCoinsPF2e.multiplyCoins(1 / quantity, finalSpend);
+		const maxSpendPer: UnsignedCoins =
+			quantity === 0 ? {} : UnsignedCoinsPF2e.multiplyCoins(1 / quantity, finalSpend);
 		treasureFromData.value = maxSpendPer;
 		treasureFromData.quantity = quantity;
 	}
