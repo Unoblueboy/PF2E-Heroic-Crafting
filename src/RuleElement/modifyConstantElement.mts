@@ -14,7 +14,7 @@ import {
 	HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD,
 	HEROIC_CRAFTING_SPENDING_LIMIT_UNSIGNEDCOINSPF2E_RECORD,
 } from "../Helper/constants.mjs";
-import { CoinsPF2eUtility, SignedCoins, UnsignedCoins } from "../Helper/currency.mjs";
+import { CoinsPF2eUtility, UnsignedCoins } from "../Helper/currency.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 
 type ModifyConstantSchema = RuleElementSchema & {
@@ -24,8 +24,8 @@ type ModifyConstantSchema = RuleElementSchema & {
 };
 
 const fields = foundry.data.fields;
-type ModifyConstantChangeOperation = keyof typeof ModifyConstantRuleElement.CHANGE_OPERATION_DEFAULT_PRIORITIES;
-type ModifyConstantConstants = (typeof ModifyConstantRuleElement.HEROIC_CRAFTING_CONSTANTS)[number];
+export type ModifyConstantChangeOperation = keyof typeof ModifyConstantRuleElement.CHANGE_OPERATION_DEFAULT_PRIORITIES;
+export type ModifyConstantElementConstant = (typeof ModifyConstantRuleElement.HEROIC_CRAFTING_CONSTANTS)[number];
 
 type ModifyConstantSpendingLimitMultDivSynthetic = {
 	predicate: Predicate;
@@ -38,24 +38,34 @@ type ModifyConstantSpendingLimitOtherSynthetic = {
 	predicate: Predicate;
 	constant: "spendingLimit";
 	operation: "add" | "subtract" | "upgrade" | "downgrade" | "override";
-	change: SignedCoins;
+	change: UnsignedCoins;
 };
 
-type ModifyConstantBatchSizeSynthetic = {
+export type ModifyConstantBatchSizeSynthetic = {
 	predicate: Predicate;
 	constant: "batchSize";
 	operation: "add" | "subtract" | "multiply" | "divide" | "upgrade" | "downgrade" | "override";
 	change: number;
 };
 
-type ModifyConstantRushCostSynthetic = {
+export type ModifyConstantRushCostBooleanSynthetic = {
 	predicate: Predicate;
 	constant: "rushCost";
-	operation: "override";
+	operation: "override" | "and" | "or" | "nand" | "nor" | "xor";
 	change: boolean;
 };
 
-type ModifyConstantSpendingLimitSynthetic =
+export type ModifyConstantRushCostUnarySynthetic = {
+	predicate: Predicate;
+	constant: "rushCost";
+	operation: "not";
+};
+
+export type ModifyConstantRushCostSynthetic =
+	| ModifyConstantRushCostBooleanSynthetic
+	| ModifyConstantRushCostUnarySynthetic;
+
+export type ModifyConstantSpendingLimitSynthetic =
 	| ModifyConstantSpendingLimitMultDivSynthetic
 	| ModifyConstantSpendingLimitOtherSynthetic;
 
@@ -67,7 +77,7 @@ export type ModifyConstantSynthetic =
 export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConstantSchema> {
 	protected static override validActorTypes: ["character"] = ["character"];
 
-	declare constant: ModifyConstantConstants;
+	declare constant: ModifyConstantElementConstant;
 	declare operation: ModifyConstantChangeOperation;
 	declare value: unknown;
 
@@ -75,8 +85,31 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 		super(source, options);
 		if (this.invalid) return;
 
-		if (this.constant === "rushCost" && this.operation !== "override") {
-			this.failValidation(`Rush Cost: Operation must be "override"`);
+		if (
+			this.constant === "spendingLimit" &&
+			!["add", "subtract", "multiply", "divide", "upgrade", "downgrade", "override"].includes(this.operation)
+		) {
+			this.failValidation(
+				`Spending Limit: Operation must be one of ("override", "and", "or", "nand", "nor", "xor", "not")`
+			);
+		}
+
+		if (
+			this.constant === "batchSize" &&
+			!["add", "subtract", "multiply", "divide", "upgrade", "downgrade", "override"].includes(this.operation)
+		) {
+			this.failValidation(
+				`Batch Size: Operation must be one of ("override", "and", "or", "nand", "nor", "xor", "not")`
+			);
+		}
+
+		if (
+			this.constant === "rushCost" &&
+			!["override", "and", "or", "nand", "nor", "xor", "not"].includes(this.operation)
+		) {
+			this.failValidation(
+				`Rush Cost: Operation must be one of ("override", "and", "or", "nand", "nor", "xor", "not")`
+			);
 		}
 
 		if (this.constant === "rushCost" && typeof this.resolveValue(this.value) !== "boolean") {
@@ -98,7 +131,7 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 
 		return {
 			...baseSchema,
-			outcome: new fields.StringField({
+			constant: new fields.StringField({
 				required: true,
 				blank: false,
 				choices: this.HEROIC_CRAFTING_CONSTANTS,
@@ -107,7 +140,21 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 				required: true,
 				nullable: false,
 				blank: false,
-				choices: ["multiply", "divide", "add", "subtract", "downgrade", "upgrade", "override"],
+				choices: [
+					"multiply",
+					"divide",
+					"add",
+					"subtract",
+					"downgrade",
+					"upgrade",
+					"override",
+					"and",
+					"or",
+					"nand",
+					"nor",
+					"xor",
+					"not",
+				],
 			}),
 			value: new ResolvableValueFieldConstructor({
 				required: true,

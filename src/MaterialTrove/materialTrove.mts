@@ -3,15 +3,12 @@ import { ContainerPF2e, TreasurePF2e } from "../../types/src/module/item";
 import { PhysicalItemPF2e } from "../../types/src/module/item/physical";
 import { TreasureSource } from "../../types/src/module/item/treasure/data";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
-import {
-	MATERIAL_TROVE_SLUG,
-	CRAFTING_MATERIAL_SLUG,
-	CRAFTING_MATERIAL_UUID,
-	HEROIC_CRAFTING_SPENDING_LIMIT,
-} from "../Helper/constants.mjs";
+import { ProjectCraftDuration } from "../CraftProject/types.mjs";
+import { MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, CRAFTING_MATERIAL_UUID } from "../Helper/constants.mjs";
 import { UnsignedCoins } from "../Helper/currency.mjs";
 import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
+import { ModifyConstantRuleElementHelper } from "../RuleElement/Helpers/ModifyConstantHelper.mjs";
 
 import { EditMaterialTroveApplication } from "./Applications/EditMaterialTroveApplication.mjs";
 import { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";
@@ -234,12 +231,14 @@ export class MaterialTrove {
 	}
 
 	private getLightBulkCoins(actorLevel: number = this.actor.level) {
-		const spendingLimitForLevel = HEROIC_CRAFTING_SPENDING_LIMIT.get(actorLevel);
-		if (!spendingLimitForLevel) {
-			return new UnsignedCoinsPF2e({});
-		}
+		const spendingLimit = ModifyConstantRuleElementHelper.getConstant(
+			this.actor,
+			"spendingLimit",
+			{ level: actorLevel, duration: ProjectCraftDuration.WEEK },
+			new Set([...this.actor.getRollOptions(), "material-trove"])
+		);
 
-		return UnsignedCoinsPF2e.multiplyCoins(1 / 20, spendingLimitForLevel.week);
+		return UnsignedCoinsPF2e.multiplyCoins(1 / 20, spendingLimit);
 	}
 
 	async add(value: UnsignedCoins) {

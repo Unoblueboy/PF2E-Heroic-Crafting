@@ -7,19 +7,15 @@ import {
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
-import {
-	CRAFTING_MATERIAL_SLUG,
-	HEROIC_CRAFTING_SPENDING_LIMIT,
-	MATERIAL_TROVE_SLUG,
-	SALVAGE_MATERIAL_SLUG,
-} from "../../Helper/constants.mjs";
+import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../../Helper/constants.mjs";
 import { DENOMINATION, UnsignedCoins } from "../../Helper/currency.mjs";
 import { fractionToPercent } from "../../Helper/generics.mjs";
 import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
-import { HeroicCraftingProjectHelper } from "../../Projects/helper.mjs";
 import { AProject, Projects } from "../../Projects/projects.mjs";
+import { ModifyConstantRuleElementHelper } from "../../RuleElement/Helpers/ModifyConstantHelper.mjs";
+import { ModifyProgressRuleElementHelper } from "../../RuleElement/Helpers/ModifyProgressHelper.mjs";
 import { CraftProjectUtility } from "../craftProjectUtility.mjs";
 import {
 	ProjectCraftDetails,
@@ -44,21 +40,21 @@ type CraftProjectApplicationTeasureRecord = {
 };
 
 export class CraftProjectApplication extends HandlebarsApplicationMixin(ApplicationV2) {
-	actor: CharacterPF2eHeroicCrafting;
-	project: AProject;
-	materialTrove?: MaterialTrove;
-	result?: ProjectCraftDetails;
-	callback: (result?: ProjectCraftDetails) => void;
+	private readonly actor: CharacterPF2eHeroicCrafting;
+	private readonly project: AProject;
+	private materialTrove?: MaterialTrove;
+	private result?: ProjectCraftDetails;
+	private readonly callback: (result?: ProjectCraftDetails) => void;
 
-	formData: {
+	private readonly formData: {
 		craftDuration: ProjectCraftDuration;
 		materialList: {
 			currency: UnsignedCoins;
 			trove: UnsignedCoins;
-			treasures: Record<string, CraftProjectApplicationTeasureRecord>;
+			materials: Record<string, CraftProjectApplicationTeasureRecord>;
 		};
 	};
-	treasures: PhysicalItemPF2e[];
+	private materials: PhysicalItemPF2e[];
 	private constructor(options: CraftProjectApplicationOptions) {
 		super(options as object);
 		this.actor = options.actor;
@@ -70,24 +66,24 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			materialList: {
 				currency: new UnsignedCoinsPF2e(),
 				trove: new UnsignedCoinsPF2e(),
-				treasures: {},
+				materials: {},
 			},
 		};
-		this.treasures = [];
+		this.materials = [];
 	}
 
 	private async initializeTreasureData() {
 		this.materialTrove = await MaterialTrove.getMaterialTrove(this.actor);
 		if (!this.materialTrove) return;
 
-		this.treasures = this.materialTrove.contents.filter(
+		this.materials = this.materialTrove.contents.filter(
 			(troveItem) =>
 				!!troveItem.slug &&
 				![MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, SALVAGE_MATERIAL_SLUG].includes(troveItem.slug)
 		);
 
-		this.formData.materialList.treasures = Object.fromEntries(
-			this.treasures.map((treasure) => [
+		this.formData.materialList.materials = Object.fromEntries(
+			this.materials.map((treasure) => [
 				treasure.uuid,
 				{
 					value: new UnsignedCoinsPF2e(),
@@ -101,25 +97,25 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	private async updateTreasureData() {
 		this.materialTrove = await MaterialTrove.getMaterialTrove(this.actor);
 		if (!this.materialTrove) {
-			this.treasures = [];
-			this.formData.materialList.treasures = {};
+			this.materials = [];
+			this.formData.materialList.materials = {};
 			return;
 		}
 
-		this.treasures = this.materialTrove.contents.filter(
+		this.materials = this.materialTrove.contents.filter(
 			(troveItem) =>
 				!!troveItem.slug &&
 				![MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, SALVAGE_MATERIAL_SLUG].includes(troveItem.slug)
 		);
 
-		const treasureUuids = new Set(this.treasures.map((x) => x.uuid));
-		const treasureFormDataUuids = new Set(Object.keys(this.formData.materialList.treasures));
+		const treasureUuids = new Set(this.materials.map((x) => x.uuid));
+		const treasureFormDataUuids = new Set(Object.keys(this.formData.materialList.materials));
 
 		const newUuids = treasureUuids.difference(treasureFormDataUuids);
 		const deletedUuids = treasureFormDataUuids.difference(treasureUuids);
 
 		for (const uuid of newUuids) {
-			this.formData.materialList.treasures[uuid] = {
+			this.formData.materialList.materials[uuid] = {
 				value: new UnsignedCoinsPF2e(),
 				quantity: 0,
 				postUseOperation: TreasurePostUseOperation.DECREASE_VALUE,
@@ -127,7 +123,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		}
 
 		for (const uuid of deletedUuids) {
-			delete this.formData.materialList.treasures[uuid];
+			delete this.formData.materialList.materials[uuid];
 		}
 	}
 
@@ -163,7 +159,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		_form: HTMLFormElement,
 		_formData: FormDataExtended
 	) {
-		const treasureMaterials: TreasureMaterialSpent[] = Object.entries(this.formData.materialList.treasures)
+		const treasureMaterials: TreasureMaterialSpent[] = Object.entries(this.formData.materialList.materials)
 			.filter(([_, record]) => UnsignedCoinsPF2e.getCopperValue(record.value) > 0 && record.quantity > 0)
 			.map(([uuid, record]) => {
 				return { uuid, ...record };
@@ -179,7 +175,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 		const totalCost = await CraftProjectUtility.getTotalCost(materialsSpent);
 		const duration = _formData.object[`duration`] as ProjectCraftDuration;
-		const progress = HeroicCraftingProjectHelper.getProjectProgress(
+		const progress = ModifyProgressRuleElementHelper.getProgress(
 			this.actor,
 			{
 				criticalSuccess: SignedCoinsPF2e.multiplyCoins(2, totalCost),
@@ -224,8 +220,8 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		this.formData.materialList = {
 			currency: new UnsignedCoinsPF2e(),
 			trove: new UnsignedCoinsPF2e(),
-			treasures: Object.fromEntries(
-				this.treasures.map((treasure) => [
+			materials: Object.fromEntries(
+				this.materials.map((treasure) => [
 					treasure.uuid,
 					{
 						value: new UnsignedCoinsPF2e(),
@@ -297,7 +293,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		switch (pathSegments[1]) {
 			case "currency":
 			case "trove":
-				this.updateBasicMaterial(value, pathSegments[1], pathSegments[2] as DENOMINATION);
+				await this.updateBasicMaterial(value, pathSegments[1], pathSegments[2] as DENOMINATION);
 				break;
 			case "treasures":
 				await this.updateAdvancedMaterial(value, pathSegments.slice(2));
@@ -307,20 +303,27 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		}
 	}
 
-	private updateBasicMaterial(value: string, basicMaterial: "currency" | "trove", basicMaterialKey: DENOMINATION) {
+	private async updateBasicMaterial(
+		value: string,
+		basicMaterial: "currency" | "trove",
+		basicMaterialKey: DENOMINATION
+	) {
 		this.formData.materialList[basicMaterial][basicMaterialKey] = Number.parseInt(value) || 0;
 
-		const maxSpend = this.getMaxSpend(basicMaterial);
+		const maxSpend = await this.getMaxSpend(basicMaterial);
 		if (UnsignedCoinsPF2e.getCopperValue(this.formData.materialList[basicMaterial]) <= maxSpend.copperValue) return;
 
 		this.formData.materialList[basicMaterial] = maxSpend;
 	}
 
-	private getMaxSpend(basicMaterial: "currency" | "trove"): UnsignedCoinsPF2e {
-		const spendingLimit = new UnsignedCoinsPF2e(
-			HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[this.formData.craftDuration]
+	private async getMaxSpend(basicMaterial: "currency" | "trove"): Promise<UnsignedCoinsPF2e> {
+		const spendingLimit = ModifyConstantRuleElementHelper.getConstant(
+			this.actor,
+			"spendingLimit",
+			{ duration: this.formData.craftDuration },
+			await this.project.getRollOptions()
 		);
-		const scaledSpendingLimit = spendingLimit.multiply(this.project.batchSize);
+		const scaledSpendingLimit = UnsignedCoinsPF2e.multiplyCoins(this.project.batchSize, spendingLimit);
 
 		const preMaterialContribution = UnsignedCoinsPF2e.subtractCoins(
 			this.getTotalMaterialCost(),
@@ -343,7 +346,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		return UnsignedCoinsPF2e.sumCoins(
 			this.formData.materialList.trove,
 			this.formData.materialList.currency,
-			...Object.values(this.formData.materialList.treasures).map((treasure) => treasure.value)
+			...Object.values(this.formData.materialList.materials).map((treasure) => treasure.value)
 		);
 	}
 
@@ -351,7 +354,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		const treasureUuid = pathSegments[0];
 		const treasureKey = pathSegments[1] as DENOMINATION | "quantity" | "postUseOperation";
 
-		const treasureFromData = this.formData.materialList.treasures[treasureUuid];
+		const treasureFromData = this.formData.materialList.materials[treasureUuid];
 		if (!treasureFromData) return;
 
 		switch (treasureKey) {
@@ -372,11 +375,13 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 				return;
 		}
 
-		const craftDuration = this.formData.craftDuration;
-		const spendingLimit = new UnsignedCoinsPF2e(
-			HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[craftDuration]
+		const spendingLimit = ModifyConstantRuleElementHelper.getConstant(
+			this.actor,
+			"spendingLimit",
+			{ duration: this.formData.craftDuration },
+			await this.project.getRollOptions()
 		);
-		const scaledSpendingLimit = spendingLimit.multiply(this.project.batchSize);
+		const scaledSpendingLimit = UnsignedCoinsPF2e.multiplyCoins(this.project.batchSize, spendingLimit);
 
 		const item = (await foundry.utils.fromUuid(treasureUuid)) as PhysicalItemPF2e;
 		const treasureCoinsTotal = UnsignedCoinsPF2e.multiplyCoins(
@@ -429,7 +434,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 		const craftDuration = this.formData.craftDuration;
 
-		const progress = HeroicCraftingProjectHelper.getProjectProgress(
+		const progress = ModifyProgressRuleElementHelper.getProgress(
 			this.actor,
 			{
 				criticalSuccess: SignedCoinsPF2e.multiplyCoins(2, totalMaterialCost),
@@ -511,21 +516,23 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			formData: CraftProjectApplicationTeasureRecord;
 		}[] = [];
 
-		this.treasures.forEach((troveItem) =>
+		this.materials.forEach((troveItem) =>
 			materials.push({
 				img: troveItem.img,
 				name: troveItem.name,
 				uuid: troveItem.uuid,
 				quantity: troveItem.quantity,
-				formData: this.formData.materialList.treasures[troveItem.uuid],
+				formData: this.formData.materialList.materials[troveItem.uuid],
 			})
 		);
 
-		const spendingLimitCoins = UnsignedCoinsPF2e.multiplyCoins(
-			this.project.batchSize,
-			HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level)?.[this.formData.craftDuration] ?? {}
+		const spendingLimit = ModifyConstantRuleElementHelper.getConstant(
+			this.actor,
+			"spendingLimit",
+			{ duration: this.formData.craftDuration },
+			await this.project.getRollOptions()
 		);
-		const spendingLimit = spendingLimitCoins;
+		const scaledSpendingLimit = UnsignedCoinsPF2e.multiplyCoins(this.project.batchSize, spendingLimit);
 		const totalMaterialCost = this.getTotalMaterialCost();
 		const buttons = [
 			{
@@ -550,11 +557,11 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			formData: this.formData,
 			buttons,
 			materials,
-			spendingLimit: spendingLimit,
+			spendingLimit: scaledSpendingLimit,
 			hasMaterialTrove: !!this.materialTrove,
 			totalMaterial: {
 				value: totalMaterialCost,
-				max: spendingLimit,
+				max: scaledSpendingLimit,
 			},
 			progressBarWidths: await this.getProgressBarWidths(),
 			hideCurrencyMaterials: this.formData.craftDuration === ProjectCraftDuration.HOUR,

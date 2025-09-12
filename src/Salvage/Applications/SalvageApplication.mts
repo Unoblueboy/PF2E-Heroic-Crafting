@@ -11,7 +11,6 @@ import {
 	CRAFTING_MATERIAL_SLUG,
 	DEGREE_OF_SUCCESS_STRINGS,
 	HEROIC_CRAFTING_GATHERED_INCOME,
-	HEROIC_CRAFTING_SPENDING_LIMIT,
 	MATERIAL_TROVE_SLUG,
 	SALVAGE_MATERIAL_SLUG,
 } from "../../Helper/constants.mjs";
@@ -20,7 +19,11 @@ import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 import { DegreeOfSuccessString } from "../../../types/src/module/system/degree-of-success";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
-import { HeroicCraftingProjectHelper } from "../../Projects/helper.mjs";
+import { ModifyProgressRuleElementHelper } from "../../RuleElement/Helpers/ModifyProgressHelper.mjs";
+import { ProjectCraftDuration } from "../../CraftProject/types.mjs";
+import { ModifyConstantRuleElementHelper } from "../../RuleElement/Helpers/ModifyConstantHelper.mjs";
+import { getHeroicItemRollOptions } from "../../Helper/item.mjs";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 enum SalvageApplicationPart {
@@ -330,7 +333,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		const baseIncomeSuccessValue = baseIncomeValue;
 		const baseIncomeFailureValue = UnsignedCoinsPF2e.multiplyCoins(1 / 2, baseIncomeValue);
 
-		const progress = HeroicCraftingProjectHelper.getProjectProgress(
+		const progress = ModifyProgressRuleElementHelper.getProgress(
 			this.actor,
 			{
 				criticalSuccess: UnsignedCoinsPF2e.multiplyCoins(hasMasterCrafting ? 2 : 1, baseIncomeSuccessValue),
@@ -394,20 +397,20 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 				failure: { content: "", tooltip: "", value: {} },
 			};
 		}
-		const spendingLimitForLevel = HEROIC_CRAFTING_SPENDING_LIMIT.get(this.actor.level);
-		if (!spendingLimitForLevel) {
-			return {
-				success: { content: "", tooltip: "", value: {} },
-				failure: { content: "", tooltip: "", value: {} },
-			};
-		}
+
+		const spendingLimit = ModifyConstantRuleElementHelper.getConstant(
+			this.actor,
+			"spendingLimit",
+			{ duration: ProjectCraftDuration.DAY },
+			new Set([...this.actor.getRollOptions(), ...getHeroicItemRollOptions(this.item), "action:savvy-teardown"])
+		);
+		const dailySpendingLimit = new UnsignedCoinsPF2e(spendingLimit);
 
 		const halfSalvageMax = UnsignedCoinsPF2e.multiplyCoins(0.5, this.formData.salvageMax);
-		const dailySpendingLimit = new UnsignedCoinsPF2e(spendingLimitForLevel.day);
 		const baseIncomeSuccessValue = UnsignedCoinsPF2e.minCoins(halfSalvageMax, dailySpendingLimit);
 		const baseIncomeFailureValue = new UnsignedCoinsPF2e();
 
-		const progress = HeroicCraftingProjectHelper.getProjectProgress(
+		const progress = ModifyProgressRuleElementHelper.getProgress(
 			this.actor,
 			{
 				criticalSuccess: baseIncomeSuccessValue,

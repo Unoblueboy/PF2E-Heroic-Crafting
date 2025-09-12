@@ -6,7 +6,7 @@ import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { HEROIC_CRAFTING_GATHERED_INCOME } from "../Helper/constants.mjs";
 import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
-import { HeroicCraftingProjectHelper } from "../Projects/helper.mjs";
+import { ModifyProgressRuleElementHelper } from "../RuleElement/Helpers/ModifyProgressHelper.mjs";
 import { ForageDcDialog } from "./Applications/ForageDcDialog.mjs";
 import { ForageLocationLevelDialog } from "./Applications/ForageLocationLevelDialog.mjs";
 import { ForageCraftingResourcesRequest, GetDCMessage, RollCheckMessage, SocketMessage } from "./types.mjs";
@@ -86,7 +86,7 @@ async function rollForageCheck(actor: CharacterPF2eHeroicCrafting, data: { dc: n
 	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
 			const gatheredIncome = new UnsignedCoinsPF2e(HEROIC_CRAFTING_GATHERED_INCOME.get(actor.level));
-			const progress = HeroicCraftingProjectHelper.getProjectProgress(
+			const progress = ModifyProgressRuleElementHelper.getProgress(
 				actor,
 				{
 					criticalSuccess: gatheredIncome,

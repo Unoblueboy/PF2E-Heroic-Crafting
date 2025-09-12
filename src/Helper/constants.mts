@@ -12,6 +12,8 @@ export const SALVAGE_MATERIAL_SLUG = "generic-salvage-material";
 export const RARITIES: readonly ["common", "uncommon", "rare", "unique"] = ["common", "uncommon", "rare", "unique"];
 export const MODULE_ID = "pf2e-heroic-crafting";
 
+export const HEROIC_CRAFTING_ROLL_OPTION_PREFIX = "heroic:crafting" as const;
+
 export type HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD = {
 	hour: Coins;
 	day: Coins;

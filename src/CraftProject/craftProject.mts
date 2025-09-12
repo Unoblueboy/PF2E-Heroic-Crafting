@@ -6,8 +6,8 @@ import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { fractionToPercent } from "../Helper/generics.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
-import { HeroicCraftingProjectHelper } from "../Projects/helper.mjs";
 import { Projects } from "../Projects/projects.mjs";
+import { ModifyProgressRuleElementHelper } from "../RuleElement/Helpers/ModifyProgressHelper.mjs";
 import { CraftProjectApplication } from "./Applications/CraftProjectApplications.mjs";
 import { CraftProjectUtility } from "./craftProjectUtility.mjs";
 import { ProjectCraftDetails, ProjectCraftDuration } from "./types.mjs";
@@ -36,7 +36,7 @@ export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId
 			if (!project || !craftDetails) return; // this should never happen
 			const materials = await getMaterialsContext(craftDetails);
 
-			const projectProgress = HeroicCraftingProjectHelper.getProjectProgress(
+			const projectProgress = ModifyProgressRuleElementHelper.getProgress(
 				actor,
 				{
 					criticalFailure: { ...totalCost, isNegative: true },

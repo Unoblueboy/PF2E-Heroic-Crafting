@@ -6,13 +6,12 @@ import { itemDataUuid, ProjectItemDetails } from "../BeginProject/types.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { FORMULA_PRICE, MODULE_ID, RARITIES } from "../Helper/constants.mjs";
 import { UnsignedCoins } from "../Helper/currency.mjs";
+import { getHeroicItemRollOptions } from "../Helper/item.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 
 type PF2eHeroicCraftingFlags = {
 	projects?: Record<string, ProjectItemDetails>;
 };
-
-const HEROIC_CRAFTING_ROLL_OPTION_PREFIX = "heroic:crafting" as const;
 
 function getPF2eHeroicCraftingFlags(actor: CharacterPF2eHeroicCrafting) {
 	return actor.flags[MODULE_ID] as PF2eHeroicCraftingFlags | undefined;
@@ -192,10 +191,7 @@ export abstract class AProject implements ProjectItemDetails {
 
 	async getRollOptions() {
 		const item = await this.baseItem;
-		return new Set([
-			...this.actor.getRollOptions(),
-			...item.getRollOptions(item.type).map((trait) => `${HEROIC_CRAFTING_ROLL_OPTION_PREFIX}:${trait}`),
-		]);
+		return new Set([...this.actor.getRollOptions(), ...getHeroicItemRollOptions(item)]);
 	}
 }
 

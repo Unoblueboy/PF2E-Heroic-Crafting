@@ -1,11 +1,4 @@
-import {
-	ConsumablePF2e,
-	ItemPF2e,
-	PhysicalItemPF2e,
-	SpellPF2e,
-	TreasurePF2e,
-	WeaponPF2e,
-} from "../../../types/src/module/item";
+import { ConsumablePF2e, ItemPF2e, PhysicalItemPF2e, SpellPF2e, TreasurePF2e } from "../../../types/src/module/item";
 import {
 	ApplicationClosingOptions,
 	ApplicationConfiguration,
@@ -17,8 +10,10 @@ import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../../Helper/constants.mjs";
 import { DENOMINATION, UnsignedCoins } from "../../Helper/currency.mjs";
 import { calculateDC } from "../../Helper/dc.mjs";
+import { getGenericScrollOrWandRank, getHeroicItemRollOptions, isGenericScrollOrWand } from "../../Helper/item.mjs";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
+import { ModifyConstantRuleElementHelper } from "../../RuleElement/Helpers/ModifyConstantHelper.mjs";
 import {
 	BeginProjectStartingValues,
 	BeginProjectFullDetails,
@@ -76,14 +71,26 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 		this.formData = {
 			isFormula: options.itemSettings?.formula?.defaultValue ?? false,
-			dc: this.item ? calculateDC(this.item.level, this.item.rarity) : 1,
-			batchSize: getMaxBatchSize(this.item),
+			dc: 1,
+			batchSize: 1,
 			currency: new UnsignedCoinsPF2e(),
 			trove: new UnsignedCoinsPF2e(),
 		};
 
 		if (this.item) {
-			this.batchSizeMax = getMaxBatchSize(this.item);
+			const batchSize = ModifyConstantRuleElementHelper.getConstant(
+				this.actor,
+				"batchSize",
+				{ item: this.item },
+				new Set([
+					...this.actor.getRollOptions(),
+					...getHeroicItemRollOptions(this.item),
+					"action:begin-project",
+				])
+			);
+			this.batchSizeMax = batchSize;
+			this.formData.batchSize = batchSize;
+			this.formData.dc = calculateDC(this.item.level, this.item.rarity);
 		}
 	}
 
@@ -471,7 +478,12 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 	private resetBatchSizeInput() {
 		if (!this.item) return;
-		const batchSize = getMaxBatchSize(this.item);
+		const batchSize = ModifyConstantRuleElementHelper.getConstant(
+			this.actor,
+			"batchSize",
+			{ item: this.item },
+			new Set([...this.actor.getRollOptions(), ...getHeroicItemRollOptions(this.item), "action:begin-project"])
+		);
 		this.formData.batchSize = batchSize;
 		this.batchSizeMax = batchSize;
 	}
@@ -481,49 +493,4 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		const maxStartingValue = UnsignedCoinsPF2e.multiplyCoins(this.formData.batchSize / 2, this.item.price.value);
 		return maxStartingValue;
 	}
-}
-
-const consumableMagicSlugs = [
-	"scroll-of",
-	"magic-wand",
-	"wand-of-mercy",
-	"wand-of-legerdemain",
-	"wand-of-reaching",
-	"wand-of-widening",
-	"wand-of-continuation",
-];
-
-function isGenericScrollOrWand(item: PhysicalItemPF2e | undefined) {
-	if (!item) {
-		return false;
-	}
-	if (!["wand", "scroll"].includes((item as ConsumablePF2e).category)) {
-		return false;
-	}
-	if (!consumableMagicSlugs.some((slugStart) => item.slug?.startsWith(slugStart))) {
-		return false;
-	}
-	return true;
-}
-
-function getGenericScrollOrWandRank(item: ConsumablePF2e) {
-	const containedSpellRankString = /(\d+)(?=((st)|(nd)|(rd)|(th)))/.exec(item.name) ?? ["1"];
-	const containedSpellRank = Number.parseInt(containedSpellRankString[0]) || 1;
-	return containedSpellRank;
-}
-
-function getMaxBatchSize(item: PhysicalItemPF2e | undefined): number {
-	if (!item) return 1;
-	const isAmmo = item.isOfType("consumable") && (item as ConsumablePF2e).isAmmo;
-	const isMundaneAmmo = isAmmo && !item.isMagical;
-	const isConsumable =
-		(item.isOfType("consumable") && (item as ConsumablePF2e).category !== "wand") ||
-		(item.isOfType("weapon") && (item as WeaponPF2e).baseType === "alchemical-bomb");
-
-	const magicalAmmo = isConsumable && !isAmmo ? 4 : 1;
-	const batchSize = Math.max(
-		item.system.price.per,
-		isMundaneAmmo ? Math.clamp(item.system.price.per, 1, 10) : magicalAmmo
-	);
-	return batchSize;
 }

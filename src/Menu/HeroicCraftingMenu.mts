@@ -21,10 +21,12 @@ import {
 } from "../Helper/constants.mjs";
 import { UnsignedCoins } from "../Helper/currency.mjs";
 import { calculateDC } from "../Helper/dc.mjs";
+import { getHeroicItemRollOptions } from "../Helper/item.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { ProjectContextData, Projects } from "../Projects/projects.mjs";
 import { reverseEngineer } from "../ReverseEngineer/reverseEngineer.mjs";
+import { ModifyConstantRuleElementHelper } from "../RuleElement/Helpers/ModifyConstantHelper.mjs";
 import { salvage } from "../Salvage/salvage.mjs";
 
 const { ApplicationV2, DialogV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -38,7 +40,6 @@ enum HeroCraftingMenuTab {
 	REVERSE_ENGINEER = "reverse-engineer",
 	FORAGE = "forage",
 }
-// Forage, Reverse Engineer
 
 enum HeroCraftingMenuSalvageTab {
 	EXISTING = "existing",
@@ -428,7 +429,21 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 	}
 
 	private async getBeginProjectContext(): Promise<HeroCraftingMenuBeginProjectContext> {
-		const formulas = await this.actor.crafting.getFormulas();
+		const formulas = (await this.actor.crafting.getFormulas()).map((formula) => {
+			const batchSizeMax = ModifyConstantRuleElementHelper.getConstant(
+				this.actor,
+				"batchSize",
+				{ item: formula.item },
+				new Set([
+					...this.actor.getRollOptions(),
+					...getHeroicItemRollOptions(formula.item),
+					"action:begin-project",
+				])
+			);
+			const formulaData = foundry.utils.deepClone(formula);
+			formulaData.batchSize = batchSizeMax;
+			return formulaData;
+		});
 		const groupedFormulas = Object.groupBy<number, CraftingFormula>(formulas, ({ item }) => item.level) as Record<
 			number,
 			CraftingFormula[]
