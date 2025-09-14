@@ -1,5 +1,4 @@
-import { DENOMINATIONS } from "./currencyTypes.mjs";
-import { UnsignedCoins } from "./currencyTypes.mjs";
+import { DENOMINATIONS, UnsignedCoins } from "./currencyTypes.mjs";
 
 export class UnsignedCoinsPF2e implements UnsignedCoins {
 	declare cp: number;
@@ -122,7 +121,8 @@ export class UnsignedCoinsPF2e implements UnsignedCoins {
 		const parts: string[] = [];
 		for (const denomination of DENOMINATIONS) {
 			if (this[denomination]) {
-				parts.push(`${this[denomination]} ${game.i18n.localize(`PF2E.CurrencyAbbreviations.${denomination}`)}`);
+				const localisedDenomString = game.i18n.localize(`PF2E.CurrencyAbbreviations.${denomination}`);
+				parts.push(`${this[denomination]} ${localisedDenomString}`);
 			}
 		}
 

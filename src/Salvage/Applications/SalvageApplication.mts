@@ -7,7 +7,7 @@ import {
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
 import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
-import { DENOMINATION } from "../../Helper/currencyTypes.mjs";
+import { DENOMINATION, UnsignedCoins } from "../../Helper/currencyTypes.mjs";
 import {
 	CRAFTING_MATERIAL_SLUG,
 	DEGREE_OF_SUCCESS_STRINGS,
@@ -24,7 +24,6 @@ import { ModifyProgressRuleElementHelper } from "../../RuleElement/Helpers/Modif
 import { ProjectCraftDuration } from "../../CraftProject/types.mjs";
 import { ModifyConstantRuleElementHelper } from "../../RuleElement/Helpers/ModifyConstantHelper.mjs";
 import { getHeroicItemRollOptions } from "../../Helper/item.mjs";
-import { UnsignedCoins } from "../../Helper/currencyTypes.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 

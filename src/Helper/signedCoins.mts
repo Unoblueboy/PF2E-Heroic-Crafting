@@ -1,5 +1,4 @@
-import { DENOMINATIONS } from "./currencyTypes.mjs";
-import { SignedCoins } from "./currencyTypes.mjs";
+import { DENOMINATIONS, SignedCoins } from "./currencyTypes.mjs";
 
 export class SignedCoinsPF2e implements SignedCoins {
 	declare cp: number;
@@ -148,7 +147,8 @@ export class SignedCoinsPF2e implements SignedCoins {
 		const parts: string[] = [];
 		for (const denomination of DENOMINATIONS) {
 			if (this[denomination]) {
-				parts.push(`${this[denomination]} ${game.i18n.localize(`PF2E.CurrencyAbbreviations.${denomination}`)}`);
+				const localisedDenomString = game.i18n.localize(`PF2E.CurrencyAbbreviations.${denomination}`);
+				parts.push(`${this[denomination]} ${localisedDenomString}`);
 			}
 		}
 
