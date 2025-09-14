@@ -6,7 +6,8 @@ import {
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
-import { CoinsPF2eUtility, DENOMINATION } from "../../Helper/currency.mjs";
+import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
+import { DENOMINATION } from "../../Helper/currencyTypes.mjs";
 import {
 	CRAFTING_MATERIAL_SLUG,
 	DEGREE_OF_SUCCESS_STRINGS,

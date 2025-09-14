@@ -3,9 +3,6 @@ import { UnsignedCoins, SignedCoins } from "./currencyTypes.mjs";
 import { SignedCoinsPF2e } from "./signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "./unsignedCoins.mjs";
 
-export const DENOMINATIONS = ["pp", "gp", "sp", "cp"] as const;
-export type DENOMINATION = (typeof DENOMINATIONS)[number];
-
 export class CoinsPF2eUtility {
 	static isCoin(coin: unknown): coin is Coins {
 		return typeof coin === "object" && coin !== null;

@@ -1,4 +1,4 @@
-import { DENOMINATIONS } from "./currency.mjs";
+import { DENOMINATIONS } from "./currencyTypes.mjs";
 import { UnsignedCoins } from "./currencyTypes.mjs";
 
 export class UnsignedCoinsPF2e implements UnsignedCoins {

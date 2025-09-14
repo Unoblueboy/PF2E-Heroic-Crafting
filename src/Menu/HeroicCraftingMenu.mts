@@ -25,6 +25,7 @@ import { getHeroicItemRollOptions } from "../Helper/item.mjs";
 import { consoleDebug } from "../Helper/log.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
+import { editMaterialTrove } from "../MaterialTrove/materialTroveHelper.mjs";
 import { ProjectContextData, Projects } from "../Projects/projects.mjs";
 import { reverseEngineer } from "../ReverseEngineer/reverseEngineer.mjs";
 import { ModifyConstantRuleElementHelper } from "../RuleElement/Helpers/ModifyConstantHelper.mjs";
@@ -294,7 +295,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			await Item.implementation.create(materialTrove.toObject(), { parent: this.actor });
 		}
 
-		await MaterialTrove.editMaterialTrove(this.actor);
+		await editMaterialTrove(this.actor);
 	}
 
 	async toggleGeneralSummary(target: HTMLElement) {
