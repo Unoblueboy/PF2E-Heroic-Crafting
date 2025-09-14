@@ -131,6 +131,12 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 		downgrade: 30,
 		upgrade: 40,
 		override: 50,
+		and: 50,
+		or: 50,
+		nand: 50,
+		nor: 50,
+		xor: 50,
+		not: 50,
 	};
 
 	static readonly HEROIC_CRAFTING_CONSTANTS = ["spendingLimit", "batchSize", "rushCost"] as const;
@@ -242,6 +248,11 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 		const change = this.resolveValue(this.value);
 
 		switch (this.operation) {
+			case "and":
+			case "or":
+			case "nand":
+			case "nor":
+			case "xor":
 			case "override": {
 				console.debug(`HEROIC CRAFTING | DEBUG | change ${change} ${typeof change}`);
 				if (typeof change !== "boolean") {
@@ -253,6 +264,20 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 					constant: this.constant,
 					operation: this.operation,
 					change,
+				};
+				synthetics.push(synthetic);
+				break;
+			}
+			case "not": {
+				console.debug(`HEROIC CRAFTING | DEBUG | change ${change} ${typeof change}`);
+				if (typeof change !== "boolean") {
+					this.failValidation(`${this.value} (${change}) could not resolve to a boolean`);
+					return;
+				}
+				const synthetic: ModifyConstantRushCostSynthetic = {
+					predicate,
+					constant: this.constant,
+					operation: this.operation,
 				};
 				synthetics.push(synthetic);
 				break;
