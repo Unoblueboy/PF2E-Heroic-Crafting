@@ -284,7 +284,7 @@ class ProjectWithSpell extends Project {
 	}
 
 	private getSpellItemLink(item: PhysicalItemPF2e, spell: SpellPF2e): string {
-		return item.link.replace(/(?<={).*(?=})/, this.getSpellItemName(item, spell));
+		return item.link.replace(/(?<=^[^{]*\{).*(?=\}$)/, this.getSpellItemName(item, spell));
 	}
 
 	async createItem(): Promise<PhysicalItemPF2e | undefined> {

@@ -30,7 +30,7 @@ export function isGenericScrollOrWand(item: PhysicalItemPF2e | undefined) {
 }
 
 export function getGenericScrollOrWandRank(item: ConsumablePF2e) {
-	const containedSpellRankString = /(\d+)(?=((st)|(nd)|(rd)|(th)))/.exec(item.name) ?? ["1"];
+	const containedSpellRankString = /(\d{1,2})(?=((st)|(nd)|(rd)|(th)))/.exec(item.name) ?? ["1"];
 	const containedSpellRank = Number.parseInt(containedSpellRankString[0]) || 1;
 	return containedSpellRank;
 }

@@ -1,5 +1,3 @@
-console.log("Heroic Crafting |", `Begin Importing ${import.meta.url.replace(/.*\//g, "")}`);
-
 import { CharacterPF2e } from "../types/src/module/actor";
 import { RuleElementSynthetics } from "../types/src/module/rules";
 import { ModifyProgressSynthetic } from "./RuleElement/modifyProgressElement.mjs";
