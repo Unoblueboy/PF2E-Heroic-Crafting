@@ -1,0 +1,4 @@
+name: sonarcloud-CI
+on:
+  workflow_dispatch:
+  push:
