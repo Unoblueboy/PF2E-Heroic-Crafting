@@ -15,6 +15,8 @@ import {
 } from "../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
+import { objectToString } from "../Helper/generics.mjs";
+import { consoleDebug } from "../Helper/log.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import {
 	ModifyConstantBatchSizeSynthetic,
@@ -215,13 +217,18 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 			case "upgrade":
 			case "downgrade":
 			case "override": {
-				if (CONFIG.debug.ruleElement)
-					console.debug(`HEROIC CRAFTING | DEBUG | change ${change} ${typeof change}`);
+				consoleDebug(
+					CONFIG.debug.ruleElement,
+					"CreateBatchSizeSynthetic",
+					objectToString(change),
+					typeof change
+				);
 				if (typeof change === "string" && Number.isNumeric(change)) {
 					change = Number.parseFloat(change);
 				}
 				if (typeof change !== "number" || !Number.isNumeric(change)) {
-					this.failValidation(`${this.value} (${change}) could not resolve to a number`);
+					const changeString = objectToString(change);
+					this.failValidation(`${this.value} (${changeString}) could not resolve to a number`);
 					return;
 				}
 				const synthetic: ModifyConstantBatchSizeSynthetic = {
@@ -254,9 +261,15 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 			case "nor":
 			case "xor":
 			case "override": {
-				console.debug(`HEROIC CRAFTING | DEBUG | change ${change} ${typeof change}`);
+				consoleDebug(
+					CONFIG.debug.ruleElement,
+					"CreateRushCostSynthetic",
+					objectToString(change),
+					typeof change
+				);
 				if (typeof change !== "boolean") {
-					this.failValidation(`${this.value} (${change}) could not resolve to a boolean`);
+					const changeString = objectToString(change);
+					this.failValidation(`${this.value} (${changeString}) could not resolve to a boolean`);
 					return;
 				}
 				const synthetic: ModifyConstantRushCostSynthetic = {
@@ -269,9 +282,15 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 				break;
 			}
 			case "not": {
-				console.debug(`HEROIC CRAFTING | DEBUG | change ${change} ${typeof change}`);
+				consoleDebug(
+					CONFIG.debug.ruleElement,
+					"CreateRushCostSynthetic",
+					objectToString(change),
+					typeof change
+				);
 				if (typeof change !== "boolean") {
-					this.failValidation(`${this.value} (${change}) could not resolve to a boolean`);
+					const changeString = objectToString(change);
+					this.failValidation(`${this.value} (${changeString}) could not resolve to a boolean`);
 					return;
 				}
 				const synthetic: ModifyConstantRushCostSynthetic = {
@@ -299,12 +318,18 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 		switch (this.operation) {
 			case "multiply":
 			case "divide": {
-				console.debug(`HEROIC CRAFTING | DEBUG | change ${change} ${typeof change}`);
+				consoleDebug(
+					CONFIG.debug.ruleElement,
+					"CreateRushCostSynthetic",
+					objectToString(change),
+					typeof change
+				);
 				if (typeof change === "string" && Number.isNumeric(change)) {
 					change = Number.parseFloat(change);
 				}
 				if (typeof change !== "number" || !Number.isNumeric(change)) {
-					this.failValidation(`${this.value} (${change}) could not resolve to a number`);
+					const changeString = objectToString(change);
+					this.failValidation(`${this.value} (${changeString}) could not resolve to a number`);
 					return;
 				}
 				const synthetic: ModifyConstantSpendingLimitMultDivSynthetic = {
@@ -328,7 +353,8 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 					change = UnsignedCoinsPF2e.fromString(change);
 				}
 				if (!CoinsPF2eUtility.isCoin(change)) {
-					this.failValidation(`${this.value} (${change}) could not resolve to Coins`);
+					const changeString = objectToString(change);
+					this.failValidation(`${this.value} (${changeString}) could not resolve to Coins`);
 					return;
 				}
 				const synthetic: ModifyConstantSpendingLimitOtherSynthetic = {
