@@ -1,7 +1,7 @@
 import { PhysicalItemPF2e } from "../../../types/src/module/item/physical";
 import { DegreeOfSuccessString } from "../../../types/src/module/system/degree-of-success";
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
-import { UnsignedCoins } from "../../Helper/currency.mjs";
+import { UnsignedCoins } from "../../Helper/currencyTypes.mjs";
 
 export type SalvageApplicationResult = {
 	savvyTeardown: boolean;

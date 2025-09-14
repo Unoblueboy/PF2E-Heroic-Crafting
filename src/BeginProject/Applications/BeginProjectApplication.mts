@@ -8,7 +8,8 @@ import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/app
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../../Helper/constants.mjs";
-import { DENOMINATION, UnsignedCoins } from "../../Helper/currency.mjs";
+import { DENOMINATION } from "../../Helper/currency.mjs";
+import { UnsignedCoins } from "../../Helper/currencyTypes.mjs";
 import { calculateDC } from "../../Helper/dc.mjs";
 import { getGenericScrollOrWandRank, getHeroicItemRollOptions, isGenericScrollOrWand } from "../../Helper/item.mjs";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";

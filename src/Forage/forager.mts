@@ -4,7 +4,7 @@ import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-s
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { HEROIC_CRAFTING_GATHERED_INCOME } from "../Helper/constants.mjs";
-import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
+import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { ModifyProgressRuleElementHelper } from "../RuleElement/Helpers/ModifyProgressHelper.mjs";
 import { ForageDcDialog } from "./Applications/ForageDcDialog.mjs";
@@ -96,7 +96,7 @@ async function rollForageCheck(actor: CharacterPF2eHeroicCrafting, data: { dc: n
 				},
 				new Set(["action:forage"])
 			);
-			const forage = outcome ? new SignedCoinsPF2e(progress[outcome]).toUnsignedCoins() : new UnsignedCoinsPF2e();
+			const forage = outcome ? CoinsPF2eUtility.toUnsignedCoins(progress[outcome]) : new UnsignedCoinsPF2e();
 			const flavor = await foundry.applications.handlebars.renderTemplate(
 				"modules/pf2e-heroic-crafting/templates/chat/forage/result.hbs",
 				{

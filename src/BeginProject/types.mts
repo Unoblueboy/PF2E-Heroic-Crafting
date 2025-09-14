@@ -1,5 +1,5 @@
 import { PhysicalItemPF2e } from "../../types/src/module/item/physical";
-import { UnsignedCoins } from "../Helper/currency.mjs";
+import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 import { Either } from "../Helper/generics.mjs";
 
 export interface ProjectItemDetails {

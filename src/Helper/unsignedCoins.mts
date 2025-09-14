@@ -1,5 +1,5 @@
-import { DENOMINATIONS, SignedCoins, UnsignedCoins } from "./currency.mjs";
-import { SignedCoinsPF2e } from "./signedCoins.mjs";
+import { DENOMINATIONS } from "./currency.mjs";
+import { UnsignedCoins } from "./currencyTypes.mjs";
 
 export class UnsignedCoinsPF2e implements UnsignedCoins {
 	declare cp: number;
@@ -49,10 +49,6 @@ export class UnsignedCoinsPF2e implements UnsignedCoins {
 			}
 			return result;
 		}, {});
-	}
-
-	toSignedCoins(): SignedCoins {
-		return new SignedCoinsPF2e(this);
 	}
 
 	static fromString(coinString: string, quantity = 1): UnsignedCoinsPF2e {

@@ -5,7 +5,7 @@ import { ItemUUID } from "../../types/types/foundry/common/documents/_module.mjs
 import { itemDataUuid, ProjectItemDetails } from "../BeginProject/types.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { FORMULA_PRICE, MODULE_ID, RARITIES } from "../Helper/constants.mjs";
-import { UnsignedCoins } from "../Helper/currency.mjs";
+import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 import { getHeroicItemRollOptions } from "../Helper/item.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 

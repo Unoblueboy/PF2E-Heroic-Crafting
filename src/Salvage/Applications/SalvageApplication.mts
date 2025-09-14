@@ -6,7 +6,7 @@ import {
 } from "../../../types/types/foundry/client/applications/_module.mjs";
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
-import { DENOMINATION, UnsignedCoins } from "../../Helper/currency.mjs";
+import { CoinsPF2eUtility, DENOMINATION } from "../../Helper/currency.mjs";
 import {
 	CRAFTING_MATERIAL_SLUG,
 	DEGREE_OF_SUCCESS_STRINGS,
@@ -23,6 +23,7 @@ import { ModifyProgressRuleElementHelper } from "../../RuleElement/Helpers/Modif
 import { ProjectCraftDuration } from "../../CraftProject/types.mjs";
 import { ModifyConstantRuleElementHelper } from "../../RuleElement/Helpers/ModifyConstantHelper.mjs";
 import { getHeroicItemRollOptions } from "../../Helper/item.mjs";
+import { UnsignedCoins } from "../../Helper/currencyTypes.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -364,12 +365,12 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			success: {
 				content: new SignedCoinsPF2e(progress.success).toString(),
 				tooltip: tooltipArrays.success.join("<br>"),
-				value: new SignedCoinsPF2e(progress.success).toUnsignedCoins(),
+				value: CoinsPF2eUtility.toUnsignedCoins(progress.success),
 			},
 			failure: {
 				content: new SignedCoinsPF2e(progress.failure).toString(),
 				tooltip: tooltipArrays.failure.join("<br>"),
-				value: new SignedCoinsPF2e(progress.failure).toUnsignedCoins(),
+				value: CoinsPF2eUtility.toUnsignedCoins(progress.failure),
 			},
 		};
 
@@ -377,14 +378,14 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			incomeData.criticalSuccess = {
 				content: new SignedCoinsPF2e(progress.criticalSuccess).toString(),
 				tooltip: tooltipArrays.criticalSuccess.join("<br>"),
-				value: new SignedCoinsPF2e(progress.criticalSuccess).toUnsignedCoins(),
+				value: CoinsPF2eUtility.toUnsignedCoins(progress.criticalSuccess),
 			};
 		}
 		if (!SignedCoinsPF2e.equal(progress.failure, progress.criticalFailure)) {
 			incomeData.criticalFailure = {
 				content: new SignedCoinsPF2e(progress.criticalFailure).toString(),
 				tooltip: tooltipArrays.criticalFailure.join("<br>"),
-				value: new SignedCoinsPF2e(progress.criticalFailure).toUnsignedCoins(),
+				value: CoinsPF2eUtility.toUnsignedCoins(progress.criticalFailure),
 			};
 		}
 		return incomeData;
@@ -456,12 +457,12 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			success: {
 				content: new SignedCoinsPF2e(progress.success).toString(),
 				tooltip: tooltipArrays.success.join("<br>"),
-				value: new SignedCoinsPF2e(progress.success).toUnsignedCoins(),
+				value: CoinsPF2eUtility.toUnsignedCoins(progress.success),
 			},
 			failure: {
 				content: new SignedCoinsPF2e(progress.failure).toString(),
 				tooltip: tooltipArrays.failure.join("<br>"),
-				value: new SignedCoinsPF2e(progress.failure).toUnsignedCoins(),
+				value: CoinsPF2eUtility.toUnsignedCoins(progress.failure),
 			},
 		};
 
@@ -469,14 +470,14 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			incomeData.criticalSuccess = {
 				content: new SignedCoinsPF2e(progress.criticalSuccess).toString(),
 				tooltip: tooltipArrays.criticalSuccess.join("<br>"),
-				value: new SignedCoinsPF2e(progress.criticalSuccess).toUnsignedCoins(),
+				value: CoinsPF2eUtility.toUnsignedCoins(progress.criticalSuccess),
 			};
 		}
 		if (!SignedCoinsPF2e.equal(progress.failure, progress.criticalFailure)) {
 			incomeData.criticalFailure = {
 				content: new SignedCoinsPF2e(progress.criticalFailure).toString(),
 				tooltip: tooltipArrays.criticalFailure.join("<br>"),
-				value: new SignedCoinsPF2e(progress.criticalFailure).toUnsignedCoins(),
+				value: CoinsPF2eUtility.toUnsignedCoins(progress.criticalFailure),
 			};
 		}
 		return incomeData;

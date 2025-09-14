@@ -5,7 +5,6 @@ import {
 	RuleElementSource,
 } from "../../types/src/module/rules/rule-element";
 import { RollOptionRuleElement } from "../../types/src/module/rules/rule-element/roll-option/rule-element";
-import { Predicate } from "../../types/src/module/system/predication";
 import { StringField } from "../../types/types/foundry/common/data/fields.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import {
@@ -14,8 +13,15 @@ import {
 	HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD,
 	HEROIC_CRAFTING_SPENDING_LIMIT_UNSIGNEDCOINSPF2E_RECORD,
 } from "../Helper/constants.mjs";
-import { CoinsPF2eUtility, UnsignedCoins } from "../Helper/currency.mjs";
+import { CoinsPF2eUtility } from "../Helper/currency.mjs";
+import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
+import {
+	ModifyConstantBatchSizeSynthetic,
+	ModifyConstantRushCostSynthetic,
+	ModifyConstantSpendingLimitMultDivSynthetic,
+	ModifyConstantSpendingLimitOtherSynthetic,
+} from "./types";
 
 type ModifyConstantSchema = RuleElementSchema & {
 	constant: StringField;
@@ -26,53 +32,6 @@ type ModifyConstantSchema = RuleElementSchema & {
 const fields = foundry.data.fields;
 export type ModifyConstantChangeOperation = keyof typeof ModifyConstantRuleElement.CHANGE_OPERATION_DEFAULT_PRIORITIES;
 export type ModifyConstantElementConstant = (typeof ModifyConstantRuleElement.HEROIC_CRAFTING_CONSTANTS)[number];
-
-type ModifyConstantSpendingLimitMultDivSynthetic = {
-	predicate: Predicate;
-	constant: "spendingLimit";
-	operation: "multiply" | "divide";
-	change: number;
-};
-
-type ModifyConstantSpendingLimitOtherSynthetic = {
-	predicate: Predicate;
-	constant: "spendingLimit";
-	operation: "add" | "subtract" | "upgrade" | "downgrade" | "override";
-	change: UnsignedCoins;
-};
-
-export type ModifyConstantBatchSizeSynthetic = {
-	predicate: Predicate;
-	constant: "batchSize";
-	operation: "add" | "subtract" | "multiply" | "divide" | "upgrade" | "downgrade" | "override";
-	change: number;
-};
-
-export type ModifyConstantRushCostBooleanSynthetic = {
-	predicate: Predicate;
-	constant: "rushCost";
-	operation: "override" | "and" | "or" | "nand" | "nor" | "xor";
-	change: boolean;
-};
-
-export type ModifyConstantRushCostUnarySynthetic = {
-	predicate: Predicate;
-	constant: "rushCost";
-	operation: "not";
-};
-
-export type ModifyConstantRushCostSynthetic =
-	| ModifyConstantRushCostBooleanSynthetic
-	| ModifyConstantRushCostUnarySynthetic;
-
-export type ModifyConstantSpendingLimitSynthetic =
-	| ModifyConstantSpendingLimitMultDivSynthetic
-	| ModifyConstantSpendingLimitOtherSynthetic;
-
-export type ModifyConstantSynthetic =
-	| ModifyConstantSpendingLimitSynthetic
-	| ModifyConstantBatchSizeSynthetic
-	| ModifyConstantRushCostSynthetic;
 
 export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConstantSchema> {
 	protected static override validActorTypes: ["character"] = ["character"];

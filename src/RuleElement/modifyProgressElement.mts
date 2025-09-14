@@ -1,7 +1,6 @@
 import { ResolvableValueField, RuleElementSchema } from "../../types/src/module/rules/rule-element";
 import { RollOptionRuleElement } from "../../types/src/module/rules/rule-element/roll-option/rule-element";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
-import { Predicate } from "../../types/src/module/system/predication";
 import { StringField } from "../../types/types/foundry/common/data/fields.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import {
@@ -10,8 +9,10 @@ import {
 	HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD,
 	HEROIC_CRAFTING_SPENDING_LIMIT_UNSIGNEDCOINSPF2E_RECORD,
 } from "../Helper/constants.mjs";
-import { CoinsPF2eUtility, UnsignedCoins } from "../Helper/currency.mjs";
+import { CoinsPF2eUtility } from "../Helper/currency.mjs";
+import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
+import { ModifyProgressSynthetic } from "./types";
 
 type ModifyProgressSchema = RuleElementSchema & {
 	outcome: StringField;
@@ -21,24 +22,6 @@ type ModifyProgressSchema = RuleElementSchema & {
 
 const fields = foundry.data.fields;
 type ModifyProgressChangeOperation = keyof typeof ModifyProgressRuleElement.CHANGE_OPERATION_DEFAULT_PRIORITIES;
-
-type ModifyProgressMultDivSynthetic = {
-	predicate: Predicate;
-	operation: "multiply" | "divide";
-	change: number;
-	outcome: DegreeOfSuccessString[];
-	label: string;
-};
-
-type ModifyProgressAddSubSynthetic = {
-	predicate: Predicate;
-	operation: "add" | "subtract" | "upgrade" | "downgrade" | "override";
-	change: UnsignedCoins;
-	outcome: DegreeOfSuccessString[];
-	label: string;
-};
-
-export type ModifyProgressSynthetic = ModifyProgressMultDivSynthetic | ModifyProgressAddSubSynthetic;
 
 export class ModifyProgressRuleElement extends game.pf2e.RuleElement<ModifyProgressSchema> {
 	protected static override validActorTypes: ["character"] = ["character"];

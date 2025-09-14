@@ -2,7 +2,8 @@ import { ChatMessagePF2e } from "../../types/src/module/chat-message/document";
 import { PhysicalItemPF2e } from "../../types/src/module/item";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
-import { UnsignedCoins } from "../Helper/currency.mjs";
+import { CoinsPF2eUtility } from "../Helper/currency.mjs";
+import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 import { fractionToPercent } from "../Helper/generics.mjs";
 import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
@@ -48,7 +49,7 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 		await project.createItem();
 		await project.delete();
 	} else {
-		await project.setValue(newProjectTotal.toUnsignedCoins());
+		await project.setValue(CoinsPF2eUtility.toUnsignedCoins(newProjectTotal));
 	}
 
 	const projectProgressPercent = fractionToPercent(newProjectTotal.copperValue, projectMax.copperValue);

@@ -4,13 +4,13 @@ import { CheckRoll } from "../../types/src/module/system/check";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { StatisticRollParameters } from "../../types/src/module/system/statistic";
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
-import { UnsignedCoins } from "../Helper/currency.mjs";
 import { SALVAGE_MATERIAL_UUID } from "../Helper/constants.mjs";
 import { SalvageApplication } from "./Applications/SalvageApplication.mjs";
 import { SalvageApplicationResult } from "./Applications/types.mjs";
 import { calculateDC } from "../Helper/dc.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
+import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 
 export async function salvage(actor: CharacterPF2eHeroicCrafting, item?: PhysicalItemPF2e, lockItem = false) {
 	const salvageDetails = await SalvageApplication.GetSalvageDetails({ actor: actor, item: item, lockItem: lockItem });

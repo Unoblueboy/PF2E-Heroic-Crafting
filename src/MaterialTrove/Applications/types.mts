@@ -1,4 +1,4 @@
-import { UnsignedCoins } from "../../Helper/currency.mjs";
+import { UnsignedCoins } from "../../Helper/currencyTypes.mjs";
 
 export type EditMaterialTroveApplicationResult = {
 	newMaterialTroveValue: UnsignedCoins;

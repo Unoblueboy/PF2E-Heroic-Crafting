@@ -1,5 +1,5 @@
-import { DENOMINATIONS, SignedCoins, UnsignedCoins } from "./currency.mjs";
-import { UnsignedCoinsPF2e } from "./unsignedCoins.mjs";
+import { DENOMINATIONS } from "./currency.mjs";
+import { SignedCoins } from "./currencyTypes.mjs";
 
 export class SignedCoinsPF2e implements SignedCoins {
 	declare cp: number;
@@ -52,16 +52,6 @@ export class SignedCoinsPF2e implements SignedCoins {
 			},
 			{ isNegative: this.isNegative }
 		);
-	}
-
-	toUnsignedCoins(boundCoins: boolean = true): UnsignedCoins {
-		if (this.copperValue < 0) {
-			console.warn(`${this} converted to UnsignedCoins, sign has been lost in the process`);
-		}
-		const data = (boundCoins ? SignedCoinsPF2e.maxCoins({}, this) : this).toObject();
-		delete data.isNegative;
-
-		return new UnsignedCoinsPF2e(data as UnsignedCoins);
 	}
 
 	clone() {

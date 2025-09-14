@@ -1,5 +1,5 @@
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
-import { UnsignedCoins, SignedCoins } from "../Helper/currency.mjs";
+import { UnsignedCoins, SignedCoins } from "../Helper/currencyTypes.mjs";
 
 export type ProjectCraftMaterialSpent = {
 	trove?: UnsignedCoins;

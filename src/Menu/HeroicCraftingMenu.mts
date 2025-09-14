@@ -19,7 +19,7 @@ import {
 	MATERIAL_TROVE_UUID,
 	SALVAGE_MATERIAL_SLUG,
 } from "../Helper/constants.mjs";
-import { UnsignedCoins } from "../Helper/currency.mjs";
+import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 import { calculateDC } from "../Helper/dc.mjs";
 import { getHeroicItemRollOptions } from "../Helper/item.mjs";
 import { consoleDebug } from "../Helper/log.mjs";

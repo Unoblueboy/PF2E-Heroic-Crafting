@@ -6,7 +6,8 @@ import {
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/_module.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
-import { UnsignedCoins, SignedCoins } from "../../Helper/currency.mjs";
+import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
+import { UnsignedCoins, SignedCoins } from "../../Helper/currencyTypes.mjs";
 import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../materialTrove.mjs";
@@ -110,10 +111,12 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 		switch (this.tabGroups.primary) {
 			case EditMaterialTroveApplicationTab.ADD_SUB:
 				this.result = {
-					newMaterialTroveValue: SignedCoinsPF2e.addCoins(
-						this.materialTrove.value,
-						this.formData.curValue[EditMaterialTroveApplicationTab.ADD_SUB]
-					).toUnsignedCoins(),
+					newMaterialTroveValue: CoinsPF2eUtility.toUnsignedCoins(
+						SignedCoinsPF2e.addCoins(
+							this.materialTrove.value,
+							this.formData.curValue[EditMaterialTroveApplicationTab.ADD_SUB]
+						)
+					),
 					updateActorCoins: this.formData.updateActorCoins,
 				};
 				break;
@@ -222,10 +225,9 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 				if (!this.formData.updateActorCoins) return;
 				const difference = SignedCoinsPF2e.subtractCoins(this.formData.curValue.edit, this.materialTrove.value);
 				const boundedDifference = SignedCoinsPF2e.minCoins(difference, this.actor.inventory.coins);
-				this.formData.curValue[tab] = SignedCoinsPF2e.maxCoins(
-					{},
-					SignedCoinsPF2e.addCoins(this.materialTrove.value, boundedDifference)
-				).toUnsignedCoins();
+				this.formData.curValue[tab] = CoinsPF2eUtility.toUnsignedCoins(
+					SignedCoinsPF2e.maxCoins({}, SignedCoinsPF2e.addCoins(this.materialTrove.value, boundedDifference))
+				);
 				break;
 			}
 			default:
@@ -261,10 +263,9 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 					this.formData.curValue.edit,
 					this.materialTrove.value
 				);
-				const newActorValue = SignedCoinsPF2e.subtractCoins(
-					this.actor.inventory.coins,
-					coinDifference
-				).toUnsignedCoins();
+				const newActorValue = CoinsPF2eUtility.toUnsignedCoins(
+					SignedCoinsPF2e.subtractCoins(this.actor.inventory.coins, coinDifference)
+				);
 				context = {
 					...context,
 					trove: {
@@ -287,18 +288,19 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 				context = {
 					...context,
 					trove: {
-						newValue: SignedCoinsPF2e.addCoins(
-							this.materialTrove.value,
-							this.formData.curValue["add-sub"]
-						).toUnsignedCoins(),
+						newValue: CoinsPF2eUtility.toUnsignedCoins(
+							SignedCoinsPF2e.addCoins(this.materialTrove.value, this.formData.curValue["add-sub"])
+						),
 						baseValue: this.materialTrove.value,
 					},
 					currency: {
 						newValue: this.formData.updateActorCoins
-							? SignedCoinsPF2e.subtractCoins(
-									this.actor.inventory.coins,
-									this.formData.curValue["add-sub"]
-							  ).toUnsignedCoins()
+							? CoinsPF2eUtility.toUnsignedCoins(
+									SignedCoinsPF2e.subtractCoins(
+										this.actor.inventory.coins,
+										this.formData.curValue["add-sub"]
+									)
+							  )
 							: new UnsignedCoinsPF2e(this.actor.inventory.coins),
 						baseValue: new UnsignedCoinsPF2e(this.actor.inventory.coins),
 					},
