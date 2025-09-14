@@ -1,3 +1,7 @@
 {
-	"sonarlint.analysisExcludesStandalone": "**/*.d.ts,**/Handlebars-application.*"
+	"sonarlint.analysisExcludesStandalone": "**/*.d.ts,**/Handlebars-application.*",
+	"sonarlint.connectedMode.project": {
+		"connectionId": "unoblueboy",
+		"projectKey": "Unoblueboy_PF2E-Heroic-Crafting"
+	}
 }
