@@ -765,6 +765,12 @@ section.heroic-crafting-menu {
 			height: 2.25rem;
 		}
 
+		section.tab.active {
+			display: flex;
+			flex-direction: column;
+			flex-grow: 1;
+		}
+
 		.heroic-list {
 			list-style-type: none;
 			padding: 0;
@@ -837,44 +843,57 @@ section.heroic-crafting-menu {
 			}
 		}
 
-		section.tab.begin-project .formula-list {
-			.formula-header,
-			.formula-item {
-				grid-template-areas: "name dc price quantity button";
-				grid-template-rows: 1fr;
-				grid-template-columns: 1fr 1.5rem 4.5rem 7rem max-content;
-			}
+		section.tab.formulas .formula-list .formula-header,
+		section.tab.formulas .formula-list .formula-item {
+			grid-template-areas: "name dc price _ button";
+			grid-template-rows: 1fr;
+			grid-template-columns: 1fr 1.5rem 4.5rem 7rem max-content;
+		}
+		section.tab.begin-project .formula-list .formula-header,
+		section.tab.begin-project .formula-list .formula-item {
+			grid-template-areas: "name dc price quantity button";
+			grid-template-rows: 1fr;
+			grid-template-columns: 1fr 1.5rem 4.5rem 7rem max-content;
+		}
 
-			.formula-header .formula-header-name,
-			.formula-item .formula-item-name {
-				grid-area: name;
-				justify-self: start;
-				padding-left: 0.25rem;
-			}
+		section.tab.formulas .formula-list .formula-header .formula-header-name,
+		section.tab.formulas .formula-list .formula-item .formula-item-name,
+		section.tab.begin-project .formula-list .formula-header .formula-header-name,
+		section.tab.begin-project .formula-list .formula-item .formula-item-name {
+			grid-area: name;
+			justify-self: start;
+			padding-left: 0.25rem;
+		}
 
-			.formula-header .formula-header-dc,
-			.formula-item .formula-item-dc {
-				grid-area: dc;
-			}
+		section.tab.formulas .formula-list .formula-header .formula-header-dc,
+		section.tab.formulas .formula-list .formula-item .formula-item-dc,
+		section.tab.begin-project .formula-list .formula-header .formula-header-dc,
+		section.tab.begin-project .formula-list .formula-item .formula-item-dc {
+			grid-area: dc;
+		}
 
-			.formula-header .formula-header-price,
-			.formula-item .formula-item-price {
-				grid-area: price;
-			}
+		section.tab.formulas .formula-list .formula-header .formula-header-price,
+		section.tab.formulas .formula-list .formula-item .formula-item-price,
+		section.tab.begin-project .formula-list .formula-header .formula-header-price,
+		section.tab.begin-project .formula-list .formula-item .formula-item-price {
+			grid-area: price;
+		}
 
-			.formula-header .formula-header-quantity,
-			.formula-item .formula-item-quantity {
-				grid-area: quantity;
-			}
+		section.tab.begin-project .formula-list .formula-header .formula-header-quantity,
+		section.tab.begin-project .formula-list .formula-item .formula-item-quantity {
+			grid-area: quantity;
+		}
 
-			.formula-header .formula-header-button,
-			.formula-item .formula-item-button {
-				grid-area: button;
-			}
+		section.tab.formulas .formula-list .formula-header .formula-header-button,
+		section.tab.formulas .formula-list .formula-item .formula-item-button,
+		section.tab.begin-project .formula-list .formula-header .formula-header-button,
+		section.tab.begin-project .formula-list .formula-item .formula-item-button {
+			grid-area: button;
+		}
 
-			.formula-item .item-summary {
-				grid-column: name / button;
-			}
+		section.tab.formulas .formula-list .formula-item .item-summary,
+		section.tab.begin-project .formula-list .formula-item .item-summary {
+			grid-column: name / button;
 		}
 
 		section.tab.craft-project .project-list {

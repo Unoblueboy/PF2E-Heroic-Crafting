@@ -507,7 +507,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 
 		const item = await (async () => {
 			try {
-				return await CONFIG.PF2E.Item.documentClasses.armor.fromDropData<ItemPF2e<CharacterPF2eHeroicCrafting>>(
+				return await (CONFIG.Item.documentClass as typeof ItemPF2e<CharacterPF2eHeroicCrafting>).fromDropData(
 					data
 				);
 			} catch {

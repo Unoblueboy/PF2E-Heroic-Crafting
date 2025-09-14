@@ -397,7 +397,13 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	private async getItem(data: Record<string, JSONValue>): Promise<PhysicalItemPF2e | null> {
-		const item = await CONFIG.PF2E.Item.documentClasses.armor.fromDropData<ItemPF2e>(data);
+		const item = await (async () => {
+			try {
+				return await (CONFIG.Item.documentClass as typeof ItemPF2e).fromDropData(data);
+			} catch {
+				return null;
+			}
+		})();
 
 		if (!item) return null;
 		if (!item.isOfType("physical")) {

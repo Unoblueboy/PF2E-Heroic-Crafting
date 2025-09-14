@@ -1,5 +1,5 @@
 import { CraftingFormula } from "../../types/src/module/actor/character/crafting";
-import { PhysicalItemPF2e, TreasurePF2e } from "../../types/src/module/item";
+import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../types/src/module/item";
 import { ItemInstances } from "../../types/src/module/item/types";
 import {
 	ApplicationConfiguration,
@@ -22,6 +22,7 @@ import {
 import { UnsignedCoins } from "../Helper/currency.mjs";
 import { calculateDC } from "../Helper/dc.mjs";
 import { getHeroicItemRollOptions } from "../Helper/item.mjs";
+import { consoleDebug } from "../Helper/log.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { ProjectContextData, Projects } from "../Projects/projects.mjs";
@@ -39,6 +40,7 @@ enum HeroCraftingMenuTab {
 	SALVAGE = "salvage",
 	REVERSE_ENGINEER = "reverse-engineer",
 	FORAGE = "forage",
+	FORMULAS = "formulas",
 }
 
 enum HeroCraftingMenuSalvageTab {
@@ -70,6 +72,13 @@ type HeroCraftingMenuBeginProjectContext = {
 	}[];
 };
 
+type HeroCraftingMenuFormulasContext = {
+	formulaGroups: {
+		level: number;
+		formulas: CraftingFormula[];
+	}[];
+};
+
 type HeroCraftingMenuSalvageData = {
 	id: string;
 	img: string;
@@ -77,6 +86,14 @@ type HeroCraftingMenuSalvageData = {
 	name: string;
 	dc: number;
 	max: UnsignedCoins;
+};
+
+type HeroicCraftingMenuTabGroup<T> = {
+	tabs: {
+		id: T;
+		label: string;
+	}[];
+	initial: T;
 };
 
 export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -91,6 +108,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		tag: "section",
 		window: { title: "Heroic Crafting Menu", icon: "fa-solid fa-pen-ruler", resizable: true },
 		actions: {
+			"delete-formula": HeroCraftingMenu.deleteFormula,
 			"begin-project": HeroCraftingMenu.beginProject,
 			"craft-project": HeroCraftingMenu.craftProject,
 			salvage: HeroCraftingMenu.salvage,
@@ -103,7 +121,10 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		position: { width: 700, height: 800 },
 	};
 
-	static override readonly PARTS = {
+	static override readonly PARTS: Record<
+		HeroCraftingMenuPart | HeroCraftingMenuTab,
+		{ template: string; classes: string[] }
+	> = {
 		[HeroCraftingMenuPart.CHARACTER_SUMMARY]: {
 			template: "modules/pf2e-heroic-crafting/templates/menu/character-summary.hbs",
 			classes: ["charcter-summary"],
@@ -111,6 +132,10 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		[HeroCraftingMenuPart.TABS]: {
 			template: "modules/pf2e-heroic-crafting/templates/menu/tab-navigation.hbs",
 			classes: ["standard-form"],
+		},
+		[HeroCraftingMenuTab.FORMULAS]: {
+			template: "modules/pf2e-heroic-crafting/templates/menu/formulas.hbs",
+			classes: ["formulas"],
 		},
 		[HeroCraftingMenuTab.BEGIN]: {
 			template: "modules/pf2e-heroic-crafting/templates/menu/begin.hbs",
@@ -134,9 +159,13 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		},
 	};
 
-	static override readonly TABS = {
+	static override readonly TABS: {
+		primary: HeroicCraftingMenuTabGroup<HeroCraftingMenuTab>;
+		salvage: HeroicCraftingMenuTabGroup<HeroCraftingMenuSalvageTab>;
+	} = {
 		primary: {
 			tabs: [
+				{ id: HeroCraftingMenuTab.FORMULAS, label: "Formulas" },
 				{ id: HeroCraftingMenuTab.BEGIN, label: "Begin a Project" },
 				{ id: HeroCraftingMenuTab.CRAFT, label: "Craft a Project" },
 				{ id: HeroCraftingMenuTab.SALVAGE, label: "Salvage" },
@@ -162,6 +191,20 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		if (!actor || actor.type !== "character") return;
 
 		new HeroCraftingMenu({ actor: actor }).render(true);
+	}
+
+	private static async deleteFormula(this: HeroCraftingMenu, event: Event, target: HTMLElement) {
+		consoleDebug(CONFIG.debug.applications, "HeroCraftingMenu.deleteFormula", event, target);
+
+		if (!(event.target instanceof HTMLAnchorElement)) return;
+		const itemUuid = target.dataset.itemUuid;
+		if (!itemUuid) {
+			return;
+		}
+
+		const formulas = this.actor.toObject().system.crafting?.formulas ?? [];
+		formulas.findSplice((f) => f.uuid === itemUuid);
+		return this.actor.update({ "system.crafting.formulas": formulas });
 	}
 
 	private static async beginProject(this: HeroCraftingMenu, event: Event, target: HTMLElement) {
@@ -279,7 +322,8 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			isCreature: item.actor?.isOfType("creature"),
 			chatData: chatData,
 		};
-		console.log(chatData, summaryContext);
+
+		consoleDebug(CONFIG.debug.applications, "HeroCraftingMenu.toggleGeneralSummary", chatData, summaryContext);
 		const summary = await foundry.applications.handlebars.renderTemplate(
 			"systems/pf2e/templates/actors/partials/item-summary.hbs",
 			summaryContext
@@ -318,7 +362,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			chatData: chatData,
 		};
 
-		console.log(chatData, summaryContext);
+		consoleDebug(CONFIG.debug.applications, "HeroCraftingMenu.toggleProjectSummary", chatData, summaryContext);
 		const summary = await foundry.applications.handlebars.renderTemplate(
 			"systems/pf2e/templates/actors/partials/item-summary.hbs",
 			summaryContext
@@ -345,9 +389,13 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		await super._onRender(context, options);
 		new foundry.applications.ux.DragDrop.implementation({
 			dragSelector: "[data-is-formula], [data-is-item]",
+			dropSelector: ".tab.formulas",
 			callbacks: {
 				dragstart: (event: DragEvent) => {
 					this.onDragStart(event);
+				},
+				drop: (event: DragEvent) => {
+					this.onDrop(event);
 				},
 			},
 		}).bind(this.element);
@@ -381,6 +429,28 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		dataTransfer.setData("text/plain", JSON.stringify(baseDragData));
 	}
 
+	private async onDrop(event: DragEvent) {
+		const data = game.pf2e.TextEditor.getDragEventData(event);
+		consoleDebug(CONFIG.debug.applications, "HeroCraftingMenu onDrop", data);
+
+		if (this.tabGroups.primary !== HeroCraftingMenuTab.FORMULAS) return;
+
+		const item = await (async () => {
+			try {
+				return await (CONFIG.Item.documentClass as typeof ItemPF2e).fromDropData(data);
+			} catch {
+				return null;
+			}
+		})();
+		if (item?.isOfType("physical")) {
+			const formulas = this.actor.toObject().system.crafting?.formulas ?? [];
+			if (!formulas.some((f) => f.uuid === item.uuid)) {
+				formulas.push({ uuid: item.uuid });
+				await this.actor.update({ "system.crafting.formulas": formulas });
+			}
+		}
+	}
+
 	override _onClose(options: fa.ApplicationClosingOptions) {
 		super._onClose(options);
 		delete this.actor.apps[this.id];
@@ -398,24 +468,25 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		});
 		switch (partId) {
 			case HeroCraftingMenuPart.CHARACTER_SUMMARY:
-				context = foundry.utils.mergeObject(context, await this.getCharacterSummaryContext());
-				break;
+				return foundry.utils.mergeObject(context, await this.getCharacterSummaryContext());
 			case HeroCraftingMenuTab.BEGIN:
-				context = foundry.utils.mergeObject(context, await this.getBeginProjectContext());
-				break;
+				return foundry.utils.mergeObject(context, await this.getBeginProjectContext());
 			case HeroCraftingMenuTab.CRAFT:
-				context = foundry.utils.mergeObject(context, await this.getCraftProjectContext());
-				break;
+				return foundry.utils.mergeObject(context, await this.getCraftProjectContext());
 			case HeroCraftingMenuTab.SALVAGE:
-				context = foundry.utils.mergeObject(context, this.getSalvageContext());
-				break;
+				return foundry.utils.mergeObject(context, this.getSalvageContext());
 			case HeroCraftingMenuTab.REVERSE_ENGINEER:
-				context = foundry.utils.mergeObject(context, this.getReverseEngineerContext());
-				break;
-			default:
-				break;
+				return foundry.utils.mergeObject(context, this.getReverseEngineerContext());
+			case HeroCraftingMenuTab.FORMULAS:
+				return foundry.utils.mergeObject(context, await this.getFormulasContext());
+			case HeroCraftingMenuPart.TABS:
+			case HeroCraftingMenuTab.FORAGE:
+				return context;
+			default: {
+				const exhaustiveCheck: never = partId;
+				throw new Error(`Unhandled color case: ${exhaustiveCheck}`);
+			}
 		}
-		return context;
 	}
 
 	private async getCharacterSummaryContext(): Promise<HeroCraftingMenuCharacterSummaryContext> {
@@ -425,6 +496,23 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 				coinage: new UnsignedCoinsPF2e(this.actor.inventory.coins),
 				materials: (await MaterialTrove.getMaterialTrove(this.actor, false))?.value,
 			},
+		};
+	}
+
+	private async getFormulasContext(): Promise<HeroCraftingMenuFormulasContext> {
+		const formulas = await this.actor.crafting.getFormulas();
+		const groupedFormulas = Object.groupBy<number, CraftingFormula>(formulas, ({ item }) => item.level) as Record<
+			number,
+			CraftingFormula[]
+		>;
+		const levels = Object.keys(groupedFormulas).map((num) => Number.parseInt(num));
+		levels.sort((a, b) => b - a);
+		const formulaGroups = levels.map((level) => {
+			return { level, formulas: groupedFormulas[level] };
+		});
+
+		return {
+			formulaGroups,
 		};
 	}
 
@@ -532,7 +620,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 
 	override async _prepareContext(options: ApplicationRenderOptions) {
 		const data = await super._prepareContext(options);
-		console.log(data);
+		consoleDebug(CONFIG.debug.applications, "HeroCraftingMenu._prepareContext", data);
 		return foundry.utils.mergeObject(data, {
 			tabs: this._prepareTabs("primary"),
 			rootId: this.id,

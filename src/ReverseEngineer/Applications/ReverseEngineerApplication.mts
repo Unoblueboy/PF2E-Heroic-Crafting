@@ -176,7 +176,7 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 
 		const item = await (async () => {
 			try {
-				return await CONFIG.PF2E.Item.documentClasses.armor.fromDropData<ItemPF2e>(data);
+				return await (CONFIG.Item.documentClass as typeof ItemPF2e).fromDropData(data);
 			} catch {
 				return null;
 			}

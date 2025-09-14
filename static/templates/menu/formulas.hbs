@@ -1,0 +1,48 @@
+<section class="tab {{tab.cssClass}}"
+         data-group="{{tab.group}}"
+         data-tab="{{tab.id}}">
+    {{#if (gt formulaGroups.length 0)}}
+        <ol class="formula-list heroic-list">
+            {{#each formulaGroups as | formulaGroup |}}
+                <li class="formula-header heroic-header">
+                    <div class="formula-header-name heroic-header-name">
+                        Level {{formulaGroup.level}}
+                    </div>
+                    <div class="formula-header-dc">
+                        DC
+                    </div>
+                    <div class="formula-header-price">
+                        Price
+                    </div>
+                    <a class="formula-header-button heroic-button-group"
+                       disabled><i class="fa-solid fa-fw fa-trash"
+                           inert></i></a>
+                </li>
+                {{#each formulaGroup.formulas as | formula |}}
+                    <li class="formula-item heroic-item"
+                        data-formula-lvl="{{formula.item.level}}"
+                        data-item-uuid="{{formula.uuid}}"
+                        data-action="delete-formula"
+                        data-is-formula>
+                        <div class="formula-item-name heroic-item-name">
+                            <img src="{{formula.item.img}}">
+                            <a data-action="toggle-summary">{{formula.item.name}}</a>
+                        </div>
+                        <div class="formula-item-dc">
+                            {{formula.dc}}
+                        </div>
+                        <div class="formula-item-price">
+                            {{formula.item.price.value}}
+                        </div>
+                        <a class="formula-item-button heroic-button-group"><i class="fa-solid fa-fw fa-trash"
+                               inert></i></a>
+                        <div class="item-summary heroic-item-summary"
+                             hidden></div>
+                    </li>
+                {{/each}}
+            {{/each}}
+        </ol>
+    {{else}}
+        You have no formulas
+    {{/if}}
+</section>
