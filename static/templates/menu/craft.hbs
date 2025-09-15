@@ -38,6 +38,10 @@
                         <span class="project-item-progress-value">{{project.value}}</span>
                         <span class="project-item-progress-sep">/</span>
                         <span class="project-item-progress-max">{{project.max}}</span>
+                        <div class="project-item-progress-bar">
+                            <div class="internal-bar base-bar start"
+                                 style="width:{{project.percent}};"><span>{{project.percent}}</span></div>
+                        </div>
                     </div>
                     <div class="project-item-quantity">
                         {{project.batchSize}}

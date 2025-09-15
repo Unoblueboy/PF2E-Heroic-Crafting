@@ -1,6 +1,13 @@
 <section class="tab {{salvageTabs.new.cssClass}}"
          data-group="{{salvageTabs.new.group}}"
          data-tab="{{salvageTabs.new.id}}">
+    <div data-action="salvage"><button class="custom-button"><i class="fa-fw fa-sharp fa-solid fa-recycle"
+               inert></i>Salvage an item</button></div>
+    <div class="seperator">
+        <div></div>
+        <span>OR</span>
+        <div></div>
+    </div>
     {{#if (gt itemGroups.length 0)}}
         <ol class="item-list heroic-list">
             {{#each itemGroups as | itemGroup |}}

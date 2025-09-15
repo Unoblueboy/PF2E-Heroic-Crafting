@@ -1,3 +1,7 @@
+body {
+	--heroic-crafting-proress-bar-color: rgb(0, 160, 40);
+}
+
 .material-form {
 	gap: 0.5rem;
 
@@ -521,7 +525,7 @@
 			}
 
 			.internal-bar {
-				background-color: #00f000;
+				background-color: var(--heroic-crafting-proress-bar-color);
 
 				&.invisible-bar {
 					opacity: 0;
@@ -672,6 +676,17 @@ section.heroic-crafting-menu {
 			padding-top: 0.75rem;
 			padding-bottom: 1rem;
 			overflow: hidden auto;
+			scrollbar-gutter: stable;
+		}
+
+		section.tab.salvage {
+			scrollbar-gutter: auto;
+			padding: 0;
+		}
+
+		section.tab.salvage > nav.tabs {
+			border: transparent;
+			box-shadow: 0 2px 4px rgba(159, 132, 117, 0.3);
 		}
 
 		.seperator {
@@ -759,8 +774,9 @@ section.heroic-crafting-menu {
 		section.tab.begin-project .custom-button,
 		section.tab.craft-project .custom-button,
 		section.tab.salvage .custom-button,
-		section.tab.reverse-engineer .custom-button {
-			margin: auto;
+		section.tab.reverse-engineer .custom-button,
+		section.tab.other .custom-button {
+			margin: 0 auto;
 			width: 80%;
 			height: 2.25rem;
 		}
@@ -901,7 +917,7 @@ section.heroic-crafting-menu {
 			.project-item {
 				grid-template-areas: "name dc progress quantity buttons";
 				grid-template-rows: 1fr;
-				grid-template-columns: 1fr 1.5rem 11rem 4rem max-content;
+				grid-template-columns: 3fr 1.5rem minmax(11rem, 2.5fr) 4rem max-content;
 			}
 
 			.project-header .project-header-name,
@@ -936,6 +952,7 @@ section.heroic-crafting-menu {
 				grid-template-columns: 1fr 0.5rem 1fr;
 				align-items: center;
 				width: 100%;
+				height: 100%;
 				padding: 0 1rem;
 
 				.project-item-progress-value {
@@ -954,6 +971,40 @@ section.heroic-crafting-menu {
 
 			.project-item .project-item-summary {
 				grid-column: name / buttons;
+			}
+
+			.project-item .project-item-progress:hover .project-item-progress-value,
+			.project-item .project-item-progress:hover .project-item-progress-sep,
+			.project-item .project-item-progress:hover .project-item-progress-max,
+			.project-item .project-item-progress .project-item-progress-bar {
+				display: none;
+			}
+
+			.project-item .project-item-progress .project-item-progress-value,
+			.project-item .project-item-progress .project-item-progress-sep,
+			.project-item .project-item-progress .project-item-progress-max,
+			.project-item .project-item-progress:hover .project-item-progress-bar {
+				display: block;
+			}
+
+			.project-item .project-item-progress .project-item-progress-bar {
+				grid-column: value / max;
+				height: 70%;
+				width: calc(100% - 4px);
+				background-color: #6f6c66;
+				border: 2px inset #000000;
+				border-radius: 4px;
+
+				.internal-bar {
+					height: 100%;
+					background-color: var(--heroic-crafting-proress-bar-color);
+					border-radius: 2px;
+					line-height: 1.25rem;
+					span {
+						margin-left: 2px;
+						text-shadow: 1px 1px 2px black;
+					}
+				}
 			}
 		}
 
@@ -1075,7 +1126,7 @@ section.heroic-crafting-menu {
 			.internal-bar {
 				height: 100%;
 				line-height: calc(100% + 4px);
-				background-color: #00f000;
+				background-color: var(--heroic-crafting-proress-bar-color);
 				border-radius: 2px;
 				span {
 					margin-left: 2px;

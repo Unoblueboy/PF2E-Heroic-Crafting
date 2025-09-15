@@ -40,7 +40,7 @@ enum HeroCraftingMenuTab {
 	CRAFT = "craft",
 	SALVAGE = "salvage",
 	REVERSE_ENGINEER = "reverse-engineer",
-	FORAGE = "forage",
+	OTHER = "forage",
 	FORMULAS = "formulas",
 }
 
@@ -92,7 +92,10 @@ type HeroCraftingMenuSalvageData = {
 type HeroicCraftingMenuTabGroup<T> = {
 	tabs: {
 		id: T;
-		label: string;
+		icon?: string;
+		label?: string;
+		tooltip?: string;
+		cssClass?: string;
 	}[];
 	initial: T;
 };
@@ -124,7 +127,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 
 	static override readonly PARTS: Record<
 		HeroCraftingMenuPart | HeroCraftingMenuTab,
-		{ template: string; classes: string[] }
+		{ template: string; classes: string[]; scrollable?: string[] }
 	> = {
 		[HeroCraftingMenuPart.CHARACTER_SUMMARY]: {
 			template: "modules/pf2e-heroic-crafting/templates/menu/character-summary.hbs",
@@ -137,26 +140,32 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		[HeroCraftingMenuTab.FORMULAS]: {
 			template: "modules/pf2e-heroic-crafting/templates/menu/formulas.hbs",
 			classes: ["formulas"],
+			scrollable: [""],
 		},
 		[HeroCraftingMenuTab.BEGIN]: {
 			template: "modules/pf2e-heroic-crafting/templates/menu/begin.hbs",
 			classes: ["begin-project"],
+			scrollable: [""],
 		},
 		[HeroCraftingMenuTab.CRAFT]: {
 			template: "modules/pf2e-heroic-crafting/templates/menu/craft.hbs",
 			classes: ["craft-project"],
+			scrollable: [""],
 		},
 		[HeroCraftingMenuTab.SALVAGE]: {
 			template: "modules/pf2e-heroic-crafting/templates/menu/salvage/main.hbs",
 			classes: ["salvage"],
+			scrollable: ["section.tab.salvage-new", "section.tab.salvage-existing"],
 		},
 		[HeroCraftingMenuTab.REVERSE_ENGINEER]: {
 			template: "modules/pf2e-heroic-crafting/templates/menu/reverse-engineer.hbs",
 			classes: ["reverse-engineer"],
+			scrollable: [""],
 		},
-		[HeroCraftingMenuTab.FORAGE]: {
-			template: "modules/pf2e-heroic-crafting/templates/menu/forage.hbs",
-			classes: ["forage"],
+		[HeroCraftingMenuTab.OTHER]: {
+			template: "modules/pf2e-heroic-crafting/templates/menu/other.hbs",
+			classes: ["other"],
+			scrollable: [""],
 		},
 	};
 
@@ -171,14 +180,14 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 				{ id: HeroCraftingMenuTab.CRAFT, label: "Craft a Project" },
 				{ id: HeroCraftingMenuTab.SALVAGE, label: "Salvage" },
 				{ id: HeroCraftingMenuTab.REVERSE_ENGINEER, label: "Reverse Engineer" },
-				{ id: HeroCraftingMenuTab.FORAGE, label: "Forage" },
+				{ id: HeroCraftingMenuTab.OTHER, label: "Other" },
 			],
 			initial: HeroCraftingMenuTab.BEGIN,
 		},
 		salvage: {
 			tabs: [
-				{ id: HeroCraftingMenuSalvageTab.NEW, label: "Salvage New" },
-				{ id: HeroCraftingMenuSalvageTab.EXISTING, label: "Salvage Existing" },
+				{ id: HeroCraftingMenuSalvageTab.NEW, label: "Salvage New", cssClass: "salvage-new" },
+				{ id: HeroCraftingMenuSalvageTab.EXISTING, label: "Salvage Existing", cssClass: "salvage-existing" },
 			],
 			initial: HeroCraftingMenuSalvageTab.NEW,
 		},
@@ -481,7 +490,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			case HeroCraftingMenuTab.FORMULAS:
 				return foundry.utils.mergeObject(context, await this.getFormulasContext());
 			case HeroCraftingMenuPart.TABS:
-			case HeroCraftingMenuTab.FORAGE:
+			case HeroCraftingMenuTab.OTHER:
 				return context;
 			default: {
 				const exhaustiveCheck: never = partId;

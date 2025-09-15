@@ -26,7 +26,7 @@
     </div>
     <section class="material-list">
         {{#with formData.materialList.currency as |currencyFormData|}}
-            <div class="basic-material currency {{#if hideCurrencyMaterials}}hide{{/if}}">
+            <div class="basic-material currency {{#if ../hideCurrencyMaterials}}hide{{/if}}">
                 <hr>
                 <div class="item-summary">
                     <img src="systems/pf2e/icons/equipment/treasure/currency/gold-pieces.webp"
@@ -35,7 +35,7 @@
                 </div>
                 <div class="money-form">
                     <div class="form-group">
-                        <label for="{{partId}}-currency-pp">Platinum</label>
+                        <label for="{{../partId}}-currency-pp">Platinum</label>
                         <div class="form-fields">
                             <input type="number"
                                    data-action="update-input-manual"
@@ -43,11 +43,11 @@
                                    value="{{currencyFormData.pp}}"
                                    step="1"
                                    name="materialList.currency.pp"
-                                   id="{{partId}}-currency-pp">
+                                   id="{{../partId}}-currency-pp">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="{{partId}}-currency-gp">Gold</label>
+                        <label for="{{../partId}}-currency-gp">Gold</label>
                         <div class="form-fields">
                             <input type="number"
                                    data-action="update-input-manual"
@@ -55,11 +55,11 @@
                                    value="{{currencyFormData.gp}}"
                                    step="1"
                                    name="materialList.currency.gp"
-                                   id="{{partId}}-currency-gp">
+                                   id="{{../partId}}-currency-gp">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="{{partId}}-currency-sp">Silver</label>
+                        <label for="{{../partId}}-currency-sp">Silver</label>
                         <div class="form-fields">
                             <input type="number"
                                    data-action="update-input-manual"
@@ -67,11 +67,11 @@
                                    value="{{currencyFormData.sp}}"
                                    step="1"
                                    name="materialList.currency.sp"
-                                   id="{{partId}}-currency-sp">
+                                   id="{{../partId}}-currency-sp">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="{{partId}}-currency-cp">Copper</label>
+                        <label for="{{../partId}}-currency-cp">Copper</label>
                         <div class="form-fields">
                             <input type="number"
                                    data-action="update-input-manual"
@@ -79,7 +79,7 @@
                                    value="{{currencyFormData.cp}}"
                                    step="1"
                                    name="materialList.currency.cp"
-                                   id="{{partId}}-currency-cp">
+                                   id="{{../partId}}-currency-cp">
                         </div>
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                     </div>
                     <div class="money-form">
                         <div class="form-group">
-                            <label for="{{partId}}-trove-pp">Platinum</label>
+                            <label for="{{../partId}}-trove-pp">Platinum</label>
                             <div class="form-fields">
                                 <input type="number"
                                        data-action="update-input-manual"
@@ -104,11 +104,11 @@
                                        value="{{troveFormData.pp}}"
                                        step="1"
                                        name="materialList.trove.pp"
-                                       id="{{partId}}-trove-pp">
+                                       id="{{../partId}}-trove-pp">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="{{partId}}-trove-gp">Gold</label>
+                            <label for="{{../partId}}-trove-gp">Gold</label>
                             <div class="form-fields">
                                 <input type="number"
                                        data-action="update-input-manual"
@@ -116,11 +116,11 @@
                                        value="{{troveFormData.gp}}"
                                        step="1"
                                        name="materialList.trove.gp"
-                                       id="{{partId}}-trove-gp">
+                                       id="{{../partId}}-trove-gp">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="{{partId}}-trove-sp">Silver</label>
+                            <label for="{{../partId}}-trove-sp">Silver</label>
                             <div class="form-fields">
                                 <input type="number"
                                        data-action="update-input-manual"
@@ -128,11 +128,11 @@
                                        value="{{troveFormData.sp}}"
                                        step="1"
                                        name="materialList.trove.sp"
-                                       id="{{partId}}-trove-sp">
+                                       id="{{../partId}}-trove-sp">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="{{partId}}-trove-cp">Copper</label>
+                            <label for="{{../partId}}-trove-cp">Copper</label>
                             <div class="form-fields">
                                 <input type="number"
                                        data-action="update-input-manual"
@@ -140,7 +140,7 @@
                                        value="{{troveFormData.cp}}"
                                        step="1"
                                        name="materialList.trove.cp"
-                                       id="{{partId}}-trove-cp">
+                                       id="{{../partId}}-trove-cp">
                             </div>
                         </div>
                     </div>
@@ -148,7 +148,7 @@
             {{/with}}
         {{/if}}
         {{#each materials as | material |}}
-            {{#with (lookup ../formData.materialList.treasures material.uuid) as |materialFormData|}}
+            {{#with (lookup ../formData.materialList.materials material.uuid) as |materialFormData|}}
                 <div class="treasure-material">
                     <hr>
                     <div class="item-summary">
@@ -158,12 +158,12 @@
                     </div>
                     <div class="standard-form post-use-operation-select">
                         <div class="form-group">
-                            <label for="{{partId}}-{{material.uuid}}-post-use-operation">
+                            <label for="{{../../partId}}-{{material.uuid}}-post-use-operation">
                                 Post use operation</label>
                             <div class="form-fields">
-                                <select name="materialList.treasures.{{material.uuid}}.postUseOperation"
+                                <select name="materialList.materials.{{material.uuid}}.postUseOperation"
                                         data-action="update-input-manual"
-                                        id="{{partId}}-{{material.uuid}}-post-use-operation">
+                                        id="{{../../partId}}-{{material.uuid}}-post-use-operation">
                                     <option value="decrease-value"
                                             {{#if (eq materialFormData.postUseOperation "decrease-value") }}selected{{/if}}>
                                         Decrease Item Value</option>
@@ -182,7 +182,7 @@
                     </div>
                     <div class="money-form">
                         <div class="form-group">
-                            <label for="{{partId}}-{{material.uuid}}-quantity">Quantity</label>
+                            <label for="{{../../partId}}-{{material.uuid}}-quantity">Quantity</label>
                             <div class="form-fields">
                                 <input type="number"
                                        data-action="update-input-manual"
@@ -190,57 +190,57 @@
                                        value={{materialFormData.quantity}}
                                        step="1"
                                        max="{{material.quantity}}"
-                                       name="materialList.treasures.{{material.uuid}}.quantity"
-                                       id="{{partId}}-{{material.uuid}}-quantity">
+                                       name="materialList.materials.{{material.uuid}}.quantity"
+                                       id="{{../../partId}}-{{material.uuid}}-quantity">
                             </div>
                         </div>
                         <span><i class="fa-solid fa-xmark-large"></i></span>
                         <div class="form-group">
-                            <label for="{{partId}}-{{material.uuid}}-pp">Platinum</label>
+                            <label for="{{../../partId}}-{{material.uuid}}-pp">Platinum</label>
                             <div class="form-fields">
                                 <input type="number"
                                        data-action="update-input-manual"
                                        min="0"
                                        value="{{materialFormData.value.pp}}"
                                        step="1"
-                                       name="materialList.treasures.{{material.uuid}}.pp"
-                                       id="{{partId}}-{{material.uuid}}-pp">
+                                       name="materialList.materials.{{material.uuid}}.pp"
+                                       id="{{../../partId}}-{{material.uuid}}-pp">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="{{partId}}-{{material.uuid}}-gp">Gold</label>
+                            <label for="{{../../partId}}-{{material.uuid}}-gp">Gold</label>
                             <div class="form-fields">
                                 <input type="number"
                                        data-action="update-input-manual"
                                        min="0"
                                        value="{{materialFormData.value.gp}}"
                                        step="1"
-                                       name="materialList.treasures.{{material.uuid}}.gp"
-                                       id="{{partId}}-{{material.uuid}}-gp">
+                                       name="materialList.materials.{{material.uuid}}.gp"
+                                       id="{{../../partId}}-{{material.uuid}}-gp">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="{{partId}}-{{material.uuid}}-sp">Silver</label>
+                            <label for="{{../../partId}}-{{material.uuid}}-sp">Silver</label>
                             <div class="form-fields">
                                 <input type="number"
                                        data-action="update-input-manual"
                                        min="0"
                                        value="{{materialFormData.value.sp}}"
                                        step="1"
-                                       name="materialList.treasures.{{material.uuid}}.sp"
-                                       id="{{partId}}-{{material.uuid}}-sp">
+                                       name="materialList.materials.{{material.uuid}}.sp"
+                                       id="{{../../partId}}-{{material.uuid}}-sp">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="{{partId}}-{{material.uuid}}-cp">Copper</label>
+                            <label for="{{../../partId}}-{{material.uuid}}-cp">Copper</label>
                             <div class="form-fields">
                                 <input type="number"
                                        data-action="update-input-manual"
                                        min="0"
                                        value="{{materialFormData.value.cp}}"
                                        step="1"
-                                       name="materialList.treasures.{{material.uuid}}.cp"
-                                       id="{{partId}}-{{material.uuid}}-cp">
+                                       name="materialList.materials.{{material.uuid}}.cp"
+                                       id="{{../../partId}}-{{material.uuid}}-cp">
                             </div>
                         </div>
                     </div>

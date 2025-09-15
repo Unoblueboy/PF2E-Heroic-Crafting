@@ -6,6 +6,7 @@ import { itemDataUuid, ProjectItemDetails } from "../BeginProject/types.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { FORMULA_PRICE, MODULE_ID, RARITIES } from "../Helper/constants.mjs";
 import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
+import { fractionToPercent } from "../Helper/generics.mjs";
 import { getHeroicItemRollOptions } from "../Helper/item.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 
@@ -85,7 +86,7 @@ export class Projects {
 		return this.actorProjectsMap.has(id);
 	}
 
-	async getContextData() {
+	async getContextData(): Promise<(ProjectContextData & { percent: string })[]> {
 		return Promise.all([...this.actorProjectsMap.values()].map(async (x) => await x.getContextData()));
 	}
 }
@@ -112,6 +113,7 @@ export type ProjectContextData = {
 	batchSize: number;
 	value: UnsignedCoins;
 	max: UnsignedCoins;
+	percent: string;
 	baseItem: PhysicalItemPF2e;
 	itemLink: string;
 	baseSpell?: SpellPF2e;
@@ -184,6 +186,10 @@ export abstract class AProject implements ProjectItemDetails {
 			batchSize: this.batchSize,
 			value: this.value,
 			max: await this.max,
+			percent: fractionToPercent(
+				UnsignedCoinsPF2e.getCopperValue(this.value),
+				UnsignedCoinsPF2e.getCopperValue(await this.max)
+			),
 			baseItem: await this.baseItem,
 			itemLink: await this.itemLink,
 		};

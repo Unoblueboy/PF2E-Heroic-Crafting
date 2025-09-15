@@ -10,6 +10,7 @@ import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../../Helper/constants.mjs";
 import { DENOMINATION, UnsignedCoins } from "../../Helper/currencyTypes.mjs";
 import { fractionToPercent } from "../../Helper/generics.mjs";
+import { consoleDebug } from "../../Helper/log.mjs";
 import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
@@ -265,8 +266,9 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		const totalPath = target.name;
 		const pathSegments = totalPath.split(".");
 
-		console.debug(
-			"Heroic Crafting | Craft Project Application: Manual Update",
+		consoleDebug(
+			CONFIG.debug.applications,
+			"CraftProjectApplication.manualUpdateInput",
 			pathSegments,
 			target?.value,
 			event.target
@@ -295,7 +297,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			case "trove":
 				await this.updateBasicMaterial(value, pathSegments[1], pathSegments[2] as DENOMINATION);
 				break;
-			case "treasures":
+			case "materials":
 				await this.updateAdvancedMaterial(value, pathSegments.slice(2));
 				break;
 			default:
@@ -308,6 +310,13 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		basicMaterial: "currency" | "trove",
 		basicMaterialKey: DENOMINATION
 	) {
+		consoleDebug(
+			CONFIG.debug.applications,
+			"CraftProjectApplication.updateBasicMaterial",
+			value,
+			basicMaterial,
+			basicMaterialKey
+		);
 		this.formData.materialList[basicMaterial][basicMaterialKey] = Number.parseInt(value) || 0;
 
 		const maxSpend = await this.getMaxSpend(basicMaterial);
@@ -351,24 +360,26 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	private async updateAdvancedMaterial(value: string, pathSegments: string[]) {
-		const treasureUuid = pathSegments[0];
-		const treasureKey = pathSegments[1] as DENOMINATION | "quantity" | "postUseOperation";
+		consoleDebug(CONFIG.debug.applications, "CraftProjectApplication.updateAdvancedMaterial", value, pathSegments);
+		consoleDebug(CONFIG.debug.applications, "Materials", this.formData.materialList.materials);
+		const materialUuid = pathSegments.slice(0, -1).join(".");
+		const materialKey = pathSegments.slice(-1)[0] as DENOMINATION | "quantity" | "postUseOperation";
 
-		const treasureFromData = this.formData.materialList.materials[treasureUuid];
-		if (!treasureFromData) return;
+		const materialFromData = this.formData.materialList.materials[materialUuid];
+		if (!materialFromData) return;
 
-		switch (treasureKey) {
+		switch (materialKey) {
 			case "cp":
 			case "sp":
 			case "gp":
 			case "pp":
-				treasureFromData.value[treasureKey] = Number.parseInt(value) || 0;
+				materialFromData.value[materialKey] = Number.parseInt(value) || 0;
 				break;
 			case "quantity":
-				treasureFromData.quantity = Number.parseInt(value) || 0;
+				materialFromData.quantity = Number.parseInt(value) || 0;
 				break;
 			case "postUseOperation":
-				treasureFromData.postUseOperation = value as TreasurePostUseOperation;
+				materialFromData.postUseOperation = value as TreasurePostUseOperation;
 				return;
 
 			default:
@@ -383,10 +394,10 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		);
 		const scaledSpendingLimit = UnsignedCoinsPF2e.multiplyCoins(this.project.batchSize, spendingLimit);
 
-		const item = (await foundry.utils.fromUuid(treasureUuid)) as PhysicalItemPF2e;
+		const item = (await foundry.utils.fromUuid(materialUuid)) as PhysicalItemPF2e;
 		const treasureCoinsTotal = UnsignedCoinsPF2e.multiplyCoins(
-			treasureFromData.quantity ?? 1,
-			treasureFromData.value
+			materialFromData.quantity ?? 1,
+			materialFromData.value
 		);
 
 		const preTreasureContribution = UnsignedCoinsPF2e.subtractCoins(
@@ -395,22 +406,22 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		);
 		const remainingBudget = UnsignedCoinsPF2e.subtractCoins(scaledSpendingLimit, preTreasureContribution);
 		const maxSpendTotal = UnsignedCoinsPF2e.minCoins(
-			item.price.value.scale(treasureFromData.quantity ?? 1),
+			item.price.value.scale(materialFromData.quantity ?? 1),
 			remainingBudget
 		);
 
 		if (
 			treasureCoinsTotal.copperValue <= maxSpendTotal.copperValue &&
-			(treasureFromData.quantity ?? 0) <= item.quantity
+			(materialFromData.quantity ?? 0) <= item.quantity
 		)
 			return;
 
-		const quantity = Math.min(treasureFromData.quantity ?? 1, item.quantity);
+		const quantity = Math.min(materialFromData.quantity ?? 1, item.quantity);
 		const finalSpend = UnsignedCoinsPF2e.minCoins(treasureCoinsTotal, maxSpendTotal);
 		const maxSpendPer: UnsignedCoins =
 			quantity === 0 ? {} : UnsignedCoinsPF2e.multiplyCoins(1 / quantity, finalSpend);
-		treasureFromData.value = maxSpendPer;
-		treasureFromData.quantity = quantity;
+		materialFromData.value = maxSpendPer;
+		materialFromData.quantity = quantity;
 	}
 
 	private async getProgressBarWidths() {
@@ -484,7 +495,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			bands.splice(curValIdx, 0, UnsignedCoinsPF2e.getCopperValue(projectValue));
 		}
 
-		console.log("Heroic Crafting |", bands, progress);
+		consoleDebug(CONFIG.debug.applications, bands, progress);
 
 		return {
 			invisible: fractionToPercent(bands[0], UnsignedCoinsPF2e.getCopperValue(projectMax)),
