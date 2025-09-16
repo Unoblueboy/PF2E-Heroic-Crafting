@@ -3,13 +3,11 @@ import { PhysicalItemPF2e } from "../../types/src/module/item";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
-import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 import { fractionToPercent } from "../Helper/generics.mjs";
 import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
-import { AProject, Projects } from "../Projects/projects.mjs";
-import { CraftProjectUtility } from "./craftProjectUtility.mjs";
+import { Projects } from "../Projects/projects.mjs";
 import { ProjectCraftDetails, TreasureMaterialSpent, TreasurePostUseOperation } from "./types.mjs";
 
 export async function craftProjectChatButtonListener(message: ChatMessagePF2e, html: HTMLElement, _data: unknown) {
@@ -39,8 +37,7 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 
 	await useMaterialSpent(actor, craftDetails);
 
-	const totalSpent = await CraftProjectUtility.getTotalCost(craftDetails.materialsSpent);
-	const newProjectTotal: SignedCoinsPF2e = getNewProjectTotal(outcome, project, totalSpent);
+	const newProjectTotal: SignedCoinsPF2e = SignedCoinsPF2e.addCoins(project.value, craftDetails.progress[outcome]);
 
 	const projectMax = new UnsignedCoinsPF2e(await project.max);
 	if (newProjectTotal.copperValue < 0) {
@@ -71,20 +68,6 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	});
 	const flavorHtml = generalDiv.closest("span.flavor-text")?.innerHTML;
 	if (flavorHtml) message.update({ flavor: flavorHtml });
-}
-
-function getNewProjectTotal(outcome: string, project: AProject, totalSpent: UnsignedCoins): SignedCoinsPF2e {
-	switch (outcome) {
-		case "criticalFailure":
-			return SignedCoinsPF2e.subtractCoins(project.value, totalSpent);
-		case "failure":
-			return SignedCoinsPF2e.addCoins(project.value, UnsignedCoinsPF2e.multiplyCoins(0.5, totalSpent));
-		case "criticalSuccess":
-		case "success":
-			return SignedCoinsPF2e.addCoins(project.value, UnsignedCoinsPF2e.multiplyCoins(2, totalSpent));
-		default:
-			return new SignedCoinsPF2e();
-	}
 }
 
 async function useMaterialSpent(actor: CharacterPF2eHeroicCrafting, craftDetails: ProjectCraftDetails): Promise<void> {

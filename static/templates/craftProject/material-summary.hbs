@@ -2,8 +2,9 @@
     <hr>
     <h4>Material Breakdown</h4>
     <div class="total-material">
-        <strong>Total Spent:&nbsp;</strong>
-        <span class="material-value">{{totalMaterial.value}}</span>
+        <strong>Total Cost:&nbsp;</strong>
+        <span class="material-value">{{totalMaterial.cost}}{{#if rushCost}} <i class="fa-solid fa-info-circle"
+                   data-tooltip="Total Spent: {{totalMaterial.spent}}"></i>{{/if}}</span>
         <span class="seperator">/</span>
         <span class="material-max">{{totalMaterial.max}}</span>
     </div>

@@ -13,12 +13,23 @@ import { craftProjectChatButtonListener } from "./CraftProject/chatListener.mjs"
 import { forageCraftingResourcesChatButtonListener } from "./Forage/chatListener.mjs";
 import { initRuleElements } from "./RuleElement/initRuleElements.mjs";
 import { MaterialTrove } from "./MaterialTrove/materialTrove.mjs";
+import { SignedCoins, UnsignedCoins } from "./Helper/currencyTypes.mjs";
+import { UnsignedCoinsPF2e } from "./Helper/unsignedCoins.mjs";
+import { SignedCoinsPF2e } from "./Helper/signedCoins.mjs";
 
 Handlebars.registerHelper("padStart", (objectToFormat: unknown, maxLength: number, fillString: string) => {
 	console.assert(typeof maxLength === "number", "Max Length expected to be number");
 	console.assert(typeof fillString === "string", "Fill string expected to be number");
 	const formatString = String(objectToFormat);
 	return fillString ? formatString.padStart(maxLength, fillString) : formatString.padStart(maxLength);
+});
+
+Handlebars.registerHelper("formatCoin", (coins: SignedCoins | UnsignedCoins, ignoreSign: boolean = false) => {
+	if (!ignoreSign) return SignedCoinsPF2e.toString(coins);
+
+	const coinsCopy = foundry.utils.deepClone(coins);
+	delete coins.isNegative;
+	return UnsignedCoinsPF2e.toString(coinsCopy as UnsignedCoins);
 });
 
 Hooks.once("init", () => {

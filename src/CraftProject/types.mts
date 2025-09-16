@@ -7,13 +7,14 @@ export type ProjectCraftMaterialSpent = {
 	treasure?: TreasureMaterialSpent[];
 };
 
-type ProjectCraftProgress = {
+export type ProjectCraftProgress = {
 	[x in DegreeOfSuccessString]: SignedCoins;
 };
 
 export type ProjectCraftDetails = {
 	projectId: string;
 	materialsSpent: ProjectCraftMaterialSpent;
+	cost: UnsignedCoins;
 	progress: ProjectCraftProgress;
 	duration: ProjectCraftDuration;
 	createItem?: boolean;

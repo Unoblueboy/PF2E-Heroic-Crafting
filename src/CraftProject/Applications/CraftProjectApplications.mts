@@ -56,6 +56,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		};
 	};
 	private materials: PhysicalItemPF2e[];
+	private rushCost: boolean;
 	private constructor(options: CraftProjectApplicationOptions) {
 		super(options as object);
 		this.actor = options.actor;
@@ -71,9 +72,11 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			},
 		};
 		this.materials = [];
+		this.rushCost = false;
 	}
 
-	private async initializeTreasureData() {
+	private async initializeData() {
+		await this.updateRushCost();
 		this.materialTrove = await MaterialTrove.getMaterialTrove(this.actor);
 		if (!this.materialTrove) return;
 
@@ -95,7 +98,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		);
 	}
 
-	private async updateTreasureData() {
+	private async updateMaterialData() {
 		this.materialTrove = await MaterialTrove.getMaterialTrove(this.actor);
 		if (!this.materialTrove) {
 			this.materials = [];
@@ -126,6 +129,20 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		for (const uuid of deletedUuids) {
 			delete this.formData.materialList.materials[uuid];
 		}
+	}
+
+	private async updateRushCost() {
+		this.rushCost = ModifyConstantRuleElementHelper.getConstant(
+			this.actor,
+			"rushCost",
+			{ value: false },
+			new Set([
+				...(await this.project.getRollOptions()),
+				"action:craft",
+				"action:craft-project",
+				`heroic:crafting:duration:${this.formData.craftDuration}`,
+			])
+		);
 	}
 
 	static override readonly DEFAULT_OPTIONS = {
@@ -174,7 +191,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			materialsSpent.trove = this.formData.materialList.trove;
 		if (treasureMaterials.length > 0) materialsSpent.treasure = treasureMaterials;
 
-		const totalCost = await CraftProjectUtility.getTotalCost(materialsSpent);
+		const totalCost = this.getTotalMaterialCost();
 		const duration = _formData.object[`duration`] as ProjectCraftDuration;
 		const progress = ModifyProgressRuleElementHelper.getProgress(
 			this.actor,
@@ -195,6 +212,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		const result: ProjectCraftDetails = {
 			projectId: this.project.id,
 			materialsSpent: materialsSpent,
+			cost: totalCost,
 			progress: {
 				criticalFailure: new SignedCoinsPF2e(progress.criticalFailure),
 				failure: new SignedCoinsPF2e(progress.failure),
@@ -213,7 +231,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		return new Promise<ProjectCraftDetails | undefined>((resolve) => {
 			const applicationOptions: CraftProjectApplicationOptions = Object.assign(options, { callback: resolve });
 			const app = new CraftProjectApplication(applicationOptions);
-			app.initializeTreasureData().then(() => app.render(true));
+			app.initializeData().then(() => app.render(true));
 		});
 	}
 
@@ -243,7 +261,8 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	override async render(options?: boolean | ApplicationRenderOptions): Promise<this> {
-		await this.updateTreasureData();
+		await this.updateMaterialData();
+		await this.updateRushCost();
 		return await super.render(options);
 	}
 
@@ -332,10 +351,13 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			{ duration: this.formData.craftDuration },
 			await this.project.getRollOptions()
 		);
-		const scaledSpendingLimit = UnsignedCoinsPF2e.multiplyCoins(this.project.batchSize, spendingLimit);
+		const scaledSpendingLimit = UnsignedCoinsPF2e.multiplyCoins(
+			this.rushCost ? 2 * this.project.batchSize : this.project.batchSize,
+			spendingLimit
+		);
 
 		const preMaterialContribution = UnsignedCoinsPF2e.subtractCoins(
-			this.getTotalMaterialCost(),
+			CraftProjectUtility.getTotalMaterialSpent(this.formData.materialList),
 			this.formData.materialList[basicMaterial]
 		);
 
@@ -351,12 +373,10 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		}
 	}
 
-	private getTotalMaterialCost(): UnsignedCoinsPF2e {
-		return UnsignedCoinsPF2e.sumCoins(
-			this.formData.materialList.trove,
-			this.formData.materialList.currency,
-			...Object.values(this.formData.materialList.materials).map((treasure) => treasure.value)
-		);
+	private getTotalMaterialCost(totalMaterialsSpent?: UnsignedCoinsPF2e): UnsignedCoinsPF2e {
+		totalMaterialsSpent ??= CraftProjectUtility.getTotalMaterialSpent(this.formData.materialList);
+
+		return this.rushCost ? UnsignedCoinsPF2e.multiplyCoins(0.5, totalMaterialsSpent) : totalMaterialsSpent;
 	}
 
 	private async updateAdvancedMaterial(value: string, pathSegments: string[]) {
@@ -401,7 +421,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		);
 
 		const preTreasureContribution = UnsignedCoinsPF2e.subtractCoins(
-			this.getTotalMaterialCost(),
+			CraftProjectUtility.getTotalMaterialSpent(this.formData.materialList),
 			treasureCoinsTotal
 		);
 		const remainingBudget = UnsignedCoinsPF2e.subtractCoins(scaledSpendingLimit, preTreasureContribution);
@@ -545,6 +565,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		);
 		const scaledSpendingLimit = UnsignedCoinsPF2e.multiplyCoins(this.project.batchSize, spendingLimit);
 		const totalMaterialCost = this.getTotalMaterialCost();
+		const totalMaterialSpent = CraftProjectUtility.getTotalMaterialSpent(this.formData.materialList);
 		const buttons = [
 			{
 				type: "submit",
@@ -571,9 +592,11 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			spendingLimit: scaledSpendingLimit,
 			hasMaterialTrove: !!this.materialTrove,
 			totalMaterial: {
-				value: totalMaterialCost,
+				cost: totalMaterialCost,
+				spent: totalMaterialSpent,
 				max: scaledSpendingLimit,
 			},
+			rushCost: this.rushCost,
 			progressBarWidths: await this.getProgressBarWidths(),
 			hideCurrencyMaterials: this.formData.craftDuration === ProjectCraftDuration.HOUR,
 		};

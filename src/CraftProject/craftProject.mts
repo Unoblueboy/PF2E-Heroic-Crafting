@@ -4,10 +4,7 @@ import { CheckRoll } from "../../types/src/module/system/check";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
-import { fractionToPercent } from "../Helper/generics.mjs";
-import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { Projects } from "../Projects/projects.mjs";
-import { ModifyProgressRuleElementHelper } from "../RuleElement/Helpers/ModifyProgressHelper.mjs";
 import { CraftProjectApplication } from "./Applications/CraftProjectApplications.mjs";
 import { CraftProjectUtility } from "./craftProjectUtility.mjs";
 import { ProjectCraftDetails, ProjectCraftDuration } from "./types.mjs";
@@ -23,7 +20,7 @@ export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId
 	const craftDetails = await CraftProjectApplication.getCraftDetails({ actor, projectId });
 	if (!craftDetails) return;
 
-	const totalCost = await CraftProjectUtility.getTotalCost(craftDetails.materialsSpent);
+	const totalCost = craftDetails.cost;
 	const item = (await foundry.utils.fromUuid(project.itemData.uuid)) as PhysicalItemPF2e;
 
 	async function getStatisticRollCallback(
@@ -34,48 +31,24 @@ export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId
 	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
 			if (!project || !craftDetails) return; // this should never happen
-			const materials = await getMaterialsContext(craftDetails);
 
-			const projectProgress = ModifyProgressRuleElementHelper.getProgress(
-				actor,
-				{
-					criticalFailure: { ...totalCost, isNegative: true },
-					failure: {},
-					success: totalCost,
-					criticalSuccess: totalCost,
-				},
-				[
-					...item.getRollOptions(item.type),
-					...actor.getRollOptions(),
-					"action:craft",
-					"action:craft-project",
-					`heroic:crafting:duration:${craftDetails.duration}`,
-				]
-			);
+			const projectProgress = craftDetails.progress;
 			console.log("Heroic Crafting |", projectProgress);
 
-			const projectMax = await project.max;
-			const projectCur = project.value;
 			const flavor = await foundry.applications.handlebars.renderTemplate(
 				"modules/pf2e-heroic-crafting/templates/chat/craftProject/result.hbs",
 				{
 					item: item,
 					actorUuid: actor.uuid,
-					project: {
-						id: project.id,
-						max: await project.max,
-						cur: projectCur,
-						percent: fractionToPercent(
-							UnsignedCoinsPF2e.getCopperValue(projectCur),
-							UnsignedCoinsPF2e.getCopperValue(projectMax)
-						),
-					},
+					project: await project.getContextData(),
 					itemLink: await foundry.applications.ux.TextEditor.enrichHTML(await project.itemLink, {
 						rollData: item.getRollData(),
 					}),
 					craftDetails: JSON.stringify(craftDetails),
-					materials,
-					totalMaterialsSpent: totalCost,
+					materials: await getMaterialsContext(craftDetails),
+					totalMaterialsSpent: CraftProjectUtility.getTotalMaterialSpent(craftDetails.materialsSpent),
+					cost: totalCost,
+					progress: craftDetails.progress,
 					outcome,
 				}
 			);

@@ -17,9 +17,9 @@
                      style="width:{{project.percent}};"><span>{{project.percent}}</span></div>
             </div>
             <div class="project-progress-line">
-                <span class="project-cur-value">{{project.cur}}</span>
+                <span class="project-cur-value">{{formatCoin project.value}}</span>
                 <span class="seperator">/</span>
-                <span>{{project.max}}</span>
+                <span>{{formatCoin project.max}}</span>
             </div>
         </div>
         <hr>
@@ -31,25 +31,32 @@
                         <span class="spent-material-item-name">{{#if (gt material.quantity 1)}}{{material.quantity}}x
                             {{/if}}{{item.name}}</span>
                     {{/with}}
-                    <span class="spent-material-value">{{material.spent}}{{#if (gt material.quantity 1)}}
+                    <span class="spent-material-value">{{formatCoin material.spent}}{{#if (gt material.quantity 1)}}
                             / item{{/if}}</span>
                 </div>
             {{/each}}
         </div>
-        <p>Total Cost: {{totalMaterialsSpent}}</p>
+        <p>Total Cost: {{cost}}{{#if (ne totalMaterialsSpent.copperValue cost.copperValue)}} <i
+                   class="fa-solid fa-info-circle"
+                   data-tooltip="Total Spent: {{formatCoin totalMaterialsSpent}}"></i>{{/if}}</p>
     </div>
     <hr>
     <div class="card-buttons"
          data-visibility="owner">
-        {{#if (eq outcome "criticalFailure")}}
-            <button type="button"
-                    data-outcome="{{outcome}}">Deduct Cost from the Project Value</button>
-        {{else if (eq outcome "failure")}}
-            <button type="button"
-                    data-outcome="{{outcome}}">Add half the Cost to the Project Value</button>
-        {{else}}
-            <button type="button"
-                    data-outcome="{{outcome}}">Add double the Cost to the Project Value</button>
-        {{/if}}
+        {{#with (lookup progress outcome) as |progressOutcome|}}
+            {{#if (eq progressOutcome.copperValue 0)}}
+                <button type="button"
+                        data-outcome="{{../outcome}}">Add 0 gp to the Project
+                    Value</button>
+            {{else if progressOutcome.isNegative}}
+                <button type="button"
+                        data-outcome="{{../outcome}}">Deduct {{formatCoin progressOutcome true}} from the Project
+                    Value</button>
+            {{else }}
+                <button type="button"
+                        data-outcome="{{../outcome}}">Add {{formatCoin progressOutcome}} to the Project
+                    Value</button>
+            {{/if}}
+        {{/with}}
     </div>
 </div>
