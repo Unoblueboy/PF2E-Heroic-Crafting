@@ -22,7 +22,9 @@
 		"slug": "salvage-item",
 		"traits": {
 			"otherTags": [],
-			"value": ["exploration"]
+			"value": [
+				"exploration"
+			]
 		},
 		"actionType": {
 			"value": "passive"

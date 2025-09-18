@@ -15,7 +15,10 @@
 				"selector": "crafting",
 				"value": 1,
 				"type": "item",
-				"predicate": ["action:craft", "blacksmithing"]
+				"predicate": [
+					"action:craft",
+					"blacksmithing"
+				]
 			}
 		],
 		"slug": "runic-anvil",
@@ -25,7 +28,9 @@
 		},
 		"traits": {
 			"otherTags": [],
-			"value": ["magical"],
+			"value": [
+				"magical"
+			],
 			"rarity": "common"
 		},
 		"publication": {

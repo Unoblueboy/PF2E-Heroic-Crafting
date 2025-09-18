@@ -1,18 +1,32 @@
 import { Coins } from "../../types/src/module/item/physical";
 import { UnsignedCoinsPF2e } from "./unsignedCoins.mjs";
 
-export const MATERIAL_TROVE_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.wtpSAjQwSyPOglzU`;
-export const CRAFTING_MATERIAL_UUID = `Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.UFqgBzSfC8XfuKVg`;
-export const SALVAGE_MATERIAL_UUID = "Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.R8QxNha74tYOrccl";
+export const MATERIAL_TROVE_UUID =
+	`Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.wtpSAjQwSyPOglzU` as const;
+export const CRAFTING_MATERIAL_UUID =
+	`Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.UFqgBzSfC8XfuKVg` as const;
+export const SALVAGE_MATERIAL_UUID =
+	"Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.R8QxNha74tYOrccl" as const;
 
-export const MATERIAL_TROVE_SLUG = "material-trove";
-export const CRAFTING_MATERIAL_SLUG = "generic-crafting-material";
-export const SALVAGE_MATERIAL_SLUG = "generic-salvage-material";
+export const MATERIAL_TROVE_SLUG = "material-trove" as const;
+export const CRAFTING_MATERIAL_SLUG = "generic-crafting-material" as const;
+export const SALVAGE_MATERIAL_SLUG = "generic-salvage-material" as const;
+export const SAVVY_TEARDOWN_SLUG = "savvy-teardown" as const;
+export const SPECIALTY_CRAFTING_SLUG = "specialty-crafting" as const;
+export const SEASONED_SLUG = "seasoned" as const;
+export const MIDNIGHT_CRAFTING_SLUG = "midnight-crafting" as const;
 
-export const RARITIES: readonly ["common", "uncommon", "rare", "unique"] = ["common", "uncommon", "rare", "unique"];
-export const MODULE_ID = "pf2e-heroic-crafting";
+export const RARITIES = ["common", "uncommon", "rare", "unique"] as const;
+export const MODULE_ID = "pf2e-heroic-crafting" as const;
 
 export const HEROIC_CRAFTING_ROLL_OPTION_PREFIX = "heroic:crafting" as const;
+export const CRAFT_ROLL_OPTION = "action:craft" as const;
+export const CRAFT_A_PROJECT_ROLL_OPTION = "action:craft-project" as const;
+export const BEGIN_A_PROJECT_ROLL_OPTION = "action:begin-project" as const;
+export const FORAGE_ROLL_OPTION = "action:forage" as const;
+export const SALVAGE_AN_ITEM_ROLL_OPTION = "action:salvage-item" as const;
+export const SAVVY_TEARDOWN_ROLL_OPTION = "action:savvy-teardown" as const;
+export const SPECIALTY_ROLL_OPTION = "specialty" as const;
 
 export type HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD = {
 	hour: Coins;

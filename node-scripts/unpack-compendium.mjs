@@ -12,5 +12,9 @@ const CWD = process.cwd();
 
 for (const folder of folders) {
 	if (SHOW_LOGS) console.log(`Extracting ${folder}`);
-	await extractPack(`${CWD}/build/packs/${folder}`, `${CWD}/static/jsons/${folder}`, { clean: true, log: SHOW_LOGS });
+	await extractPack(`${CWD}/build/packs/${folder}`, `${CWD}/static/jsons/${folder}`, {
+		clean: true,
+		log: SHOW_LOGS,
+		jsonOptions: { space: "\t" },
+	});
 }

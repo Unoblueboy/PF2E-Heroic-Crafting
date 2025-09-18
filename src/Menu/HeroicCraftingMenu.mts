@@ -532,11 +532,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 				this.actor,
 				"batchSize",
 				{ item: formula.item },
-				new Set([
-					...this.actor.getRollOptions(),
-					...getHeroicItemRollOptions(formula.item),
-					"action:begin-project",
-				])
+				this.getBeginProjectRollOptions(formula.item)
 			);
 			const formulaData = foundry.utils.deepClone(formula);
 			formulaData.batchSize = batchSizeMax;
@@ -555,6 +551,10 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		return {
 			formulaGroups,
 		};
+	}
+
+	private getBeginProjectRollOptions(item: PhysicalItemPF2e): string[] | Set<string> {
+		return new Set([...this.actor.getRollOptions(), ...getHeroicItemRollOptions(item), "action:begin-project"]);
 	}
 
 	private async getCraftProjectContext(): Promise<{ projects: ProjectContextData[] }> {

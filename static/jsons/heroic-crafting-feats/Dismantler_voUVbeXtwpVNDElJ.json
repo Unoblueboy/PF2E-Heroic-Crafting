@@ -5,8 +5,12 @@
 	"effects": [],
 	"system": {
 		"_migration": {
-			"version": 0.939,
-			"previous": null
+			"version": 0.942,
+			"previous": {
+				"schema": 0.939,
+				"foundry": "13.348",
+				"system": "7.4.3"
+			}
 		},
 		"description": {
 			"value": "<p>Hours of taking apart spare items have allowed you to develop a streamlined process. When you use the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.DfvGFDHV7pYIT7ct]{Salvage Item} activity, you can recover twice as much each hour. The maximum salvageable value of the item is unchanged.</p>",
@@ -23,15 +27,38 @@
 				"key": "Note",
 				"selector": "crafting",
 				"text": "You can recover twice as much each hour. The maximum salvageable value of the item is unchanged.",
-				"predicate": ["action:salvage-item"],
+				"predicate": [
+					"action:salvage-item"
+				],
 				"title": "{item|name}",
-				"outcome": ["criticalFailure"]
+				"outcome": [
+					"criticalFailure",
+					"failure",
+					"success",
+					"criticalSuccess"
+				]
+			},
+			{
+				"key": "ModifyProgress",
+				"operation": "multiply",
+				"value": 2,
+				"outcome": [
+					"criticalFailure",
+					"failure",
+					"success",
+					"criticalSuccess"
+				],
+				"predicate": [
+					"action:salvage-item"
+				]
 			}
 		],
 		"slug": "dismantler",
 		"traits": {
 			"otherTags": [],
-			"value": ["skill"],
+			"value": [
+				"skill"
+			],
 			"rarity": "common"
 		},
 		"level": {
@@ -67,16 +94,15 @@
 		"compendiumSource": null,
 		"duplicateSource": null,
 		"exportSource": null,
-		"coreVersion": "13.345",
+		"coreVersion": "13.348",
 		"systemId": "pf2e",
-		"systemVersion": "7.1.1",
-		"modifiedTime": 1749874952660,
+		"systemVersion": "7.4.3",
+		"modifiedTime": 1758218545963,
 		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
 	},
 	"sort": 0,
 	"ownership": {
-		"default": 0,
-		"xtF1DuSWhBdA8aGR": 3
+		"default": 0
 	},
 	"_key": "!items!voUVbeXtwpVNDElJ"
 }

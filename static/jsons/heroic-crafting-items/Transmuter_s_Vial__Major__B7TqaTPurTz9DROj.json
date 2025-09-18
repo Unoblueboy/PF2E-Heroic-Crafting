@@ -16,7 +16,10 @@
 		},
 		"traits": {
 			"otherTags": [],
-			"value": ["alchemical", "consumable"],
+			"value": [
+				"alchemical",
+				"consumable"
+			],
 			"rarity": "common"
 		},
 		"publication": {

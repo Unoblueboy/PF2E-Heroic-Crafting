@@ -1,4 +1,5 @@
-import { ConsumablePF2e, PhysicalItemPF2e, WeaponPF2e } from "../../types/src/module/item";
+import { ActorPF2e } from "../../types/src/module/actor";
+import { ConsumablePF2e, FeatPF2e, PhysicalItemPF2e, WeaponPF2e } from "../../types/src/module/item";
 import { HEROIC_CRAFTING_ROLL_OPTION_PREFIX } from "./constants.mjs";
 
 export function getHeroicItemRollOptions(item: PhysicalItemPF2e | undefined): Set<string> {
@@ -49,4 +50,10 @@ export function getMaxBatchSize(item: PhysicalItemPF2e | undefined): number {
 		isMundaneAmmo ? Math.clamp(item.system.price.per, 1, 10) : magicalAmmo
 	);
 	return batchSize;
+}
+
+export function hasFeat(actor: ActorPF2e, slug: string) {
+	return actor.itemTypes.feat.some(
+		(feat: FeatPF2e) => feat.slug === slug || game.pf2e.system.sluggify(feat.name) === slug
+	);
 }

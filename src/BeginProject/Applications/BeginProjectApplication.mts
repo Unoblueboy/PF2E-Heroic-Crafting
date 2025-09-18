@@ -7,7 +7,12 @@ import {
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/_module.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
-import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../../Helper/constants.mjs";
+import {
+	BEGIN_A_PROJECT_ROLL_OPTION,
+	CRAFTING_MATERIAL_SLUG,
+	MATERIAL_TROVE_SLUG,
+	SALVAGE_MATERIAL_SLUG,
+} from "../../Helper/constants.mjs";
 import { DENOMINATION, UnsignedCoins } from "../../Helper/currencyTypes.mjs";
 import { calculateDC } from "../../Helper/dc.mjs";
 import { getGenericScrollOrWandRank, getHeroicItemRollOptions, isGenericScrollOrWand } from "../../Helper/item.mjs";
@@ -82,11 +87,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 				this.actor,
 				"batchSize",
 				{ item: this.item },
-				new Set([
-					...this.actor.getRollOptions(),
-					...getHeroicItemRollOptions(this.item),
-					"action:begin-project",
-				])
+				this.getRollOptions()
 			);
 			this.batchSizeMax = batchSize;
 			this.formData.batchSize = batchSize;
@@ -118,6 +119,14 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		summary: { template: "modules/pf2e-heroic-crafting/templates/beginProject/summary.hbs" },
 		footer: { template: "templates/generic/form-footer.hbs", classes: ["footer-button-panel"] },
 	};
+
+	private getRollOptions(): Set<string> {
+		return new Set([
+			...this.actor.getRollOptions(),
+			...getHeroicItemRollOptions(this.item),
+			BEGIN_A_PROJECT_ROLL_OPTION,
+		]);
+	}
 
 	private static handler(
 		this: BeginProjectApplication,
@@ -414,7 +423,10 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			ui.notifications.info("Coins cannot be crafted");
 			return null;
 		}
-		if (item.slug && [MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, SALVAGE_MATERIAL_SLUG].includes(item.slug)) {
+		if (
+			item.slug &&
+			([MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, SALVAGE_MATERIAL_SLUG] as string[]).includes(item.slug)
+		) {
 			ui.notifications.info(`${item.name} cannot be crafted`);
 			return null;
 		}
@@ -488,7 +500,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			this.actor,
 			"batchSize",
 			{ item: this.item },
-			new Set([...this.actor.getRollOptions(), ...getHeroicItemRollOptions(this.item), "action:begin-project"])
+			this.getRollOptions()
 		);
 		this.formData.batchSize = batchSize;
 		this.batchSizeMax = batchSize;

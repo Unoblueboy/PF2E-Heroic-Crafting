@@ -186,7 +186,6 @@ export class ModifyConstantRuleElementHelper {
 		}
 	}
 
-	// TODO: Actually add rush cost in Craft Project Logic
 	private static getRushCost(
 		actor: CharacterPF2eHeroicCrafting,
 		retrievalData: RushCostRetrievalData,

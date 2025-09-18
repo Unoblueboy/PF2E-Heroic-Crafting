@@ -5,8 +5,12 @@
 	"effects": [],
 	"system": {
 		"_migration": {
-			"version": 0.939,
-			"previous": null
+			"version": 0.942,
+			"previous": {
+				"schema": 0.939,
+				"foundry": "13.348",
+				"system": "7.4.3"
+			}
 		},
 		"description": {
 			"value": "<p>You can burn additional resources to craft on a tight deadline. You can @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} with a duration of only 10 minutes. When you do so, use the same rules as the Hour duration, but you must expend double the amount of crafting materials. The additional materials spent this way are called the “rush cost” and don’t add to the check’s Cost or Progress.</p><p>If you critically fail a Crafting check using this feat, you deduct twice as much progress as normal from your progress.</p><p>Just like Hourly checks, crafting this way is an exploration activity and requires you to have all your materials on hand. Crafting this way also counts as one Hourly check for the purposes of determining how many checks you can make in a day without Working Overtime.</p>",
@@ -23,15 +27,34 @@
 				"key": "Note",
 				"selector": "crafting",
 				"text": "If you critically fail a Crafting check using this feat, you deduct twice as much progress as normal from your progress.",
-				"outcome": ["criticalSuccess"],
+				"outcome": [
+					"criticalFailure"
+				],
 				"title": "{item|name}",
-				"predicate": ["action:craft-a-project", "midnight-crafting"]
+				"predicate": [
+					"action:craft-a-project",
+					"midnight-crafting"
+				]
+			},
+			{
+				"key": "ModifyProgress",
+				"operation": "multiply",
+				"value": 2,
+				"outcome": [
+					"criticalFailure"
+				],
+				"predicate": [
+					"action:craft-a-project",
+					"midnight-crafting"
+				]
 			}
 		],
 		"slug": "midnight-crafting",
 		"traits": {
 			"otherTags": [],
-			"value": ["skill"],
+			"value": [
+				"skill"
+			],
 			"rarity": "common"
 		},
 		"level": {
@@ -66,17 +89,16 @@
 		"compendiumSource": null,
 		"duplicateSource": null,
 		"exportSource": null,
-		"coreVersion": "13.345",
+		"coreVersion": "13.348",
 		"systemId": "pf2e",
-		"systemVersion": "7.1.1",
-		"modifiedTime": 1749874952660,
+		"systemVersion": "7.4.3",
+		"modifiedTime": 1758218545963,
 		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
 	},
 	"_id": "lRROJh4C2TlJSwn8",
 	"sort": 0,
 	"ownership": {
-		"default": 0,
-		"xtF1DuSWhBdA8aGR": 3
+		"default": 0
 	},
 	"_key": "!items!lRROJh4C2TlJSwn8"
 }

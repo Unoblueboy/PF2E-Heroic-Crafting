@@ -40,7 +40,10 @@
 		"rules": [
 			{
 				"key": "Note",
-				"predicate": ["action:craft", "speciality"],
+				"predicate": [
+					"action:craft",
+					"speciality"
+				],
 				"selector": "crafting",
 				"text": "Whenever you roll a success at a Crafting check to make an item of the type you chose with Specialty Crafting, you get a critical success instead.",
 				"title": "{item|name}"
@@ -48,13 +51,20 @@
 		],
 		"traits": {
 			"rarity": "common",
-			"value": ["general", "skill"],
+			"value": [
+				"general",
+				"skill"
+			],
 			"otherTags": []
 		},
 		"slug": "impeccable-crafting",
 		"_migration": {
-			"version": 0.939,
-			"previous": null
+			"version": 0.942,
+			"previous": {
+				"schema": 0.939,
+				"foundry": "13.348",
+				"system": "7.4.3"
+			}
 		},
 		"onlyLevel1": false,
 		"maxTakable": 1,
@@ -70,18 +80,17 @@
 		"compendiumSource": null,
 		"duplicateSource": null,
 		"exportSource": null,
-		"coreVersion": "13.345",
+		"coreVersion": "13.348",
 		"systemId": "pf2e",
-		"systemVersion": "7.1.1",
-		"modifiedTime": 1749874952660,
+		"systemVersion": "7.4.3",
+		"modifiedTime": 1758218545963,
 		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
 	},
 	"effects": [],
 	"flags": {},
 	"sort": 0,
 	"ownership": {
-		"default": 0,
-		"xtF1DuSWhBdA8aGR": 3
+		"default": 0
 	},
 	"_key": "!items!ae1PWuyZWYdNft3K"
 }

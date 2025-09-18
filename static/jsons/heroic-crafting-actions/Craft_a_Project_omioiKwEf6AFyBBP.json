@@ -22,7 +22,10 @@
 		"slug": "craft-a-project",
 		"traits": {
 			"otherTags": [],
-			"value": ["downtime", "manipulate"]
+			"value": [
+				"downtime",
+				"manipulate"
+			]
 		},
 		"actionType": {
 			"value": "passive"

@@ -22,7 +22,9 @@
 		"slug": "begin-a-project",
 		"traits": {
 			"otherTags": [],
-			"value": ["exploration"]
+			"value": [
+				"exploration"
+			]
 		},
 		"actionType": {
 			"value": "passive"

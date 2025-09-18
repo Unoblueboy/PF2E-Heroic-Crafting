@@ -15,7 +15,9 @@
 				"selector": "survival",
 				"value": 1,
 				"type": "item",
-				"predicate": ["action:forage-crafting-resources"]
+				"predicate": [
+					"action:forage-crafting-resources"
+				]
 			}
 		],
 		"slug": "dowsing-rods",
@@ -25,7 +27,9 @@
 		},
 		"traits": {
 			"otherTags": [],
-			"value": ["magical"],
+			"value": [
+				"magical"
+			],
 			"rarity": "common"
 		},
 		"publication": {

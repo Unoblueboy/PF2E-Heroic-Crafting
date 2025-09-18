@@ -3,7 +3,7 @@ import { CheckRoll } from "../../types/src/module/system/check";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
-import { HEROIC_CRAFTING_GATHERED_INCOME } from "../Helper/constants.mjs";
+import { FORAGE_ROLL_OPTION, HEROIC_CRAFTING_GATHERED_INCOME } from "../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { ModifyProgressRuleElementHelper } from "../RuleElement/Helpers/ModifyProgressHelper.mjs";
@@ -94,7 +94,7 @@ async function rollForageCheck(actor: CharacterPF2eHeroicCrafting, data: { dc: n
 					failure: {},
 					criticalFailure: {},
 				},
-				new Set(["action:forage"])
+				new Set([FORAGE_ROLL_OPTION])
 			);
 			const forage = outcome ? CoinsPF2eUtility.toUnsignedCoins(progress[outcome]) : new UnsignedCoinsPF2e();
 			const flavor = await foundry.applications.handlebars.renderTemplate(
@@ -116,7 +116,7 @@ async function rollForageCheck(actor: CharacterPF2eHeroicCrafting, data: { dc: n
 
 	actor.skills.survival.check.roll({
 		dc: { value: data.dc, visible: false },
-		extraRollOptions: ["action:craft-projct", "action:craft", "specialty"],
+		extraRollOptions: [FORAGE_ROLL_OPTION],
 		extraRollNotes: [
 			{
 				selector: "survival",

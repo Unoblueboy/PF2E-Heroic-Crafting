@@ -85,7 +85,7 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 	if (salvageDetails.savvyTeardown) {
 		return {
 			dc: { value: baseDC + 5, visible: true },
-			extraRollOptions: ["action:savvy-teardown", "specialty"],
+			extraRollOptions: [...salvageDetails.rollOptions],
 			extraRollNotes: [
 				{
 					selector: "crafting",
@@ -112,7 +112,7 @@ async function getStatisticRollParameters(salvageDetails: SalvageApplicationResu
 	} else {
 		return {
 			dc: { value: baseDC, visible: true },
-			extraRollOptions: ["action:salvage-item"],
+			extraRollOptions: [...salvageDetails.rollOptions],
 			extraRollNotes: [
 				{
 					selector: "crafting",

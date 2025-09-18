@@ -22,7 +22,9 @@
 		"slug": "forage-crafting-resources",
 		"traits": {
 			"otherTags": [],
-			"value": ["downtime"]
+			"value": [
+				"downtime"
+			]
 		},
 		"actionType": {
 			"value": "passive"

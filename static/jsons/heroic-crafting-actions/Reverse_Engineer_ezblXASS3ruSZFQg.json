@@ -22,7 +22,9 @@
 		"slug": "reverse-engineer",
 		"traits": {
 			"otherTags": [],
-			"value": ["exploration"]
+			"value": [
+				"exploration"
+			]
 		},
 		"actionType": {
 			"value": "passive"

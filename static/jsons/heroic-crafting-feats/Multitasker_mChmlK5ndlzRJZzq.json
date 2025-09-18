@@ -5,8 +5,12 @@
 	"effects": [],
 	"system": {
 		"_migration": {
-			"version": 0.939,
-			"previous": null
+			"version": 0.942,
+			"previous": {
+				"schema": 0.939,
+				"foundry": "13.348",
+				"system": "7.4.3"
+			}
 		},
 		"description": {
 			"value": "<p>Your excellent time management allows you to work on multiple projects at once. If you @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} for at least 1 day, you can work on 2 projects simultaneously. If you are legendary in Crafting, you can work on 3 projects simultaneously. Each project requires you to contribute materials and make checks separately. Table 1: Spending Limit specifies the amount you can spend on each project. A batch of consumables counts as a single project, and your Spending Limit is multiplied by the size of the batch.</p>",
@@ -22,7 +26,9 @@
 		"slug": "multitasker",
 		"traits": {
 			"otherTags": [],
-			"value": ["skill"],
+			"value": [
+				"skill"
+			],
 			"rarity": "common"
 		},
 		"level": {
@@ -57,17 +63,16 @@
 		"compendiumSource": null,
 		"duplicateSource": null,
 		"exportSource": null,
-		"coreVersion": "13.345",
+		"coreVersion": "13.348",
 		"systemId": "pf2e",
-		"systemVersion": "7.1.1",
-		"modifiedTime": 1749874952660,
+		"systemVersion": "7.4.3",
+		"modifiedTime": 1758218545963,
 		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
 	},
 	"_id": "mChmlK5ndlzRJZzq",
 	"sort": 0,
 	"ownership": {
-		"default": 0,
-		"xtF1DuSWhBdA8aGR": 3
+		"default": 0
 	},
 	"_key": "!items!mChmlK5ndlzRJZzq"
 }

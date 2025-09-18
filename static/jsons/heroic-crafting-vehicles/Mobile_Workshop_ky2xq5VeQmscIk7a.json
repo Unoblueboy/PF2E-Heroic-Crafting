@@ -1,188 +1,188 @@
 {
-  "name": "Mobile Workshop",
-  "type": "vehicle",
-  "prototypeToken": {
-    "flags": {
-      "pf2e": {
-        "linkToActorSize": true,
-        "autoscale": true
-      }
-    },
-    "height": 2,
-    "width": 2,
-    "name": "Mobile Workshop",
-    "displayName": 20,
-    "actorLink": false,
-    "texture": {
-      "src": "systems/pf2e/icons/default-icons/vehicle.svg",
-      "anchorX": 0.5,
-      "anchorY": 0.5,
-      "offsetX": 0,
-      "offsetY": 0,
-      "fit": "contain",
-      "scaleX": 1,
-      "scaleY": 1,
-      "rotation": 0,
-      "tint": "#ffffff",
-      "alphaThreshold": 0.75
-    },
-    "lockRotation": true,
-    "rotation": 0,
-    "alpha": 1,
-    "disposition": -1,
-    "displayBars": 20,
-    "bar1": {
-      "attribute": "attributes.hp"
-    },
-    "bar2": {
-      "attribute": null
-    },
-    "light": {
-      "negative": false,
-      "priority": 0,
-      "alpha": 0.5,
-      "angle": 360,
-      "bright": 0,
-      "color": null,
-      "coloration": 1,
-      "dim": 0,
-      "attenuation": 0.5,
-      "luminosity": 0.5,
-      "saturation": 0,
-      "contrast": 0,
-      "shadows": 0,
-      "animation": {
-        "type": null,
-        "speed": 5,
-        "intensity": 5,
-        "reverse": false
-      },
-      "darkness": {
-        "min": 0,
-        "max": 1
-      }
-    },
-    "sight": {
-      "enabled": false,
-      "range": 0,
-      "angle": 360,
-      "visionMode": "basic",
-      "color": null,
-      "attenuation": 0.1,
-      "brightness": 0,
-      "saturation": 0,
-      "contrast": 0
-    },
-    "detectionModes": [],
-    "occludable": {
-      "radius": 0
-    },
-    "ring": {
-      "enabled": false,
-      "colors": {
-        "ring": null,
-        "background": null
-      },
-      "effects": 1,
-      "subject": {
-        "scale": 1,
-        "texture": null
-      }
-    },
-    "turnMarker": {
-      "mode": 1,
-      "animation": null,
-      "src": null,
-      "disposition": false
-    },
-    "movementAction": null,
-    "randomImg": false,
-    "appendNumber": false,
-    "prependAdjective": false
-  },
-  "effects": [],
-  "system": {
-    "_migration": {
-      "version": 0.939,
-      "previous": null
-    },
-    "traits": {
-      "value": [],
-      "rarity": "common",
-      "size": {
-        "value": "lg"
-      }
-    },
-    "attributes": {
-      "hp": {
-        "value": 18,
-        "max": 18,
-        "temp": 0,
-        "details": ""
-      },
-      "ac": {
-        "value": 11
-      },
-      "hardness": 5,
-      "collisionDC": {
-        "value": 15
-      },
-      "collisionDamage": {
-        "value": "2d6"
-      },
-      "immunities": [],
-      "weaknesses": [],
-      "resistances": [],
-      "emitsSound": "encounter"
-    },
-    "details": {
-      "description": "<p>This specialized wagon contains everything you need to ply your trade on the road. It counts as a suitable workshop and provides artisan’s tools for one type of crafting, even while moving. Additionally, you don’t take the penalty for making a downtime check to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} while engaging in 4 hours or less of exploration activities. It also has space for up to 50 Bulk of crafting materials. Uses the same Vehicle statistics as a @UUID[Compendium.pf2e.vehicles.UNOwkQq5lc4cYdZP]{Wagon}.</p>",
-      "level": {
-        "value": 8
-      },
-      "price": 25,
-      "space": {
-        "long": 10,
-        "wide": 10,
-        "high": 5
-      },
-      "crew": "1 pilot",
-      "passengers": "4",
-      "pilotingCheck": "Driving Lore (DC 15) or Nature (DC 17 to DC 25, depending on the pulling creature)",
-      "AC": 0,
-      "speed": "the Speed of the slowest pulling creature (pulled by 2 Large creatures)",
-      "publication": {
-        "title": "Heroic Crafting",
-        "authors": "",
-        "license": "OGL",
-        "remaster": false
-      }
-    },
-    "saves": {
-      "fortitude": {
-        "value": 7
-      }
-    }
-  },
-  "_id": "ky2xq5VeQmscIk7a",
-  "img": "systems/pf2e/icons/default-icons/vehicle.svg",
-  "items": [],
-  "folder": null,
-  "flags": {},
-  "_stats": {
-    "compendiumSource": null,
-    "duplicateSource": null,
-    "exportSource": null,
-    "coreVersion": "13.345",
-    "systemId": "pf2e",
-    "systemVersion": "7.1.1",
-    "modifiedTime": 1749874976162,
-    "lastModifiedBy": "xtF1DuSWhBdA8aGR"
-  },
-  "ownership": {
-    "default": 0,
-    "xtF1DuSWhBdA8aGR": 3
-  },
-  "sort": 0,
-  "_key": "!actors!ky2xq5VeQmscIk7a"
+	"name": "Mobile Workshop",
+	"type": "vehicle",
+	"prototypeToken": {
+		"flags": {
+			"pf2e": {
+				"linkToActorSize": true,
+				"autoscale": true
+			}
+		},
+		"height": 2,
+		"width": 2,
+		"name": "Mobile Workshop",
+		"displayName": 20,
+		"actorLink": false,
+		"texture": {
+			"src": "systems/pf2e/icons/default-icons/vehicle.svg",
+			"anchorX": 0.5,
+			"anchorY": 0.5,
+			"offsetX": 0,
+			"offsetY": 0,
+			"fit": "contain",
+			"scaleX": 1,
+			"scaleY": 1,
+			"rotation": 0,
+			"tint": "#ffffff",
+			"alphaThreshold": 0.75
+		},
+		"lockRotation": true,
+		"rotation": 0,
+		"alpha": 1,
+		"disposition": -1,
+		"displayBars": 20,
+		"bar1": {
+			"attribute": "attributes.hp"
+		},
+		"bar2": {
+			"attribute": null
+		},
+		"light": {
+			"negative": false,
+			"priority": 0,
+			"alpha": 0.5,
+			"angle": 360,
+			"bright": 0,
+			"color": null,
+			"coloration": 1,
+			"dim": 0,
+			"attenuation": 0.5,
+			"luminosity": 0.5,
+			"saturation": 0,
+			"contrast": 0,
+			"shadows": 0,
+			"animation": {
+				"type": null,
+				"speed": 5,
+				"intensity": 5,
+				"reverse": false
+			},
+			"darkness": {
+				"min": 0,
+				"max": 1
+			}
+		},
+		"sight": {
+			"enabled": false,
+			"range": 0,
+			"angle": 360,
+			"visionMode": "basic",
+			"color": null,
+			"attenuation": 0.1,
+			"brightness": 0,
+			"saturation": 0,
+			"contrast": 0
+		},
+		"detectionModes": [],
+		"occludable": {
+			"radius": 0
+		},
+		"ring": {
+			"enabled": false,
+			"colors": {
+				"ring": null,
+				"background": null
+			},
+			"effects": 1,
+			"subject": {
+				"scale": 1,
+				"texture": null
+			}
+		},
+		"turnMarker": {
+			"mode": 1,
+			"animation": null,
+			"src": null,
+			"disposition": false
+		},
+		"movementAction": null,
+		"randomImg": false,
+		"appendNumber": false,
+		"prependAdjective": false
+	},
+	"effects": [],
+	"system": {
+		"_migration": {
+			"version": 0.939,
+			"previous": null
+		},
+		"traits": {
+			"value": [],
+			"rarity": "common",
+			"size": {
+				"value": "lg"
+			}
+		},
+		"attributes": {
+			"hp": {
+				"value": 18,
+				"max": 18,
+				"temp": 0,
+				"details": ""
+			},
+			"ac": {
+				"value": 11
+			},
+			"hardness": 5,
+			"collisionDC": {
+				"value": 15
+			},
+			"collisionDamage": {
+				"value": "2d6"
+			},
+			"immunities": [],
+			"weaknesses": [],
+			"resistances": [],
+			"emitsSound": "encounter"
+		},
+		"details": {
+			"description": "<p>This specialized wagon contains everything you need to ply your trade on the road. It counts as a suitable workshop and provides artisan’s tools for one type of crafting, even while moving. Additionally, you don’t take the penalty for making a downtime check to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.omioiKwEf6AFyBBP]{Craft a Project} while engaging in 4 hours or less of exploration activities. It also has space for up to 50 Bulk of crafting materials. Uses the same Vehicle statistics as a @UUID[Compendium.pf2e.vehicles.UNOwkQq5lc4cYdZP]{Wagon}.</p>",
+			"level": {
+				"value": 8
+			},
+			"price": 25,
+			"space": {
+				"long": 10,
+				"wide": 10,
+				"high": 5
+			},
+			"crew": "1 pilot",
+			"passengers": "4",
+			"pilotingCheck": "Driving Lore (DC 15) or Nature (DC 17 to DC 25, depending on the pulling creature)",
+			"AC": 0,
+			"speed": "the Speed of the slowest pulling creature (pulled by 2 Large creatures)",
+			"publication": {
+				"title": "Heroic Crafting",
+				"authors": "",
+				"license": "OGL",
+				"remaster": false
+			}
+		},
+		"saves": {
+			"fortitude": {
+				"value": 7
+			}
+		}
+	},
+	"_id": "ky2xq5VeQmscIk7a",
+	"img": "systems/pf2e/icons/default-icons/vehicle.svg",
+	"items": [],
+	"folder": null,
+	"flags": {},
+	"_stats": {
+		"compendiumSource": null,
+		"duplicateSource": null,
+		"exportSource": null,
+		"coreVersion": "13.345",
+		"systemId": "pf2e",
+		"systemVersion": "7.1.1",
+		"modifiedTime": 1749874976162,
+		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
+	},
+	"ownership": {
+		"default": 0,
+		"xtF1DuSWhBdA8aGR": 3
+	},
+	"sort": 0,
+	"_key": "!actors!ky2xq5VeQmscIk7a"
 }

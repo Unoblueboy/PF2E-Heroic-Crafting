@@ -15,21 +15,27 @@
 				"selector": "crafting",
 				"value": 1,
 				"type": "item",
-				"predicate": ["blacksmithing"]
+				"predicate": [
+					"blacksmithing"
+				]
 			},
 			{
 				"key": "AdjustStrike",
 				"mode": "add",
 				"property": "property-runes",
 				"value": "impactful",
-				"definition": ["item:id:{item|id}"]
+				"definition": [
+					"item:id:{item|id}"
+				]
 			},
 			{
 				"key": "AdjustStrike",
 				"mode": "add",
 				"property": "property-runes",
 				"value": "flaming",
-				"definition": ["item:id:{item|id}"]
+				"definition": [
+					"item:id:{item|id}"
+				]
 			}
 		],
 		"slug": "vulcans-hammer",
@@ -39,7 +45,12 @@
 		},
 		"traits": {
 			"otherTags": [],
-			"value": ["fire", "force", "magical", "shove"],
+			"value": [
+				"fire",
+				"force",
+				"magical",
+				"shove"
+			],
 			"rarity": "uncommon"
 		},
 		"publication": {
@@ -114,7 +125,10 @@
 		"runes": {
 			"potency": 2,
 			"striking": 2,
-			"property": ["impactful", "flaming"]
+			"property": [
+				"impactful",
+				"flaming"
+			]
 		},
 		"specific": {
 			"material": {
@@ -124,7 +138,10 @@
 			"runes": {
 				"potency": 2,
 				"striking": 2,
-				"property": ["impactful", "flaming"]
+				"property": [
+					"impactful",
+					"flaming"
+				]
 			}
 		},
 		"subitems": []

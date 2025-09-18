@@ -16,7 +16,11 @@
 		},
 		"traits": {
 			"otherTags": [],
-			"value": ["consumable", "fulu", "magical"],
+			"value": [
+				"consumable",
+				"fulu",
+				"magical"
+			],
 			"rarity": "common"
 		},
 		"publication": {

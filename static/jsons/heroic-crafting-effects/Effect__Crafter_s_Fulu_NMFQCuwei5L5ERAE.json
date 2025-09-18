@@ -41,14 +41,20 @@
 				"selector": "crafting",
 				"value": 1,
 				"type": "status",
-				"predicate": ["action:craft-a-project", "crafters-fulu-craft-type:downtime"]
+				"predicate": [
+					"action:craft-a-project",
+					"crafters-fulu-craft-type:downtime"
+				]
 			},
 			{
 				"key": "RollTwice",
 				"selector": "crafting",
 				"keep": "higher",
 				"removeAfterRoll": "true",
-				"predicate": ["action:craft-a-project", "crafters-fulu-craft-type:exploration"],
+				"predicate": [
+					"action:craft-a-project",
+					"crafters-fulu-craft-type:exploration"
+				],
 				"priority": 120
 			}
 		],

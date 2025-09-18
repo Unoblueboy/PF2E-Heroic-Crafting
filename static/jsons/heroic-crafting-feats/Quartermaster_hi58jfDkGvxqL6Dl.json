@@ -5,8 +5,12 @@
 	"effects": [],
 	"system": {
 		"_migration": {
-			"version": 0.939,
-			"previous": null
+			"version": 0.942,
+			"previous": {
+				"schema": 0.939,
+				"foundry": "13.348",
+				"system": "7.4.3"
+			}
 		},
 		"description": {
 			"value": "<p>You’ve learned a myriad of tricks to help provision your entire adventuring party. When you craft a batch of consumable items, you can make up to 2 more than you could otherwise make. This increase applies after any increases from other feats or features.</p>",
@@ -18,11 +22,24 @@
 			"license": "OGL",
 			"remaster": false
 		},
-		"rules": [],
+		"rules": [
+			{
+				"key": "ModifyConstant",
+				"constant": "batchSize",
+				"operation": "add",
+				"value": 2,
+				"predicate": [
+					"heroic:crafting:item:trait:consumable",
+					"action:begin-project"
+				]
+			}
+		],
 		"slug": "quartermaster",
 		"traits": {
 			"otherTags": [],
-			"value": ["skill"],
+			"value": [
+				"skill"
+			],
 			"rarity": "common"
 		},
 		"level": {
@@ -57,17 +74,16 @@
 		"compendiumSource": null,
 		"duplicateSource": null,
 		"exportSource": null,
-		"coreVersion": "13.345",
+		"coreVersion": "13.348",
 		"systemId": "pf2e",
-		"systemVersion": "7.1.1",
-		"modifiedTime": 1749874952660,
+		"systemVersion": "7.4.3",
+		"modifiedTime": 1758218545963,
 		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
 	},
 	"_id": "hi58jfDkGvxqL6Dl",
 	"sort": 0,
 	"ownership": {
-		"default": 0,
-		"xtF1DuSWhBdA8aGR": 3
+		"default": 0
 	},
 	"_key": "!items!hi58jfDkGvxqL6Dl"
 }

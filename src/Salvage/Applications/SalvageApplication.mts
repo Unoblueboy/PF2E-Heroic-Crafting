@@ -13,7 +13,10 @@ import {
 	DEGREE_OF_SUCCESS_STRINGS,
 	HEROIC_CRAFTING_GATHERED_INCOME,
 	MATERIAL_TROVE_SLUG,
+	SALVAGE_AN_ITEM_ROLL_OPTION,
 	SALVAGE_MATERIAL_SLUG,
+	SAVVY_TEARDOWN_ROLL_OPTION,
+	SAVVY_TEARDOWN_SLUG,
 } from "../../Helper/constants.mjs";
 import { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs";
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
@@ -23,7 +26,7 @@ import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { ModifyProgressRuleElementHelper } from "../../RuleElement/Helpers/ModifyProgressHelper.mjs";
 import { ProjectCraftDuration } from "../../CraftProject/types.mjs";
 import { ModifyConstantRuleElementHelper } from "../../RuleElement/Helpers/ModifyConstantHelper.mjs";
-import { getHeroicItemRollOptions } from "../../Helper/item.mjs";
+import { getHeroicItemRollOptions, hasFeat } from "../../Helper/item.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -109,7 +112,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		return {
 			hideDetails: !this.item,
 			disableMoneyGroupInputs: this.isItemSalvage(),
-			hideSavvyTeardown: this.isItemSalvage() || !this.hasSavvyTeardownFeat(),
+			hideSavvyTeardown: this.isItemSalvage() || !hasFeat(this.actor, SAVVY_TEARDOWN_SLUG),
 			hideSalvageDuration: this.formData.useSavvyTeardown,
 			incomeData: this.item
 				? this.getIncomeData()
@@ -174,6 +177,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			},
 			actor: this.actor,
 			item: this.item,
+			rollOptions: this.getRollOptions(this.formData.useSavvyTeardown),
 		};
 		if (incomeData.criticalSuccess) {
 			this.result.income.criticalSuccess = new UnsignedCoinsPF2e(incomeData.criticalSuccess.value);
@@ -305,10 +309,6 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		return this.formData.useSavvyTeardown ? this.getSavvyTeardownIncomeData() : this.getSalvageIncomeData();
 	}
 
-	private hasSavvyTeardownFeat() {
-		return this.actor.itemTypes.feat.some((x) => x.slug === "savvy-teardown");
-	}
-
 	private isItemSalvage() {
 		return this.item?.slug === SALVAGE_MATERIAL_SLUG;
 	}
@@ -342,7 +342,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 				failure: UnsignedCoinsPF2e.multiplyCoins(hasMasterCrafting ? 2 : 1, baseIncomeFailureValue),
 				criticalFailure: UnsignedCoinsPF2e.multiplyCoins(hasMasterCrafting ? 2 : 1, baseIncomeFailureValue),
 			},
-			new Set(["action:salvage"]),
+			this.getRollOptions(),
 			true
 		);
 
@@ -391,6 +391,14 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 		return incomeData;
 	}
 
+	private getRollOptions(isSavvyTeardown: boolean = false): Set<string> {
+		return new Set([
+			...this.actor.getRollOptions(),
+			...getHeroicItemRollOptions(this.item),
+			isSavvyTeardown ? SAVVY_TEARDOWN_ROLL_OPTION : SALVAGE_AN_ITEM_ROLL_OPTION,
+		]);
+	}
+
 	private getSavvyTeardownIncomeData(): SalvageApplicationRenderDataIncomeData {
 		if (!this.actor) {
 			return {
@@ -403,7 +411,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			this.actor,
 			"spendingLimit",
 			{ duration: ProjectCraftDuration.DAY },
-			new Set([...this.actor.getRollOptions(), ...getHeroicItemRollOptions(this.item), "action:savvy-teardown"])
+			this.getRollOptions(true)
 		);
 		const dailySpendingLimit = new UnsignedCoinsPF2e(spendingLimit);
 
@@ -419,7 +427,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 				failure: baseIncomeFailureValue,
 				criticalFailure: baseIncomeFailureValue,
 			},
-			new Set(["action:savvy-teardown"]),
+			this.getRollOptions(true),
 			true
 		);
 
@@ -484,7 +492,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 	}
 
 	private updateSavvyTeardownData() {
-		this.renderData.hideSavvyTeardown = this.isItemSalvage() || !this.hasSavvyTeardownFeat();
+		this.renderData.hideSavvyTeardown = this.isItemSalvage() || !hasFeat(this.actor, SAVVY_TEARDOWN_SLUG);
 		this.formData.useSavvyTeardown &&= !this.renderData.hideSavvyTeardown;
 		this.renderData.hideSalvageDuration = this.formData.useSavvyTeardown;
 	}
@@ -529,7 +537,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 			ui.notifications.info("Coins cannot be salvaged");
 			return null;
 		}
-		if (item.slug && [MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG].includes(item.slug)) {
+		if (item.slug && ([MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG] as string[]).includes(item.slug)) {
 			ui.notifications.info(`${item.name} cannot be salvaged`);
 			return null;
 		}

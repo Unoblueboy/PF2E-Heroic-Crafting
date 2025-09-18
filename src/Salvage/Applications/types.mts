@@ -13,6 +13,7 @@ export type SalvageApplicationResult = {
 	} & { [x in DegreeOfSuccessString]?: UnsignedCoins };
 	actor: CharacterPF2eHeroicCrafting;
 	item: PhysicalItemPF2e;
+	rollOptions: Set<string>;
 };
 
 export type SalvageApplicationOptions = {

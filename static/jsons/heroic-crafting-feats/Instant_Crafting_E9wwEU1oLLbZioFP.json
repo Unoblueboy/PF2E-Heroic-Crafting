@@ -5,11 +5,15 @@
 	"effects": [],
 	"system": {
 		"_migration": {
-			"version": 0.939,
-			"previous": null
+			"version": 0.942,
+			"previous": {
+				"schema": 0.939,
+				"foundry": "13.348",
+				"system": "7.4.3"
+			}
 		},
 		"description": {
-			"value": "<p><strong>Cost</strong> The Price of the chosen item</p><p><strong>Frequency</strong> Once per day</p><hr /><p>You’ve learned the secrets of replaceable parts and carry component items on you to produce anything you might need at a moment’s notice. You can instantly produce any item you meet the crafting requirements for. The item’s level must be no higher than half your level, and its Bulk must be low enough that carrying it wouldn’t have made you encumbered. Attempt a @Check[crafting|traits:action:instant-crafting] check with a Very Hard DC for your level.</p><p><strong>Critical Success</strong> You produce the desired item, and you can immediately use any one Activate activity the item has as a free action as long as that Activate activity is three actions or less.</p><p><strong>Success</strong> You produce the desired item.</p><p><strong>Failure</strong> You partially complete the desired item. You can finish the item by spending another two actions on your next turn.</p><p><strong>Critical Failure</strong> Something goes horribly wrong in the assembly process, and the item explodes. You and all creatures within a 30 foot emanation take @Damage[7d6[fire]] damage and @Damage[7d6] damage of another type, at the GM’s discretion. Typically, magical items deal @Damage[7d6[force]]{force} damage, alchemical items deal @Damage[7d6[acid]]{acid} damage, and other items deal @Damage[7d6[sonic]]{sonic} damage.</p>",
+			"value": "<p><strong>Cost</strong> The Price of the chosen item</p><p><strong>Frequency</strong> Once per day</p><hr /><p>You’ve learned the secrets of replaceable parts and carry component items on you to produce anything you might need at a moment’s notice. You can instantly produce any item you meet the crafting requirements for. The item’s level must be no higher than half your level, and its Bulk must be low enough that carrying it wouldn’t have made you encumbered. Attempt a @Check[crafting|dc:@self.level|adjustment:5|traits:action:instant-crafting] check with a Very Hard DC for your level.</p><p><strong>Critical Success</strong> You produce the desired item, and you can immediately use any one Activate activity the item has as a free action as long as that Activate activity is three actions or less.</p><p><strong>Success</strong> You produce the desired item.</p><p><strong>Failure</strong> You partially complete the desired item. You can finish the item by spending another two actions on your next turn.</p><p><strong>Critical Failure</strong> Something goes horribly wrong in the assembly process, and the item explodes. You and all creatures within a 30 foot emanation take @Damage[7d6[fire]] damage and @Damage[7d6] damage of another type, at the GM’s discretion. Typically, magical items deal @Damage[7d6[force]]{force} damage, alchemical items deal @Damage[7d6[acid]]{acid} damage, and other items deal @Damage[7d6[sonic]]{sonic} damage.</p>",
 			"gm": ""
 		},
 		"publication": {
@@ -22,7 +26,10 @@
 		"slug": "instant-crafting",
 		"traits": {
 			"otherTags": [],
-			"value": ["manipulate", "skill"],
+			"value": [
+				"manipulate",
+				"skill"
+			],
 			"rarity": "common"
 		},
 		"level": {
@@ -64,17 +71,16 @@
 		"compendiumSource": null,
 		"duplicateSource": null,
 		"exportSource": null,
-		"coreVersion": "13.345",
+		"coreVersion": "13.348",
 		"systemId": "pf2e",
-		"systemVersion": "7.1.1",
-		"modifiedTime": 1749874952660,
+		"systemVersion": "7.4.3",
+		"modifiedTime": 1758218545963,
 		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
 	},
 	"_id": "E9wwEU1oLLbZioFP",
 	"sort": 0,
 	"ownership": {
-		"default": 0,
-		"xtF1DuSWhBdA8aGR": 3
+		"default": 0
 	},
 	"_key": "!items!E9wwEU1oLLbZioFP"
 }

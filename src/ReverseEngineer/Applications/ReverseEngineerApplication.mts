@@ -199,7 +199,10 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 			ui.notifications.info("Coins cannot be salvaged");
 			return null;
 		}
-		if (item.slug && [MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, SALVAGE_MATERIAL_SLUG].includes(item.slug)) {
+		if (
+			item.slug &&
+			([MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, SALVAGE_MATERIAL_SLUG] as string[]).includes(item.slug)
+		) {
 			ui.notifications.info(`${item.name} cannot be reverse engineered`);
 			return null;
 		}

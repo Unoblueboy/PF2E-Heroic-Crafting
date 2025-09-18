@@ -7,9 +7,20 @@ import {
 import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
 import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
-import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../../Helper/constants.mjs";
+import {
+	CRAFT_A_PROJECT_ROLL_OPTION,
+	CRAFT_ROLL_OPTION,
+	CRAFTING_MATERIAL_SLUG,
+	MATERIAL_TROVE_SLUG,
+	MIDNIGHT_CRAFTING_SLUG,
+	SALVAGE_MATERIAL_SLUG,
+	SEASONED_SLUG,
+	SPECIALTY_CRAFTING_SLUG,
+	SPECIALTY_ROLL_OPTION,
+} from "../../Helper/constants.mjs";
 import { DENOMINATION, UnsignedCoins } from "../../Helper/currencyTypes.mjs";
 import { fractionToPercent } from "../../Helper/generics.mjs";
+import { hasFeat } from "../../Helper/item.mjs";
 import { consoleDebug } from "../../Helper/log.mjs";
 import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
@@ -96,7 +107,9 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		this.materials = this.materialTrove.contents.filter(
 			(troveItem) =>
 				!!troveItem.slug &&
-				![MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, SALVAGE_MATERIAL_SLUG].includes(troveItem.slug)
+				!([MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, SALVAGE_MATERIAL_SLUG] as string[]).includes(
+					troveItem.slug
+				)
 		);
 
 		this.formData.materialList.materials = Object.fromEntries(
@@ -122,7 +135,9 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		this.materials = this.materialTrove.contents.filter(
 			(troveItem) =>
 				!!troveItem.slug &&
-				![MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, SALVAGE_MATERIAL_SLUG].includes(troveItem.slug)
+				!([MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, SALVAGE_MATERIAL_SLUG] as string[]).includes(
+					troveItem.slug
+				)
 		);
 
 		const treasureUuids = new Set(this.materials.map((x) => x.uuid));
@@ -547,8 +562,8 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	private async getRollOptions(): Promise<Set<string>> {
 		const rollOptions = new Set([
 			...(await this.project.getRollOptions()),
-			"action:craft",
-			"action:craft-project",
+			CRAFT_ROLL_OPTION,
+			CRAFT_A_PROJECT_ROLL_OPTION,
 			`heroic:crafting:duration:${this.formData.craftDuration}`,
 		]);
 
@@ -556,6 +571,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			rollOptions.add("midnight-crafting");
 		}
 		if (this.formData.craftingOptions.specialtyCrafting) {
+			rollOptions.add(SPECIALTY_ROLL_OPTION);
 			rollOptions.add(this.formData.craftingOptions.specialtyCrafting);
 		}
 		return rollOptions;
@@ -628,7 +644,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		if (specialtyCrafting.length > 0) {
 			craftingOptions.specialtyCrafting = specialtyCrafting
 				.map((feat: FeatPF2e) => {
-					if (feat.slug === "specialty-crafting") {
+					if (feat.slug === SPECIALTY_CRAFTING_SLUG) {
 						const rollOption = feat.flags.pf2e.rulesSelections.specialtyCrafting;
 						if (!rollOption) return null;
 						return {
@@ -644,7 +660,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 				.filter((x) => !!x);
 		}
 
-		if (this.hasMidnightCraftingFeat()) {
+		if (hasFeat(this.actor, MIDNIGHT_CRAFTING_SLUG)) {
 			craftingOptions.showMidnightCrafting = true;
 		}
 
@@ -706,11 +722,9 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	private getSpecialtyCrafting() {
-		return this.actor.itemTypes.feat.filter((x) => ["specialty-crafting", "seasoned"].includes(x.slug));
-	}
-
-	private hasMidnightCraftingFeat() {
-		return this.actor.itemTypes.feat.some((x) => x.slug === "midnight-crafting");
+		return this.actor.itemTypes.feat.filter(
+			(x: FeatPF2e) => !!x.slug && ([SPECIALTY_CRAFTING_SLUG, SEASONED_SLUG] as string[]).includes(x.slug)
+		);
 	}
 }
 

@@ -5,8 +5,12 @@
 	"effects": [],
 	"system": {
 		"_migration": {
-			"version": 0.939,
-			"previous": null
+			"version": 0.942,
+			"previous": {
+				"schema": 0.939,
+				"foundry": "13.348",
+				"system": "7.4.3"
+			}
 		},
 		"description": {
 			"value": "<p>Your knowledge of materials found in the wilderness includes some rare, but very valuable resources. When you use the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.KNJAA6peNXZoP7ap]{Forage Crafting Resources} activity, a critical success adds double the amount listed in Table 2: Gathered Income for the location’s level to your material trove each day. If you are a master in Survival, instead add triple the listed amount.</p>",
@@ -23,11 +27,16 @@
 				"key": "Note",
 				"selector": "survival",
 				"text": "Whenever you roll a critical success on a Survival check to Forage Crafting Resources, add double the amount listed in Table 2: Gathered Income for the location’s level to your material trove each day.",
-				"outcome": ["criticalSuccess"],
+				"outcome": [
+					"criticalSuccess"
+				],
 				"title": "{item|name}",
 				"predicate": [
 					{
-						"or": ["skill:survival:rank:1", "skill:survival:rank:2"]
+						"lt": [
+							"skill:survival:rank",
+							3
+						]
 					},
 					"action:forage-crafting-resources"
 				]
@@ -36,20 +45,38 @@
 				"key": "Note",
 				"selector": "survival",
 				"text": "Whenever you roll a critical success on a Survival check to Forage Crafting Resources, add triple the amount listed in Table 2: Gathered Income for the location’s level to your material trove each day.",
-				"outcome": ["criticalSuccess"],
+				"outcome": [
+					"criticalSuccess"
+				],
 				"predicate": [
 					{
-						"gte": ["skill:survival:rank", 3]
+						"gte": [
+							"skill:survival:rank",
+							3
+						]
 					},
 					"action:forage-crafting-resources"
 				],
 				"title": "{item|name}"
+			},
+			{
+				"key": "ModifyProgress",
+				"outcome": [
+					"criticalSuccess"
+				],
+				"operation": "multiply",
+				"value": "ternary(gte(@actor.skills.survival.rank,3),1.5,2)",
+				"predicate": [
+					"action:forage-crafting-resources"
+				]
 			}
 		],
 		"slug": "practiced-forager",
 		"traits": {
 			"otherTags": [],
-			"value": ["skill"],
+			"value": [
+				"skill"
+			],
 			"rarity": "common"
 		},
 		"level": {
@@ -84,17 +111,16 @@
 		"compendiumSource": null,
 		"duplicateSource": null,
 		"exportSource": null,
-		"coreVersion": "13.345",
+		"coreVersion": "13.348",
 		"systemId": "pf2e",
-		"systemVersion": "7.1.1",
-		"modifiedTime": 1749874952660,
+		"systemVersion": "7.4.3",
+		"modifiedTime": 1758218545963,
 		"lastModifiedBy": "xtF1DuSWhBdA8aGR"
 	},
 	"_id": "Dn63gL5fuL3kt638",
 	"sort": 0,
 	"ownership": {
-		"default": 0,
-		"xtF1DuSWhBdA8aGR": 3
+		"default": 0
 	},
 	"_key": "!items!Dn63gL5fuL3kt638"
 }
