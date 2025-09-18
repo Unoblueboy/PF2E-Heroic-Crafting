@@ -1,0 +1,43 @@
+on:
+    release:
+        types: [published]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Build
+              run: npm ci | npm run build
+
+            - name: Get Version
+              id: semver-tag
+              uses: gandarez/semver-action@master
+              with:
+                  branching_model: "git-flow"
+
+            # TODO: Update Manifest
+
+            - name: Zip Files
+              working-directory: ./build
+              run: zip -r ./pf2e-heroic-crafting.zip ./*
+
+            - name: Create Version Release
+              id: create_version_release
+              uses: ncipollo/release-action@v1
+              with:
+                  name: ${{ env.systemVersion }}
+                  allowUpdates: false
+                  draft: false
+                  prerelease: false
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  artifacts: "./build/module.json,./build/pf2e-heroic-crafting.zip"
+                  tag: ${{ env.systemVersion }}
