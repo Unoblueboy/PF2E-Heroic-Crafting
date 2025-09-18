@@ -464,6 +464,15 @@ body {
 }
 
 .craft-project-dialog {
+	hr {
+		margin: 0.5rem 0;
+		flex: 0 0 auto;
+	}
+
+	h4 {
+		margin: 0 0 0.5rem;
+	}
+
 	.item-summary {
 		flex: 0;
 
@@ -488,19 +497,10 @@ body {
 				width: 17px;
 			}
 		}
-
-		hr {
-			margin: 0.5rem 0 0;
-		}
 	}
 
 	.project-summary {
 		flex: 0;
-
-		h4 {
-			line-height: 1.5em;
-			margin: 0;
-		}
 
 		.progress-bar {
 			height: var(--input-height);
@@ -578,21 +578,12 @@ body {
 		flex: 1;
 		min-height: 50px;
 
-		hr {
-			margin: 0.5rem 0;
-			flex: 0 0 auto;
-		}
-
-		h4 {
-			margin: 0;
-		}
-
 		.total-material {
 			display: flex;
 			flex-wrap: wrap;
 			flex-direction: row;
 			justify-content: flex-end;
-			margin: 0.5em 0;
+			margin: 0 0 0.5rem;
 
 			span,
 			strong {

@@ -63,7 +63,7 @@ export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId
 
 	actor.skills?.crafting?.check?.roll({
 		dc: { value: project.dc, visible: true },
-		extraRollOptions: ["action:craft-project", "action:craft"],
+		extraRollOptions: [...craftDetails.rollOptions],
 		extraRollNotes: [
 			{
 				selector: "skill-check",

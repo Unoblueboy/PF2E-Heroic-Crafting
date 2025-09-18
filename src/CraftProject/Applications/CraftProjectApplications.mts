@@ -1,4 +1,4 @@
-import { PhysicalItemPF2e } from "../../../types/src/module/item";
+import { FeatPF2e, PhysicalItemPF2e } from "../../../types/src/module/item";
 import {
 	ApplicationClosingOptions,
 	ApplicationConfiguration,
@@ -40,6 +40,14 @@ type CraftProjectApplicationTeasureRecord = {
 	postUseOperation: TreasurePostUseOperation;
 };
 
+enum CraftProjectApplicationPart {
+	ITEM_SUMMARY = "item-summary",
+	CRAFTING_OPTIONS = "crafting-options",
+	PROJECT_SUMMARY = "project-summary",
+	MATERIAL_SUMMARY = "material-summary",
+	FOOTER = "footer",
+}
+
 export class CraftProjectApplication extends HandlebarsApplicationMixin(ApplicationV2) {
 	private readonly actor: CharacterPF2eHeroicCrafting;
 	private readonly project: AProject;
@@ -54,13 +62,17 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			trove: UnsignedCoins;
 			materials: Record<string, CraftProjectApplicationTeasureRecord>;
 		};
+		craftingOptions: {
+			specialtyCrafting?: string | null;
+			midnightCrafting?: boolean;
+		};
 	};
 	private materials: PhysicalItemPF2e[];
 	private rushCost: boolean;
 	private constructor(options: CraftProjectApplicationOptions) {
 		super(options as object);
 		this.actor = options.actor;
-		this.project = getProject(this.actor, options.projectId);
+		this.project = Projects.getProject(this.actor, options.projectId)!;
 		this.callback = options.callback;
 
 		this.formData = {
@@ -70,6 +82,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 				trove: new UnsignedCoinsPF2e(),
 				materials: {},
 			},
+			craftingOptions: {},
 		};
 		this.materials = [];
 		this.rushCost = false;
@@ -136,12 +149,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			this.actor,
 			"rushCost",
 			{ value: false },
-			new Set([
-				...(await this.project.getRollOptions()),
-				"action:craft",
-				"action:craft-project",
-				`heroic:crafting:duration:${this.formData.craftDuration}`,
-			])
+			await this.getRollOptions()
 		);
 	}
 
@@ -161,14 +169,27 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		},
 	};
 
-	static override readonly PARTS = {
-		"item-summary": { template: "modules/pf2e-heroic-crafting/templates/craftProject/item-summary.hbs" },
-		"project-summary": { template: "modules/pf2e-heroic-crafting/templates/craftProject/project-summary.hbs" },
-		"material-summary": {
+	static override readonly PARTS: Record<
+		CraftProjectApplicationPart,
+		{ template: string; classes?: string[]; scrollable?: string[] }
+	> = {
+		[CraftProjectApplicationPart.ITEM_SUMMARY]: {
+			template: "modules/pf2e-heroic-crafting/templates/craftProject/item-summary.hbs",
+		},
+		[CraftProjectApplicationPart.CRAFTING_OPTIONS]: {
+			template: "modules/pf2e-heroic-crafting/templates/craftProject/crafting-options.hbs",
+		},
+		[CraftProjectApplicationPart.PROJECT_SUMMARY]: {
+			template: "modules/pf2e-heroic-crafting/templates/craftProject/project-summary.hbs",
+		},
+		[CraftProjectApplicationPart.MATERIAL_SUMMARY]: {
 			template: "modules/pf2e-heroic-crafting/templates/craftProject/material-summary.hbs",
 			scrollable: [".material-list"],
 		},
-		footer: { template: "templates/generic/form-footer.hbs", classes: ["footer-button-panel"] },
+		[CraftProjectApplicationPart.FOOTER]: {
+			template: "templates/generic/form-footer.hbs",
+			classes: ["footer-button-panel"],
+		},
 	};
 
 	private static async handler(
@@ -191,28 +212,12 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			materialsSpent.trove = this.formData.materialList.trove;
 		if (treasureMaterials.length > 0) materialsSpent.treasure = treasureMaterials;
 
-		const totalCost = this.getTotalMaterialCost();
-		const duration = _formData.object[`duration`] as ProjectCraftDuration;
-		const progress = ModifyProgressRuleElementHelper.getProgress(
-			this.actor,
-			{
-				criticalSuccess: SignedCoinsPF2e.multiplyCoins(2, totalCost),
-				success: SignedCoinsPF2e.multiplyCoins(2, totalCost),
-				failure: SignedCoinsPF2e.multiplyCoins(0.5, totalCost),
-				criticalFailure: SignedCoinsPF2e.negate(totalCost),
-			},
-			new Set([
-				...(await this.project.getRollOptions()),
-				"action:craft",
-				"action:craft-project",
-				`heroic:crafting:duration:${duration}`,
-			])
-		);
+		const progress = await this.getProjectProgress();
 
 		const result: ProjectCraftDetails = {
 			projectId: this.project.id,
 			materialsSpent: materialsSpent,
-			cost: totalCost,
+			cost: this.getTotalMaterialCost(),
 			progress: {
 				criticalFailure: new SignedCoinsPF2e(progress.criticalFailure),
 				failure: new SignedCoinsPF2e(progress.failure),
@@ -220,6 +225,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 				criticalSuccess: new SignedCoinsPF2e(progress.criticalSuccess),
 			},
 			duration: this.formData.craftDuration,
+			rollOptions: await this.getRollOptions(),
 		};
 
 		this.result = result;
@@ -281,7 +287,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	private async manualUpdateInput(event: Event) {
-		const target = event.target as HTMLInputElement;
+		const target = event.target as HTMLInputElement | HTMLSelectElement;
 		const totalPath = target.name;
 		const pathSegments = totalPath.split(".");
 
@@ -301,6 +307,17 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			}
 			case "materialList": {
 				await this.updateMaterialList(target.value, pathSegments);
+				break;
+			}
+			case "specialtyCrafting": {
+				this.formData.craftingOptions.specialtyCrafting = target.value === "null" ? null : target.value;
+				break;
+			}
+			case "midnightCrafting": {
+				if (!(target instanceof HTMLInputElement)) break;
+				this.formData.craftingOptions.midnightCrafting = target.checked;
+				this.formData.craftDuration = ProjectCraftDuration.HOUR;
+				this.resetFormData();
 				break;
 			}
 			default:
@@ -345,12 +362,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	private async getMaxSpend(basicMaterial: "currency" | "trove"): Promise<UnsignedCoinsPF2e> {
-		const spendingLimit = ModifyConstantRuleElementHelper.getConstant(
-			this.actor,
-			"spendingLimit",
-			{ duration: this.formData.craftDuration },
-			await this.project.getRollOptions()
-		);
+		const spendingLimit = await this.getSpendingLimit();
 		const scaledSpendingLimit = UnsignedCoinsPF2e.multiplyCoins(
 			this.rushCost ? 2 * this.project.batchSize : this.project.batchSize,
 			spendingLimit
@@ -406,12 +418,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 				return;
 		}
 
-		const spendingLimit = ModifyConstantRuleElementHelper.getConstant(
-			this.actor,
-			"spendingLimit",
-			{ duration: this.formData.craftDuration },
-			await this.project.getRollOptions()
-		);
+		const spendingLimit = await this.getSpendingLimit();
 		const scaledSpendingLimit = UnsignedCoinsPF2e.multiplyCoins(this.project.batchSize, spendingLimit);
 
 		const item = (await foundry.utils.fromUuid(materialUuid)) as PhysicalItemPF2e;
@@ -445,11 +452,10 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	private async getProgressBarWidths() {
-		const totalMaterialCost = this.getTotalMaterialCost();
 		const projectMax = await this.project.max;
 		const projectValue = this.project.value;
 
-		if (totalMaterialCost.copperValue === 0) {
+		if (this.getTotalMaterialCost().copperValue === 0) {
 			return {
 				invisible: fractionToPercent(0, 1),
 				criticalFailure: fractionToPercent(0, 1),
@@ -463,23 +469,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			};
 		}
 
-		const craftDuration = this.formData.craftDuration;
-
-		const progress = ModifyProgressRuleElementHelper.getProgress(
-			this.actor,
-			{
-				criticalSuccess: SignedCoinsPF2e.multiplyCoins(2, totalMaterialCost),
-				success: SignedCoinsPF2e.multiplyCoins(2, totalMaterialCost),
-				failure: SignedCoinsPF2e.multiplyCoins(0.5, totalMaterialCost),
-				criticalFailure: SignedCoinsPF2e.negate(totalMaterialCost),
-			},
-			new Set([
-				...(await this.project.getRollOptions()),
-				"action:craft",
-				"action:craft-project",
-				`heroic:crafting:duration:${craftDuration}`,
-			])
-		);
+		const progress = await this.getProjectProgress();
 
 		const bands = [
 			Math.clamp(
@@ -530,6 +520,47 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		};
 	}
 
+	private async getProjectProgress(totalMaterialCost?: UnsignedCoinsPF2e) {
+		totalMaterialCost ??= this.getTotalMaterialCost();
+
+		return ModifyProgressRuleElementHelper.getProgress(
+			this.actor,
+			{
+				criticalSuccess: SignedCoinsPF2e.multiplyCoins(2, totalMaterialCost),
+				success: SignedCoinsPF2e.multiplyCoins(2, totalMaterialCost),
+				failure: SignedCoinsPF2e.multiplyCoins(0.5, totalMaterialCost),
+				criticalFailure: SignedCoinsPF2e.negate(totalMaterialCost),
+			},
+			await this.getRollOptions()
+		);
+	}
+
+	private async getSpendingLimit() {
+		return ModifyConstantRuleElementHelper.getConstant(
+			this.actor,
+			"spendingLimit",
+			{ duration: this.formData.craftDuration },
+			await this.getRollOptions()
+		);
+	}
+
+	private async getRollOptions(): Promise<Set<string>> {
+		const rollOptions = new Set([
+			...(await this.project.getRollOptions()),
+			"action:craft",
+			"action:craft-project",
+			`heroic:crafting:duration:${this.formData.craftDuration}`,
+		]);
+
+		if (this.formData.craftingOptions.midnightCrafting) {
+			rollOptions.add("midnight-crafting");
+		}
+		if (this.formData.craftingOptions.specialtyCrafting) {
+			rollOptions.add(this.formData.craftingOptions.specialtyCrafting);
+		}
+		return rollOptions;
+	}
+
 	protected override _onClose(options: ApplicationClosingOptions): void {
 		super._onClose(options);
 		this.callback(this.result);
@@ -539,80 +570,177 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	override async _prepareContext(options: ApplicationRenderOptions) {
 		const data = await super._prepareContext(options);
 
-		const materials: {
-			img: string;
-			name: string;
-			uuid: string;
-			quantity: number;
-			formData: CraftProjectApplicationTeasureRecord;
-		}[] = [];
-
-		this.materials.forEach((troveItem) =>
-			materials.push({
-				img: troveItem.img,
-				name: troveItem.name,
-				uuid: troveItem.uuid,
-				quantity: troveItem.quantity,
-				formData: this.formData.materialList.materials[troveItem.uuid],
-			})
-		);
-
-		const spendingLimit = ModifyConstantRuleElementHelper.getConstant(
-			this.actor,
-			"spendingLimit",
-			{ duration: this.formData.craftDuration },
-			await this.project.getRollOptions()
-		);
-		const scaledSpendingLimit = UnsignedCoinsPF2e.multiplyCoins(this.project.batchSize, spendingLimit);
-		const totalMaterialCost = this.getTotalMaterialCost();
-		const totalMaterialSpent = CraftProjectUtility.getTotalMaterialSpent(this.formData.materialList);
-		const buttons = [
-			{
-				type: "submit",
-				icon: "fa-solid fa-hammer",
-				cssClass: "craft-project-button",
-				label: "Craft Project",
-				disabled: UnsignedCoinsPF2e.getCopperValue(totalMaterialCost) === 0,
-			},
-			{
-				type: "button",
-				icon: "fa-solid fa-xmark",
-				label: "Cancel",
-				action: "close",
-			},
-		];
-
 		return {
 			...data,
 			id: this.id,
-			project: await this.project.getContextData(),
-			formData: this.formData,
-			buttons,
-			materials,
-			spendingLimit: scaledSpendingLimit,
-			hasMaterialTrove: !!this.materialTrove,
-			totalMaterial: {
-				cost: totalMaterialCost,
-				spent: totalMaterialSpent,
-				max: scaledSpendingLimit,
-			},
-			rushCost: this.rushCost,
-			progressBarWidths: await this.getProgressBarWidths(),
-			hideCurrencyMaterials: this.formData.craftDuration === ProjectCraftDuration.HOUR,
 		};
 	}
 
 	override async _preparePartContext(
-		partId: string,
+		partId: CraftProjectApplicationPart,
 		context: Record<string, unknown>,
 		options: HandlebarsRenderOptions
 	) {
 		super._preparePartContext(partId, context, options);
 		context.partId = `${this.id}-${partId}`;
-		return context;
+		switch (partId) {
+			case CraftProjectApplicationPart.ITEM_SUMMARY:
+				return {
+					...context,
+					...(await this.getItemSummaryPartContext()),
+				};
+			case CraftProjectApplicationPart.CRAFTING_OPTIONS:
+				return {
+					...context,
+					...(await this.getCraftingOptionsPartContext()),
+				};
+			case CraftProjectApplicationPart.PROJECT_SUMMARY:
+				return {
+					...context,
+					...(await this.getProjectSummaryPartContext()),
+				};
+			case CraftProjectApplicationPart.MATERIAL_SUMMARY:
+				return {
+					...context,
+					...(await this.getMaterialSummaryPartContext()),
+				};
+			case CraftProjectApplicationPart.FOOTER:
+				return {
+					...context,
+					...(await this.getFooterPartContext()),
+				};
+
+			default:
+				return context as never;
+		}
+	}
+
+	private async getItemSummaryPartContext() {
+		return {
+			project: await this.project.getContextData(),
+		};
+	}
+
+	private async getCraftingOptionsPartContext() {
+		const craftingOptions: Record<string, unknown> = {};
+
+		const specialtyCrafting = this.getSpecialtyCrafting();
+		if (specialtyCrafting.length > 0) {
+			craftingOptions.specialtyCrafting = specialtyCrafting
+				.map((feat: FeatPF2e) => {
+					if (feat.slug === "specialty-crafting") {
+						const rollOption = feat.flags.pf2e.rulesSelections.specialtyCrafting;
+						if (!rollOption) return null;
+						return {
+							label: getSpecialtyCraftingLabel(rollOption),
+							rollOption: rollOption,
+						};
+					}
+					return {
+						label: "Seasoned",
+						rollOption: "item:tag:food",
+					};
+				})
+				.filter((x) => !!x);
+		}
+
+		if (this.hasMidnightCraftingFeat()) {
+			craftingOptions.showMidnightCrafting = true;
+		}
+
+		return {
+			craftingOptions: craftingOptions,
+			formData: this.formData,
+			showCraftingOptions: Object.keys(craftingOptions).length !== 0,
+		};
+	}
+
+	private async getProjectSummaryPartContext() {
+		return {
+			progressBarWidths: await this.getProgressBarWidths(),
+			project: await this.project.getContextData(),
+		};
+	}
+
+	private async getMaterialSummaryPartContext() {
+		return {
+			materials: this.materials.map((troveItem) => {
+				return {
+					img: troveItem.img,
+					name: troveItem.name,
+					uuid: troveItem.uuid,
+					quantity: troveItem.quantity,
+					formData: this.formData.materialList.materials[troveItem.uuid],
+				};
+			}),
+			totalMaterial: {
+				cost: this.getTotalMaterialCost(),
+				spent: CraftProjectUtility.getTotalMaterialSpent(this.formData.materialList),
+				max: UnsignedCoinsPF2e.multiplyCoins(this.project.batchSize, await this.getSpendingLimit()),
+			},
+			rushCost: this.rushCost,
+			formData: this.formData,
+			hasMaterialTrove: !!this.materialTrove,
+			hideCurrencyMaterials: this.formData.craftDuration === ProjectCraftDuration.HOUR,
+		};
+	}
+
+	private async getFooterPartContext() {
+		return {
+			buttons: [
+				{
+					type: "submit",
+					icon: "fa-solid fa-hammer",
+					cssClass: "craft-project-button",
+					label: "Craft Project",
+					disabled: CraftProjectUtility.getTotalMaterialSpent(this.formData.materialList).copperValue === 0,
+				},
+				{
+					type: "button",
+					icon: "fa-solid fa-xmark",
+					label: "Cancel",
+					action: "close",
+				},
+			],
+		};
+	}
+
+	private getSpecialtyCrafting() {
+		return this.actor.itemTypes.feat.filter((x) => ["specialty-crafting", "seasoned"].includes(x.slug));
+	}
+
+	private hasMidnightCraftingFeat() {
+		return this.actor.itemTypes.feat.some((x) => x.slug === "midnight-crafting");
 	}
 }
 
-export function getProject(actor: CharacterPF2eHeroicCrafting, projectId: string): AProject {
-	return Projects.getProject(actor, projectId)!;
+function getSpecialtyCraftingLabel(rollOption: string | number | object): string {
+	switch (rollOption) {
+		case "alchemy":
+			return game.i18n.localize("PF2E.SpecificRule.SpecialtyCrafting.Alchemy");
+		case "artistry":
+			return game.i18n.localize("PF2E.SpecificRule.SpecialtyCrafting.Artistry");
+		case "blacksmithing":
+			return game.i18n.localize("PF2E.SpecificRule.SpecialtyCrafting.Blacksmithing");
+		case "bookmaking":
+			return game.i18n.localize("PF2E.SpecificRule.SpecialtyCrafting.Bookmaking");
+		case "glassmaking":
+			return game.i18n.localize("PF2E.SpecificRule.SpecialtyCrafting.Glassmaking");
+		case "leatherworking":
+			return game.i18n.localize("PF2E.SpecificRule.SpecialtyCrafting.Leatherworking");
+		case "pottery":
+			return game.i18n.localize("PF2E.SpecificRule.SpecialtyCrafting.Pottery");
+		case "shipbuilding":
+			return game.i18n.localize("PF2E.SpecificRule.SpecialtyCrafting.Shipbuilding");
+		case "stonemasonry":
+			return game.i18n.localize("PF2E.SpecificRule.SpecialtyCrafting.Stonemasonry");
+		case "tailoring":
+			return game.i18n.localize("PF2E.SpecificRule.SpecialtyCrafting.Tailoring");
+		case "weaving":
+			return game.i18n.localize("PF2E.SpecificRule.SpecialtyCrafting.Weaving");
+		case "woodworking":
+			return game.i18n.localize("PF2E.SpecificRule.SpecialtyCrafting.Woodworking");
+		default:
+			return "";
+	}
 }

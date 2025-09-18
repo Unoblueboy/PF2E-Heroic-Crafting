@@ -14,7 +14,8 @@
             <div class="form-fields">
                 <select name="duration"
                         data-action="update-input-manual"
-                        id="{{partId}}-duration">
+                        id="{{partId}}-duration"
+                        {{#if formData.craftingOptions.midnightCrafting}}disabled{{/if}}>
                     <option value="hour"
                             {{#if (eq formData.craftDuration "hour") }}selected{{/if}}>Hour</option>
                     <option value="day"

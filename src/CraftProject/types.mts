@@ -18,6 +18,7 @@ export type ProjectCraftDetails = {
 	progress: ProjectCraftProgress;
 	duration: ProjectCraftDuration;
 	createItem?: boolean;
+	rollOptions: Set<string>;
 };
 
 export type TreasureMaterialSpent = {

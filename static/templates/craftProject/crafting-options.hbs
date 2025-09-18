@@ -1,0 +1,40 @@
+{{#if showCraftingOptions}}
+    <div class="crafting-options">
+        <h4>Crafting Options</h4>
+        <div class="standard-form specialty-crafting-select">
+            {{#if craftingOptions.specialtyCrafting}}
+                <div class="form-group">
+                    <label for="{{partId}}-specialty-crafting">Specialty Crafting</label>
+                    <div class="form-fields">
+                        <select name="specialtyCrafting"
+                                data-action="update-input-manual"
+                                id="{{partId}}-specialty-crafting">
+                            <option value="null"
+                                    {{#if (eq formData.craftingOptions.specialtyCrafting null) }}selected{{/if}}>None
+                            </option>
+                            {{#each craftingOptions.specialtyCrafting as |specialtyCraft|}}
+                                <option value="{{specialtyCraft.rollOption}}"
+                                        {{#if (eq ../formData.craftingOptions.specialtyCrafting specialtyCraft.rollOption) }}selected{{/if}}>
+                                    {{specialtyCraft.label}}
+                                </option>
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+            {{/if}}
+            {{#if craftingOptions.showMidnightCrafting}}
+                <div class="form-group">
+                    <label for="{{partId}}-midnight-crafting">Use Midnight Crafting</label>
+                    <div class="form-fields">
+                        <input data-action="update-input-manual"
+                               type="checkbox"
+                               name="midnightCrafting"
+                               id="{{partId}}-midnight-crafting"
+                               {{#if formData.craftingOptions.midnightCrafting}}checked{{/if}}>
+                    </div>
+                </div>
+            {{/if}}
+        </div>
+        <hr>
+    </div>
+{{/if}}
