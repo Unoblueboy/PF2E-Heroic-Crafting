@@ -32,7 +32,7 @@
 				],
 				"title": "{item|name}",
 				"predicate": [
-					"action:craft-a-project",
+					"action:craft-project",
 					"midnight-crafting"
 				]
 			},
@@ -44,7 +44,7 @@
 					"criticalFailure"
 				],
 				"predicate": [
-					"action:craft-a-project",
+					"action:craft-project",
 					"midnight-crafting"
 				]
 			}

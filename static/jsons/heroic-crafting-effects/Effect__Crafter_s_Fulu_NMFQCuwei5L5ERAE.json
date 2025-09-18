@@ -37,22 +37,22 @@
 			{
 				"key": "FlatModifier",
 				"priority": 120,
-				"label": "Crafter's Fulu (Downtime)",
+				"label": "Crafter's Fulu",
 				"selector": "crafting",
 				"value": 1,
 				"type": "status",
 				"predicate": [
-					"action:craft-a-project",
-					"crafters-fulu-craft-type:downtime"
+					"action:craft-project"
 				]
 			},
 			{
 				"key": "RollTwice",
 				"selector": "crafting",
+				"label": "Crafter's Fulu (Exploration)",
 				"keep": "higher",
 				"removeAfterRoll": "true",
 				"predicate": [
-					"action:craft-a-project",
+					"action:craft-project",
 					"crafters-fulu-craft-type:exploration"
 				],
 				"priority": 120

@@ -29,7 +29,7 @@
 				"selector": "survival",
 				"value": -5,
 				"predicate": [
-					"action:forage-crafting-resources",
+					"action:forage",
 					"vigilant-forager"
 				]
 			}

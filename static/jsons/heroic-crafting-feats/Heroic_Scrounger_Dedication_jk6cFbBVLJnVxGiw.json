@@ -13,7 +13,7 @@
 			}
 		},
 		"description": {
-			"value": "<p>You can craft items even without appropriate tools or a workshop, though you take a –2 item penalty to your @Check[crafting|traits:action:cobble-item] check. Additionally, you don’t need a physical formula book to remember all of your formulas; you pay the same cost as normal to learn them, but you memorize them all.</p><p>You gain the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.lRROJh4C2TlJSwn8]{Midnight Crafting} skill feat, regardless of whether you meet its prerequisites. When you use it to craft a common, non-magical weapon, armor, or piece of nonconsumable adventuring gear of 1st level or lower, you can choose to create that item as a temporary item. Temporary items created in this way last only [[/gmr 1d4 #hours]]{1d4 hours} (the GM rolls secretly) before falling apart and becoming unusable, and other creatures treat them as shoddy items, but you can ignore the rush cost when crafting them. You can create only the physical item, not any information or magic, so for example, while you could create a blank journal or one of random pages, you couldn’t use it as a scholarly journal or a religious text.</p><p>Additionally, you can use other items or materials you have on hand to pay for the costs of crafting an item with Midnight Crafting, without needing to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.DfvGFDHV7pYIT7ct]{Salvage} them first. If you do so, you take a -5 penalty on the Crafting check (or a -10 penalty if the materials you used were particularly unsuitable, as determined by the GM).</p><p><strong>Special</strong> You can’t select another dedication feat until you have gained two other feats from the Scrounger archetype. This feat counts as Scrounger Dedication.</p><p>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-journals.JournalEntry.ZKtp3BdfswEOF0bM.JournalEntryPage.03AVWmjQtzugN96H]{Heroic Scrounger}</p>",
+			"value": "<p>You can craft items even without appropriate tools or a workshop, though you take a –2 item penalty to your @Check[crafting|traits:heroic:crafting:cobble-item] check. Additionally, you don’t need a physical formula book to remember all of your formulas; you pay the same cost as normal to learn them, but you memorize them all.</p><p>You gain the @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-feats.Item.lRROJh4C2TlJSwn8]{Midnight Crafting} skill feat, regardless of whether you meet its prerequisites. When you use it to craft a common, non-magical weapon, armor, or piece of nonconsumable adventuring gear of 1st level or lower, you can choose to create that item as a temporary item. Temporary items created in this way last only [[/gmr 1d4 #hours]]{1d4 hours} (the GM rolls secretly) before falling apart and becoming unusable, and other creatures treat them as shoddy items, but you can ignore the rush cost when crafting them. You can create only the physical item, not any information or magic, so for example, while you could create a blank journal or one of random pages, you couldn’t use it as a scholarly journal or a religious text.</p><p>Additionally, you can use other items or materials you have on hand to pay for the costs of crafting an item with Midnight Crafting, without needing to @UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-actions.Item.DfvGFDHV7pYIT7ct]{Salvage} them first. If you do so, you take a -5 penalty on the Crafting check (or a -10 penalty if the materials you used were particularly unsuitable, as determined by the GM).</p><p><strong>Special</strong> You can’t select another dedication feat until you have gained two other feats from the Scrounger archetype. This feat counts as Scrounger Dedication.</p><p>@UUID[Compendium.pf2e-heroic-crafting.heroic-crafting-journals.JournalEntry.ZKtp3BdfswEOF0bM.JournalEntryPage.03AVWmjQtzugN96H]{Heroic Scrounger}</p>",
 			"gm": ""
 		},
 		"publication": {
@@ -34,7 +34,7 @@
 				"selector": "crafting",
 				"value": -2,
 				"predicate": [
-					"action:cobble-item"
+					"heroic:crafting:cobble-item"
 				],
 				"type": "item"
 			},
@@ -44,7 +44,7 @@
 				"selector": "crafting",
 				"value": -5,
 				"predicate": [
-					"action:cobble-item",
+					"heroic:crafting:cobble-item",
 					"use-other-materials"
 				],
 				"type": "item"
@@ -55,7 +55,7 @@
 				"selector": "crafting",
 				"value": -10,
 				"predicate": [
-					"action:cobble-item",
+					"heroic:crafting:cobble-item",
 					"use-other-materials",
 					"use-unsuitable-materials"
 				],

@@ -14,6 +14,7 @@ import { craftProject } from "../CraftProject/craftProject.mjs";
 import { editProject } from "../EditProject/editProject.mjs";
 import { forageCraftingResources } from "../Forage/forager.mjs";
 import {
+	BEGIN_A_PROJECT_ROLL_OPTION,
 	CRAFTING_MATERIAL_SLUG,
 	MATERIAL_TROVE_SLUG,
 	MATERIAL_TROVE_UUID,
@@ -554,7 +555,11 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 	}
 
 	private getBeginProjectRollOptions(item: PhysicalItemPF2e): string[] | Set<string> {
-		return new Set([...this.actor.getRollOptions(), ...getHeroicItemRollOptions(item), "action:begin-project"]);
+		return new Set([
+			...this.actor.getRollOptions(),
+			...getHeroicItemRollOptions(item),
+			BEGIN_A_PROJECT_ROLL_OPTION,
+		]);
 	}
 
 	private async getCraftProjectContext(): Promise<{ projects: ProjectContextData[] }> {

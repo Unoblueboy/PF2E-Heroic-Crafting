@@ -4,6 +4,7 @@ import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-s
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 import { fractionToPercent } from "../Helper/generics.mjs";
+import { hasFeat } from "../Helper/item.mjs";
 import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
@@ -35,7 +36,7 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	const project = Projects.getProject(actor, projectId);
 	if (!project) return;
 
-	await useMaterialSpent(actor, craftDetails);
+	await useMaterialSpent(actor, craftDetails, outcome);
 
 	const newProjectTotal: SignedCoinsPF2e = SignedCoinsPF2e.addCoins(project.value, craftDetails.progress[outcome]);
 
@@ -70,7 +71,11 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	if (flavorHtml) message.update({ flavor: flavorHtml });
 }
 
-async function useMaterialSpent(actor: CharacterPF2eHeroicCrafting, craftDetails: ProjectCraftDetails): Promise<void> {
+async function useMaterialSpent(
+	actor: CharacterPF2eHeroicCrafting,
+	craftDetails: ProjectCraftDetails,
+	outcome: DegreeOfSuccessString
+): Promise<void> {
 	const materialsSpent = craftDetails.materialsSpent;
 	if (materialsSpent.trove) {
 		await MaterialTrove.subtractValue(actor, materialsSpent.trove);
@@ -82,6 +87,41 @@ async function useMaterialSpent(actor: CharacterPF2eHeroicCrafting, craftDetails
 		const item = await foundry.utils.fromUuid<PhysicalItemPF2e>(material.uuid);
 		if (!item) continue;
 		await updateSpentTreasure(item, material);
+	}
+
+	await doEfficientCrafting(actor, craftDetails, outcome);
+}
+
+async function doEfficientCrafting(
+	actor: CharacterPF2eHeroicCrafting,
+	craftDetails: ProjectCraftDetails,
+	outcome: DegreeOfSuccessString
+) {
+	if (outcome !== "failure" || !hasFeat(actor, "efficient-crafting")) return;
+
+	const materialSpent = foundry.utils.deepClone(craftDetails.materialsSpent);
+	const totalSpent = UnsignedCoinsPF2e.sumCoins(
+		materialSpent.currency ?? {},
+		materialSpent.trove ?? {},
+		...(materialSpent.treasure?.map((x) => x.value) ?? [])
+	);
+	const materialBack = totalSpent.multiply(0.5);
+
+	const materialTrove = await MaterialTrove.getMaterialTrove(actor);
+	if (materialTrove) {
+		await materialTrove.add(materialBack);
+		ChatMessage.create({
+			style: CONST.CHAT_MESSAGE_STYLES.EMOTE,
+			speaker: ChatMessage.getSpeaker(actor),
+			content: `<i>${actor.name} receives ${materialBack} worth of crafting resources back from Efficient Crafting (added to Material Trove)</i>`,
+		});
+	} else {
+		await actor.inventory.addCoins(materialBack);
+		ChatMessage.create({
+			style: CONST.CHAT_MESSAGE_STYLES.EMOTE,
+			speaker: ChatMessage.getSpeaker(actor),
+			content: `<i>${actor.name} receives ${materialBack} worth of crafting resources back from Efficient Crafting (added to currency)</i>`,
+		});
 	}
 }
 

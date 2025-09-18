@@ -32,7 +32,7 @@
 				],
 				"title": "{item|name}",
 				"predicate": [
-					"action:craft-a-project",
+					"action:craft-project",
 					"speciality"
 				]
 			}

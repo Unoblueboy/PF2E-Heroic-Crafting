@@ -16,7 +16,7 @@
 				"value": 1,
 				"type": "item",
 				"predicate": [
-					"action:forage-crafting-resources"
+					"action:forage"
 				]
 			}
 		],
