@@ -1,17 +1,6 @@
 body {
 	--heroic-crafting-proress-bar-color: rgb(0, 160, 40);
-}
-
-.material-form {
-	gap: 0.5rem;
-
-	h4 {
-		margin: 0.5rem 0 0;
-	}
-
-	label {
-		line-height: normal;
-	}
+	--img-thumbnail-size: 32px;
 }
 
 .edit-material-trove-dialog {
@@ -80,8 +69,8 @@ body {
 		margin: 0 2px 5px;
 
 		.item-icon {
-			height: 32px;
-			width: 32px;
+			height: var(--img-thumbnail-size);
+			width: var(--img-thumbnail-size);
 			margin-right: 1em;
 		}
 
@@ -227,22 +216,47 @@ body {
 .edit-project-dialog div.edit-project-summary .edit-project-check-summary div.form-group {
 	display: flex;
 	flex-direction: row;
+	flex-wrap: wrap;
 	align-items: center;
+	margin: 0;
 	gap: 0.5rem;
+
+	& > * {
+		flex: 2;
+	}
 
 	label {
 		flex: 1;
+		color: var(--color-form-label);
+		font-weight: bold;
+		line-height: var(--input-height);
+		cursor: var(--cursor-default);
 	}
 
+	&:hover label {
+		color: var(--color-form-label-hover);
+	}
+
+	&:hover .hint {
+		color: var(--color-form-hint-hover);
+	}
+
+	.hint {
+		flex: 0 0 100%;
+		margin: 0;
+		font-size: var(--font-size-14);
+		color: var(--color-form-hint);
+	}
 	div.form-fields {
-		flex: 2;
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		align-items: center;
+		gap: 0.5rem;
 
 		&.batch-fields {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			gap: 3px;
-
 			button {
 				flex: 1;
 				height: var(--input-height);
@@ -265,80 +279,69 @@ body {
 	}
 }
 
-.begin-project-dialog
-	div.begin-project-summary
-	.begin-project-start-summary
-	.material-list
-	.basic-material
-	.item-summary,
-.edit-project-dialog
-	div.edit-project-summary
-	.begin-project-item-details-summary
-	.material-list
-	.basic-material
-	.item-summary {
+.begin-project-dialog div.begin-project-summary .begin-project-start-summary,
+.edit-project-dialog div.edit-project-summary .project-value-summary {
 	display: flex;
-	align-items: center;
-	margin: 0 2px;
+	flex-direction: column;
+	gap: 0.5rem;
 
-	.item-icon {
-		height: 32px;
-		width: 32px;
-		margin-right: 1em;
+	h4 {
+		margin: 0;
 	}
-}
 
-.begin-project-dialog {
-	div.begin-project-summary {
-		padding-bottom: 0.5rem;
+	.total-starting {
+		display: flex;
+		flex-wrap: wrap;
+		flex-direction: row;
+		justify-content: flex-end;
+		margin: 0.5em 0;
 
-		.begin-project-start-summary {
+		span {
+			white-space: nowrap;
+		}
+
+		.seperator {
+			flex-grow: 1;
+			text-align: center;
+		}
+	}
+
+	.material-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		min-height: 0;
+		overflow-y: auto;
+
+		hr {
+			height: 1px;
+			margin: 0;
+			flex: 0 0 1px;
+		}
+
+		.basic-material {
 			display: flex;
 			flex-direction: column;
-			gap: 0.5rem;
+			gap: 5px;
 
-			h4 {
-				margin: 0;
-			}
-
-			.total-starting {
+			.item-summary {
 				display: flex;
-				flex-wrap: wrap;
-				flex-direction: row;
-				justify-content: flex-end;
-				margin: 0.5em 0;
+				align-items: center;
+				margin: 0 2px;
 
-				span {
-					white-space: nowrap;
-				}
-
-				.seperator {
-					flex-grow: 1;
-					text-align: center;
-				}
-			}
-
-			.material-list {
-				display: flex;
-				flex-direction: column;
-				gap: 0.5rem;
-				min-height: 0;
-				overflow-y: auto;
-
-				hr {
-					height: 1px;
-					margin: 0;
-					flex: 0 0 1px;
-				}
-
-				.basic-material {
-					display: flex;
-					flex-direction: column;
-					gap: 5px;
+				.item-icon {
+					height: 32px;
+					width: 32px;
+					margin-right: 1em;
 				}
 			}
 		}
 	}
+}
+
+.begin-project-dialog div.begin-project-summary,
+.edit-project-dialog .project-value-summary {
+	padding-bottom: 0.5rem;
 }
 
 .edit-material-trove-dialog .money-form,
@@ -406,8 +409,8 @@ body {
 
 	.item-icon,
 	.spell-icon {
-		height: 32px;
-		width: 32px;
+		height: var(--img-thumbnail-size);
+		width: var(--img-thumbnail-size);
 		margin-right: 1em;
 		flex: 0 0 auto;
 	}
@@ -441,8 +444,8 @@ body {
 		margin: 0 2px 5px;
 
 		.item-icon {
-			height: 32px;
-			width: 32px;
+			height: var(--img-thumbnail-size);
+			width: var(--img-thumbnail-size);
 			margin-right: 1em;
 		}
 
@@ -482,8 +485,8 @@ body {
 			margin: 0 2px 5px;
 
 			.item-icon {
-				height: 32px;
-				width: 32px;
+				height: var(--img-thumbnail-size);
+				width: var(--img-thumbnail-size);
 				margin-right: 1em;
 			}
 
@@ -629,8 +632,8 @@ body {
 					margin: 0 2px;
 
 					.item-icon {
-						height: 32px;
-						width: 32px;
+						height: var(--img-thumbnail-size);
+						width: var(--img-thumbnail-size);
 						margin-right: 1em;
 					}
 				}
@@ -825,8 +828,8 @@ section.heroic-crafting-menu {
 				border-right: 1px solid var(--list-border-color);
 				.heroic-item-name {
 					img {
-						width: 32px;
-						height: 32px;
+						width: var(--img-thumbnail-size);
+						height: var(--img-thumbnail-size);
 					}
 				}
 				.heroic-item-summary {
@@ -855,6 +858,9 @@ section.heroic-crafting-menu {
 			grid-template-areas: "name dc price _ button";
 			grid-template-rows: 1fr;
 			grid-template-columns: 1fr 1.5rem 4.5rem 7rem max-content;
+			height: var(--img-thumbnail-size);
+			min-height: var(--img-thumbnail-size);
+			box-sizing: content-box;
 		}
 		section.tab.begin-project .formula-list .formula-header,
 		section.tab.begin-project .formula-list .formula-item {
@@ -1149,8 +1155,8 @@ section.heroic-crafting-menu {
 				margin-bottom: 3px;
 
 				img {
-					height: 32px;
-					width: 32px;
+					height: var(--img-thumbnail-size);
+					width: var(--img-thumbnail-size);
 					margin-right: 3px;
 				}
 

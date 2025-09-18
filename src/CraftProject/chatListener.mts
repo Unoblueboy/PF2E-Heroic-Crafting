@@ -1,5 +1,4 @@
 import { ChatMessagePF2e } from "../../types/src/module/chat-message/document";
-import { PhysicalItemPF2e } from "../../types/src/module/item";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
@@ -8,41 +7,73 @@ import { hasFeat } from "../Helper/item.mjs";
 import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
-import { Projects } from "../Projects/projects.mjs";
-import { ProjectCraftDetails, TreasureMaterialSpent, TreasurePostUseOperation } from "./types.mjs";
+import { AProject, Projects } from "../Projects/projects.mjs";
+import { CraftProjectUtility } from "./craftProjectUtility.mjs";
+import { ProjectCraftDetails } from "./types.mjs";
 
 export async function craftProjectChatButtonListener(message: ChatMessagePF2e, html: HTMLElement, _data: unknown) {
 	const craftProjectResults = html.querySelector("[data-craft-project-results]");
-	if (craftProjectResults) craftProjectResults.addEventListener("click", (e: Event) => updateProject(e, message));
+	if (craftProjectResults)
+		craftProjectResults.addEventListener("click", (e: Event) => craftProjectEventListener(e, message));
 }
 
-async function updateProject(event: Event, message: ChatMessagePF2e) {
+async function craftProjectEventListener(event: Event, message: ChatMessagePF2e) {
 	if ((event.target as HTMLElement)?.tagName != "BUTTON") return;
-	const button = event.target as HTMLButtonElement;
+
 	const generalDiv = event.currentTarget as HTMLElement;
 
-	const craftDetailsString = generalDiv.dataset["craftDetails"];
+	const generalDataset = generalDiv.dataset;
+
+	const craftDetailsString = generalDataset["craftDetails"];
 	if (!craftDetailsString) return;
 	const craftDetails = JSON.parse(craftDetailsString) as ProjectCraftDetails;
 
-	const actorUuid = generalDiv.dataset.actorUuid;
+	const actorUuid = generalDataset.actorUuid;
 	if (!actorUuid) return;
 
 	const actor = await foundry.utils.fromUuid<CharacterPF2eHeroicCrafting>(actorUuid);
 	if (!actor) return;
 
-	const projectId = generalDiv.dataset.projectId as string;
-	const outcome = button.dataset.outcome as DegreeOfSuccessString;
+	const projectId = generalDataset.projectId as string;
 	const project = Projects.getProject(actor, projectId);
 	if (!project) return;
 
-	await useMaterialSpent(actor, craftDetails, outcome);
+	if (Object.hasOwn(generalDataset, "autoCreate")) {
+		autoCreateProject(actor, craftDetails, project);
+		return;
+	}
+
+	await updateProject(event, actor, craftDetails, project, generalDiv, message);
+}
+
+async function autoCreateProject(
+	actor: CharacterPF2eHeroicCrafting,
+	craftDetails: ProjectCraftDetails,
+	project: AProject
+) {
+	await project.createItem();
+	await project.delete();
+	await CraftProjectUtility.useMaterialSpent(actor, craftDetails);
+}
+
+async function updateProject(
+	event: Event,
+	actor: CharacterPF2eHeroicCrafting,
+	craftDetails: ProjectCraftDetails,
+	project: AProject,
+	generalDiv: HTMLElement,
+	message: ChatMessagePF2e
+) {
+	const button = event.target as HTMLButtonElement;
+	const outcome = button.dataset.outcome as DegreeOfSuccessString;
+	await CraftProjectUtility.useMaterialSpent(actor, craftDetails);
+	await doEfficientCrafting(actor, craftDetails, outcome);
 
 	const newProjectTotal: SignedCoinsPF2e = SignedCoinsPF2e.addCoins(project.value, craftDetails.progress[outcome]);
 
 	const projectMax = new UnsignedCoinsPF2e(await project.max);
 	if (newProjectTotal.copperValue < 0) {
-		await Projects.deleteProject(actor, projectId);
+		await project.delete(true);
 	} else if (newProjectTotal.copperValue >= projectMax.copperValue) {
 		await project.createItem();
 		await project.delete();
@@ -71,27 +102,6 @@ async function updateProject(event: Event, message: ChatMessagePF2e) {
 	if (flavorHtml) message.update({ flavor: flavorHtml });
 }
 
-async function useMaterialSpent(
-	actor: CharacterPF2eHeroicCrafting,
-	craftDetails: ProjectCraftDetails,
-	outcome: DegreeOfSuccessString
-): Promise<void> {
-	const materialsSpent = craftDetails.materialsSpent;
-	if (materialsSpent.trove) {
-		await MaterialTrove.subtractValue(actor, materialsSpent.trove);
-	}
-	if (materialsSpent.currency) {
-		await actor.inventory.removeCoins(materialsSpent.currency);
-	}
-	for (const material of materialsSpent.treasure ?? []) {
-		const item = await foundry.utils.fromUuid<PhysicalItemPF2e>(material.uuid);
-		if (!item) continue;
-		await updateSpentTreasure(item, material);
-	}
-
-	await doEfficientCrafting(actor, craftDetails, outcome);
-}
-
 async function doEfficientCrafting(
 	actor: CharacterPF2eHeroicCrafting,
 	craftDetails: ProjectCraftDetails,
@@ -110,61 +120,18 @@ async function doEfficientCrafting(
 	const materialTrove = await MaterialTrove.getMaterialTrove(actor);
 	if (materialTrove) {
 		await materialTrove.add(materialBack);
-		ChatMessage.create({
+		await ChatMessage.create({
 			style: CONST.CHAT_MESSAGE_STYLES.EMOTE,
 			speaker: ChatMessage.getSpeaker(actor),
 			content: `<i>${actor.name} receives ${materialBack} worth of crafting resources back from Efficient Crafting (added to Material Trove)</i>`,
 		});
 	} else {
 		await actor.inventory.addCoins(materialBack);
-		ChatMessage.create({
+		await ChatMessage.create({
 			style: CONST.CHAT_MESSAGE_STYLES.EMOTE,
 			speaker: ChatMessage.getSpeaker(actor),
 			content: `<i>${actor.name} receives ${materialBack} worth of crafting resources back from Efficient Crafting (added to currency)</i>`,
 		});
-	}
-}
-
-async function updateSpentTreasure(item: PhysicalItemPF2e, material: TreasureMaterialSpent) {
-	switch (material.postUseOperation) {
-		case TreasurePostUseOperation.DELETE:
-			await deleteItem(item);
-			break;
-		case TreasurePostUseOperation.DECREASE_VALUE:
-			await decreaseTreasureValue(item, material);
-			break;
-		case TreasurePostUseOperation.NOTHING:
-		default:
-			break;
-	}
-}
-
-async function decreaseTreasureValue(item: PhysicalItemPF2e, material: TreasureMaterialSpent) {
-	const basePrice = item.price.value;
-	const materialSpent = material.value;
-	const newPrice = UnsignedCoinsPF2e.subtractCoins(basePrice, materialSpent);
-	const baseQuantity = item.quantity;
-	const quantitySpent = material.quantity ?? 1;
-	if (newPrice.copperValue === 0 && baseQuantity === quantitySpent) {
-		await item.delete();
-	} else if (newPrice.copperValue != 0 && baseQuantity === quantitySpent) {
-		await item.update({ "system.price.value": newPrice });
-	} else if (newPrice.copperValue === 0 && baseQuantity != quantitySpent) {
-		await item.update({ "system.quantity": baseQuantity - quantitySpent });
-	} else {
-		await item.update({ "system.quantity": baseQuantity - quantitySpent });
-		const clone = item.clone({
-			system: { price: { value: newPrice }, quantity: quantitySpent },
-		});
-		await Item.implementation.create(clone.toObject(), { parent: item.actor });
-	}
-}
-
-async function deleteItem(item: PhysicalItemPF2e) {
-	if (item.quantity > 1) {
-		await item.update({ "system.quantity": item.quantity - 1 });
-	} else {
-		await item.delete();
 	}
 }
 

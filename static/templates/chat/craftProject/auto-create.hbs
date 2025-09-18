@@ -1,0 +1,13 @@
+<div class="pf2e chat-card heroic-crafting"
+     data-craft-project-results
+     data-auto-create
+     data-craft-details="{{craftDetails}}"
+     data-actor-uuid="{{actorUuid}}"
+     data-project-id="{{project.id}}">
+    {{> modules/pf2e-heroic-crafting/templates/chat/craftProject/card-content.hbs includeProgression=false}}
+    <hr>
+    <div class="card-buttons"
+         data-visibility="owner">
+        <button type="button">Get Item</button>
+    </div>
+</div>

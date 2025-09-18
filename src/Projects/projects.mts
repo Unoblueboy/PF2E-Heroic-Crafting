@@ -126,7 +126,7 @@ export abstract class AProject implements ProjectItemDetails {
 	dc: number;
 	batchSize: number;
 	itemData: itemDataUuid;
-	value: UnsignedCoins;
+	value: UnsignedCoinsPF2e;
 	protected baseItemPromise?: Promise<PhysicalItemPF2e>;
 	constructor(projectDetails: ProjectItemDetails, data: { id: string; actor: CharacterPF2eHeroicCrafting }) {
 		this.id = data.id;
@@ -146,7 +146,7 @@ export abstract class AProject implements ProjectItemDetails {
 
 	abstract get itemName(): Promise<string>;
 
-	abstract get max(): Promise<UnsignedCoins>;
+	abstract get max(): Promise<UnsignedCoinsPF2e>;
 
 	get img(): Promise<string> {
 		return this.baseItem.then((item) =>
@@ -173,7 +173,14 @@ export abstract class AProject implements ProjectItemDetails {
 		await this.actor.update({ [`flags.${MODULE_ID}.projects.${this.id}`]: details });
 	}
 
-	async delete() {
+	async delete(sendChatMessage: boolean = false) {
+		if (sendChatMessage) {
+			ChatMessage.create({
+				style: CONST.CHAT_MESSAGE_STYLES.EMOTE,
+				speaker: ChatMessage.getSpeaker(this.actor),
+				content: `<i>The project ${await this.itemName} has been destroyed</i>`,
+			});
+		}
 		Projects.deleteProject(this.actor, this.id);
 	}
 
@@ -236,13 +243,11 @@ class Project extends AProject {
 			const uuid = this.itemData.uuid as ItemUUID;
 			formulas.push({ uuid: uuid });
 			this.actor.update({ "system.crafting.formulas": formulas });
-			const newFormula = (await foundry.utils.fromUuid(uuid)) as PhysicalItemPF2e;
-			ui.notifications.info(`Project Done, ${newFormula.name} Formula Created`);
 		} else {
 			const clone = (await this.baseItem).clone();
 			clone.updateSource({ "system.quantity": this.batchSize });
 			const newItem = await Item.implementation.create(clone.toObject(), { parent: this.actor });
-			ui.notifications.info(`Project Done, ${newItem!.name} Created`);
+			return newItem as PhysicalItemPF2e;
 		}
 	}
 }
@@ -311,7 +316,6 @@ class ProjectWithSpell extends Project {
 
 		clone.updateSource({ "system.quantity": this.batchSize });
 		const newItem = await Item.implementation.create(clone.toObject(), { parent: this.actor });
-		ui.notifications.info(`Project Done, ${newItem!.name} Created`);
 		return newItem as PhysicalItemPF2e;
 	}
 

@@ -4,24 +4,75 @@ import { CheckRoll } from "../../types/src/module/system/check";
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { Projects } from "../Projects/projects.mjs";
 import { CraftProjectApplication } from "./Applications/CraftProjectApplications.mjs";
 import { CraftProjectUtility } from "./craftProjectUtility.mjs";
-import { ProjectCraftDetails, ProjectCraftDuration } from "./types.mjs";
+import { ProjectCraftDuration } from "./types.mjs";
 
 export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId: string) {
 	if (!actor) return;
 	if (!projectId) return;
-	const projects = Projects.getProjects(actor);
-	if (!projects) return;
-	const project = projects.getProject(projectId);
+	const project = Projects.getProject(actor, projectId);
 	if (!project) return;
 
 	const craftDetails = await CraftProjectApplication.getCraftDetails({ actor, projectId });
 	if (!craftDetails) return;
 
-	const totalCost = craftDetails.cost;
 	const item = (await foundry.utils.fromUuid(project.itemData.uuid)) as PhysicalItemPF2e;
+
+	const basicTotal = UnsignedCoinsPF2e.addCoins(project.value, craftDetails.cost);
+	if (basicTotal.copperValue >= (await project.max).copperValue) {
+		await foundry.applications.handlebars.loadTemplates([
+			"modules/pf2e-heroic-crafting/templates/chat/craftProject/card-content.hbs",
+		]);
+		const flavor =
+			(await foundry.applications.handlebars.renderTemplate("systems/pf2e/templates/chat/action/flavor.hbs", {
+				action: { title: "Craft A Project", subtitle: "Auto Create" },
+				outcome: "success",
+				traits: [
+					craftDetails.duration === ProjectCraftDuration.HOUR
+						? {
+								name: "exploration",
+								description: "PF2E.TraitDescriptionExploration",
+								label: "PF2E.TraitExploration",
+						  }
+						: {
+								name: "downtime",
+								description: "PF2E.TraitDescriptionDowntime",
+								label: "PF2E.TraitDowntime",
+						  },
+					{
+						name: "manipulate",
+						description: "PF2E.TraitDescriptionManipulate",
+						label: "PF2E.TraitManipulate",
+					},
+				],
+			})) +
+			(await foundry.applications.handlebars.renderTemplate(
+				"modules/pf2e-heroic-crafting/templates/chat/craftProject/auto-create.hbs",
+				{
+					craftDetails: JSON.stringify(craftDetails),
+					actorUuid: actor.uuid,
+					project: await project.getContextData(),
+					item: item,
+					itemLink: await foundry.applications.ux.TextEditor.enrichHTML(await project.itemLink, {
+						rollData: item.getRollData(),
+					}),
+					materials: await CraftProjectUtility.getMaterialsContext(craftDetails),
+					totalMaterialsSpent: CraftProjectUtility.getTotalMaterialSpent(craftDetails.materialsSpent),
+					cost: craftDetails.cost,
+					progress: craftDetails.progress,
+				}
+			));
+		ChatMessage.create({
+			style: CONST.CHAT_MESSAGE_STYLES.EMOTE,
+			speaker: ChatMessage.getSpeaker(actor),
+			flavor: flavor,
+			content: `${actor.name}`,
+		});
+		return;
+	}
 
 	async function getStatisticRollCallback(
 		_roll: Rolled<CheckRoll>,
@@ -35,19 +86,22 @@ export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId
 			const projectProgress = craftDetails.progress;
 			console.log("Heroic Crafting |", projectProgress);
 
+			await foundry.applications.handlebars.loadTemplates([
+				"modules/pf2e-heroic-crafting/templates/chat/craftProject/card-content.hbs",
+			]);
 			const flavor = await foundry.applications.handlebars.renderTemplate(
 				"modules/pf2e-heroic-crafting/templates/chat/craftProject/result.hbs",
 				{
-					item: item,
+					craftDetails: JSON.stringify(craftDetails),
 					actorUuid: actor.uuid,
 					project: await project.getContextData(),
+					item: item,
 					itemLink: await foundry.applications.ux.TextEditor.enrichHTML(await project.itemLink, {
 						rollData: item.getRollData(),
 					}),
-					craftDetails: JSON.stringify(craftDetails),
-					materials: await getMaterialsContext(craftDetails),
+					materials: await CraftProjectUtility.getMaterialsContext(craftDetails),
 					totalMaterialsSpent: CraftProjectUtility.getTotalMaterialSpent(craftDetails.materialsSpent),
-					cost: totalCost,
+					cost: craftDetails.cost,
 					progress: craftDetails.progress,
 					outcome,
 				}
@@ -89,42 +143,4 @@ export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId
 		createMessage: false,
 		callback: getStatisticRollCallback,
 	});
-}
-
-async function getMaterialsContext(craftDetails?: ProjectCraftDetails) {
-	if (!craftDetails) return [];
-	const materials = [];
-	if (craftDetails.materialsSpent.trove) {
-		materials.push({
-			item: {
-				name: "Generic Crafting Material",
-				img: "icons/tools/fasteners/nails-steel-brown.webp",
-			},
-			spent: craftDetails.materialsSpent.trove,
-		});
-	}
-	if (craftDetails.materialsSpent.currency) {
-		materials.push({
-			item: {
-				name: "Currency",
-				img: "systems/pf2e/icons/equipment/treasure/currency/gold-pieces.webp",
-			},
-			spent: craftDetails.materialsSpent.currency,
-		});
-	}
-
-	for (const treasureSpent of craftDetails.materialsSpent.treasure ?? []) {
-		const treasure = await foundry.utils.fromUuid<PhysicalItemPF2e>(treasureSpent.uuid);
-		if (!treasure) continue;
-
-		materials.push({
-			item: {
-				name: treasure.name,
-				img: treasure.img,
-			},
-			quantity: treasureSpent.quantity,
-			spent: treasureSpent.value,
-		});
-	}
-	return materials;
 }

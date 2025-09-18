@@ -57,7 +57,7 @@ async function gainSalvageMaterials(data: DOMStringMap) {
 		await item.delete();
 	}
 
-	await MaterialTrove.addValue(item.actor, UnsignedCoinsPF2e.minCoins(salvageMaxCoins, totalIncome));
+	await addCoinsToActor(item.actor, UnsignedCoinsPF2e.minCoins(salvageMaxCoins, totalIncome));
 }
 
 async function gainSavvyTeardownMaterials(data: DOMStringMap) {
@@ -73,5 +73,21 @@ async function gainSavvyTeardownMaterials(data: DOMStringMap) {
 		await item.delete();
 	}
 
-	await MaterialTrove.addValue(item.actor, income);
+	await addCoinsToActor(item.actor, income);
+}
+
+async function addCoinsToActor(actor: CharacterPF2eHeroicCrafting, gainedCoins: UnsignedCoinsPF2e) {
+	const materialTrove = await MaterialTrove.getMaterialTrove(actor, false);
+	if (materialTrove) {
+		await materialTrove.add(gainedCoins);
+	} else {
+		await actor.inventory.addCoins(gainedCoins);
+		await ChatMessage.create({
+			style: CONST.CHAT_MESSAGE_STYLES.EMOTE,
+			speaker: ChatMessage.getSpeaker(actor),
+			content: `<i>No material trove was found on ${actor.name}</i>
+			<br>
+			<i>${gainedCoins} added directly to ${actor.name}'s inventory.</i>`,
+		});
+	}
 }

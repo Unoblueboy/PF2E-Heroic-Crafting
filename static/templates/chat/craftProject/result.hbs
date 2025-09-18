@@ -3,43 +3,7 @@
      data-craft-details="{{craftDetails}}"
      data-actor-uuid="{{actorUuid}}"
      data-project-id="{{project.id}}">
-    <div class="card-content">
-        <div style="display: flex; align-items: center; margin-bottom: 3px;">
-            <img src="{{item.img}}"
-                 style="height:32px; width:32px; margin-right: 3px;">
-            <span>{{{itemLink}}}</span>
-        </div>
-        <hr>
-        <div class="project-progress">
-            <h4><strong>Project Progression</strong></h4>
-            <div class="progress-bar">
-                <div class="internal-bar"
-                     style="width:{{project.percent}};"><span>{{project.percent}}</span></div>
-            </div>
-            <div class="project-progress-line">
-                <span class="project-cur-value">{{formatCoin project.value}}</span>
-                <span class="seperator">/</span>
-                <span>{{formatCoin project.max}}</span>
-            </div>
-        </div>
-        <hr>
-        <div class="spent-materials-list">
-            {{#each materials as | material |}}
-                <div class="spent-material">
-                    {{#with material.item as | item |}}
-                        <img src="{{item.img}}" />
-                        <span class="spent-material-item-name">{{#if (gt material.quantity 1)}}{{material.quantity}}x
-                            {{/if}}{{item.name}}</span>
-                    {{/with}}
-                    <span class="spent-material-value">{{formatCoin material.spent}}{{#if (gt material.quantity 1)}}
-                            / item{{/if}}</span>
-                </div>
-            {{/each}}
-        </div>
-        <p>Total Cost: {{cost}}{{#if (ne totalMaterialsSpent.copperValue cost.copperValue)}} <i
-                   class="fa-solid fa-info-circle"
-                   data-tooltip="Total Spent: {{formatCoin totalMaterialsSpent}}"></i>{{/if}}</p>
-    </div>
+    {{> modules/pf2e-heroic-crafting/templates/chat/craftProject/card-content.hbs includeProgression=true}}
     <hr>
     <div class="card-buttons"
          data-visibility="owner">

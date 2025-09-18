@@ -55,7 +55,7 @@ export async function beginProject(
 		author: game.userId,
 		style: CONST.CHAT_MESSAGE_STYLES.EMOTE,
 	};
-	ChatMessage.create<ChatMessage>(chatMessageData);
+	await ChatMessage.create(chatMessageData);
 	return true;
 }
 

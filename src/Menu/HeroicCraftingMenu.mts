@@ -101,6 +101,7 @@ type HeroicCraftingMenuTabGroup<T> = {
 	initial: T;
 };
 
+// TODO: Add an option in the crafting tab to create a project automatically
 export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) {
 	actor: CharacterPF2eHeroicCrafting;
 	constructor(options: HeroCraftingMenuOptions) {
@@ -115,7 +116,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		actions: {
 			"delete-formula": HeroCraftingMenu.deleteFormula,
 			"begin-project": HeroCraftingMenu.beginProject,
-			"craft-project": HeroCraftingMenu.craftProject,
+			"craft-project": HeroCraftingMenu.doProjectAction,
 			salvage: HeroCraftingMenu.salvage,
 			"open-actor-sheet": HeroCraftingMenu.openActorSheet,
 			"toggle-summary": HeroCraftingMenu.toggleSummary,
@@ -229,7 +230,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		await beginProject(this.actor, { type: BeginProjectDetailsType.PARTIAL, itemUuid: itemUuid });
 	}
 
-	private static async craftProject(this: HeroCraftingMenu, event: Event, target: HTMLElement) {
+	private static async doProjectAction(this: HeroCraftingMenu, event: Event, target: HTMLElement) {
 		if (!(event.target instanceof HTMLElement)) return;
 		const dataElement = event.target.closest("[data-project-action]") as HTMLElement;
 		const projectId = target.dataset.projectId;
@@ -245,6 +246,11 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			case "delete":
 				await project?.delete();
 				break;
+			case "create": {
+				await project?.createItem();
+				await project?.delete();
+				break;
+			}
 			default:
 				break;
 		}
@@ -605,11 +611,14 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 				? itemType.flatMap((it) => this.actor.itemTypes[it])
 				: this.actor.itemTypes[itemType];
 			const items = allItems.filter(
-				(item) =>
+				(item: PhysicalItemPF2e<CharacterPF2eHeroicCrafting>) =>
 					!(
 						item.slug &&
-						[MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG, CRAFTING_MATERIAL_SLUG].includes(item.slug)
-					)
+						([MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG, CRAFTING_MATERIAL_SLUG] as string[]).includes(
+							item.slug
+						)
+					) &&
+					(!item.isOfType("treasure") || !(item as TreasurePF2e<CharacterPF2eHeroicCrafting>).isCoinage)
 			);
 			if (items.length === 0) continue;
 			itemGroups.push({

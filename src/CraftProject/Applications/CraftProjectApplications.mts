@@ -101,7 +101,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 	private async initializeData() {
 		await this.updateRushCost();
-		this.materialTrove = await MaterialTrove.getMaterialTrove(this.actor);
+		this.materialTrove = await MaterialTrove.getMaterialTrove(this.actor, false);
 		if (!this.materialTrove) return;
 
 		this.materials = this.materialTrove.contents.filter(
@@ -125,7 +125,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	private async updateMaterialData() {
-		this.materialTrove = await MaterialTrove.getMaterialTrove(this.actor);
+		this.materialTrove = await MaterialTrove.getMaterialTrove(this.actor, false);
 		if (!this.materialTrove) {
 			this.materials = [];
 			this.formData.materialList.materials = {};

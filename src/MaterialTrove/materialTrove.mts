@@ -354,7 +354,7 @@ export class MaterialTrove {
 		if (!actor) return;
 		switch (preCreateData.system?.slug) {
 			case MATERIAL_TROVE_SLUG:
-				return MaterialTrove.onPreCreateMaterialTrove(actor);
+				return MaterialTrove.onPreCreateMaterialTrove(actor, item);
 			case CRAFTING_MATERIAL_SLUG:
 				return MaterialTrove.onPreCreateGenericCraftingMaterial(actor, item);
 			default:
@@ -362,7 +362,7 @@ export class MaterialTrove {
 		}
 	}
 
-	private static onPreCreateMaterialTrove(actor: ActorPF2e) {
+	private static onPreCreateMaterialTrove(actor: ActorPF2e, item: PhysicalItemPF2e) {
 		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreCreateMaterialTrove`);
 		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", actor);
 
@@ -375,6 +375,11 @@ export class MaterialTrove {
 			ui.notifications.error("A character can not have more than 1 Material Trove");
 			return false;
 		}
+
+		MaterialTrove.troves.set(
+			actor.uuid,
+			new MaterialTrove(actor as CharacterPF2eHeroicCrafting, item as ContainerPF2e)
+		);
 	}
 
 	private static onPreCreateGenericCraftingMaterial(actor: ActorPF2e, item: PhysicalItemPF2e) {
@@ -464,7 +469,7 @@ export class MaterialTrove {
 		if (!actor) return;
 
 		if (item.system.slug === MATERIAL_TROVE_SLUG) {
-			this.newMaterialTrove(
+			MaterialTrove.newMaterialTrove(
 				actor as CharacterPF2eHeroicCrafting,
 				item as ContainerPF2e<CharacterPF2eHeroicCrafting>
 			);
