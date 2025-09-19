@@ -63,7 +63,7 @@ jobs:
                   mode: write
                   file: ./build/module.json
                   property: url
-                  value: https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/download/${{ steps.semver.outputs.nextStrict }}/pf2e-heroic-crafting.zip
+                  value: https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/download/${{ steps.semver.outputs.next }}/pf2e-heroic-crafting.zip
 
             - name: Zip Files
               working-directory: ./build
