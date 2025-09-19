@@ -27,6 +27,7 @@ jobs:
               with:
                   token: ${{ github.token }}
                   fallbackTag: 0.0.0
+                  noVersionBumpBehavior: patch
 
             - name: Echo Outputs
               run: echo ${{ steps.semver.outputs }}
@@ -61,7 +62,7 @@ jobs:
               with:
                   mode: write
                   file: ./build/module.json
-                  property: url
+                  property: download
                   value: https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/download/${{ steps.semver.outputs.nextStrict }}/pf2e-heroic-crafting.zip
 
             - name: Zip Files
