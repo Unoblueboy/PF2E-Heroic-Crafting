@@ -45,7 +45,7 @@ jobs:
               with:
                 mode: write
                 file: ./build/module.json
-                property: version
+                property: url
                 value: https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/download/${{ steps.bump-and-tag.outputs.new_tag }}/pf2e-heroic-crafting.zip
 
             - name: Zip Files
