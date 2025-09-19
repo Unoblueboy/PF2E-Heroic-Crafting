@@ -41,7 +41,7 @@ jobs:
 
             - name: Write download link to module.json
               uses: amochkin/action-json@v1
-              id: write_download-link
+              id: write_download_link
               with:
                 mode: write
                 file: ./build/module.json
@@ -52,6 +52,14 @@ jobs:
               working-directory: ./build
               run: zip -r ./pf2e-heroic-crafting.zip ./*
 
+            - name: "✏️ Generate release changelog"
+              id: generate_change_log
+              uses: janheinrichmerker/action-github-changelog-generator@v2.3
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  sinceTag: ${{ steps.bump-and-tag.outputs.old_tag }}
+                  dueTag: ${{ steps.bump-and-tag.outputs.new_tag }}
+
             - name: Create Version Release
               id: create_version_release
               uses: ncipollo/release-action@v1
@@ -60,6 +68,7 @@ jobs:
                   allowUpdates: false
                   draft: false
                   prerelease: false
+                  body: ${{ steps.generate_change_log.outputs.changelog }}
                   token: ${{ secrets.GITHUB_TOKEN }}
                   artifacts: "./build/module.json,./build/pf2e-heroic-crafting.zip"
                   tag: ${{ steps.bump-and-tag.outputs.new_tag }}
