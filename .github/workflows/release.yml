@@ -11,12 +11,17 @@ jobs:
               with:
                   fetch-depth: 0
 
-            - name: Bump version and push tag
-              id: bump-and-tag
-              uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
-                  PRERELEASE: false
+            - name: Get Next Version
+              id: semver
+              uses: ietf-tools/semver-action@v1
+              with:
+                  token: ${{ github.token }}
+                  fallbackTag: 0.0.0
+
+            - name: push tag
+              run: |
+                  git tag ${{ steps.semver.outputs.next }}
+                  git push origin ${{ steps.semver.outputs.next }}
 
             - name: Use Node.js 20.x
               uses: actions/setup-node@v4
@@ -36,7 +41,7 @@ jobs:
                   mode: write
                   file: ./build/module.json
                   property: version
-                  value: ${{ steps.bump-and-tag.outputs.new_tag }}
+                  value: ${{ steps.semver.outputs.nextStrict }}
 
             - name: Write download link to module.json
               uses: amochkin/action-json@v1
@@ -45,7 +50,7 @@ jobs:
                   mode: write
                   file: ./build/module.json
                   property: url
-                  value: https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/download/${{ steps.bump-and-tag.outputs.new_tag }}/pf2e-heroic-crafting.zip
+                  value: https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/download/${{ steps.semver.outputs.nextStrict }}/pf2e-heroic-crafting.zip
 
             - name: generate changes
               id: generate_changes
@@ -70,4 +75,4 @@ jobs:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   body: ${{ steps.generate_changes.output.changes }}
                   artifacts: "./build/module.json,./build/pf2e-heroic-crafting.zip"
-                  tag: ${{ steps.bump-and-tag.outputs.new_tag }}
+                  tag: ${{ steps.semver.outputs.next }}
