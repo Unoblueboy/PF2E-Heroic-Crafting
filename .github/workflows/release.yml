@@ -30,6 +30,23 @@ jobs:
                   npm run build
 
             # TODO: Update Manifest
+            - name: Write version to module.json
+              uses: amochkin/action-json@v1
+              id: write_version
+              with:
+                mode: write
+                file: ./build/module.json
+                property: version
+                value: ${{ steps.bump-and-tag.outputs.new_tag }}
+
+            - name: Write download link to module.json
+              uses: amochkin/action-json@v1
+              id: write_download-link
+              with:
+                mode: write
+                file: ./build/module.json
+                property: version
+                value: https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/download/${{ steps.bump-and-tag.outputs.new_tag }}/pf2e-heroic-crafting.zip
 
             - name: Zip Files
               working-directory: ./build
