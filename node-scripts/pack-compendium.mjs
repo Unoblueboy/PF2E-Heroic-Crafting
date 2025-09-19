@@ -1,7 +1,8 @@
+/* eslint-disable no-undef */
 import fs from "fs";
 import { compilePack } from "@foundryvtt/foundryvtt-cli";
 
-const SHOW_LOGS = process.argv.length > 2 ? process.argv[2].toLowerCase() == "true" : false;
+const SHOW_LOGS = process.argv.length > 2 ? process.argv[2].toLowerCase() === "true" : false;
 
 const folders = fs
 	.readdirSync("./static/jsons", { withFileTypes: true })
