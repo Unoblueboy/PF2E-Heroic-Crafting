@@ -6,6 +6,8 @@
 		"minimum": "13",
 		"verified": "13"
 	},
+	"url": "https://github.com/Unoblueboy/PF2E-Heroic-Crafting",
+	"manifest": "https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/latest/download/system.json",
 	"esmodules": ["scripts/heroicCrafting.mjs"],
 	"styles": ["styles/style.css"],
 	"languages": [
