@@ -21,8 +21,7 @@
 	"description": "<p>Heroic Crafting, new and improved</p>",
 	"authors": [
 		{
-			"name": "Nathan Douglas",
-			"flags": {}
+			"name": "Nathan Douglas"
 		}
 	],
 	"relationships": {
