@@ -357,34 +357,42 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 	private prepareDragDropContext(context: Record<string, unknown>) {
 		if (this.formData.isFormula) {
-			context.details = {
-				item: {
-					img: "icons/sundries/documents/blueprint-magical.webp",
-					name: this.item ? `Formula: ${this.item.name}` : "Drag item here...",
-					level: this.item ? String(this.item.level).padStart(2, "0") : "??",
-				},
-				spell: {
-					img: "systems/pf2e/icons/actions/craft/unknown-item.webp",
-					name: "Drag Spell here...",
-					rank: "??",
-					hide: true,
-				},
-			};
+			context.details = this.prepareDragDropFormulaContext();
 		} else {
-			context.details = {
-				item: {
-					img: this.item ? this.item.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
-					name: this.item ? this.item.name : "Drag item here...",
-					level: this.item ? String(this.item.level).padStart(2, "0") : "??",
-				},
-				spell: {
-					img: this.spell ? this.spell.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
-					name: this.spell ? this.spell.name : "Drag Spell here...",
-					rank: this.spell ? String(this.spell.rank).padStart(2, "0") : "??",
-					hide: !isGenericScrollOrWand(this.item),
-				},
-			};
+			context.details = this.prepareDragDropItemContext();
 		}
+	}
+
+	private prepareDragDropFormulaContext() {
+		return {
+			item: {
+				img: "icons/sundries/documents/blueprint-magical.webp",
+				name: this.item ? `Formula: ${this.item.name}` : "Drag item here...",
+				level: this.item ? String(this.item.level).padStart(2, "0") : "??",
+			},
+			spell: {
+				img: "systems/pf2e/icons/actions/craft/unknown-item.webp",
+				name: "Drag Spell here...",
+				rank: "??",
+				hide: true,
+			},
+		};
+	}
+
+	private prepareDragDropItemContext() {
+		return {
+			item: {
+				img: this.item ? this.item.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
+				name: this.item ? this.item.name : "Drag item here...",
+				level: this.item ? String(this.item.level).padStart(2, "0") : "??",
+			},
+			spell: {
+				img: this.spell ? this.spell.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
+				name: this.spell ? this.spell.name : "Drag Spell here...",
+				rank: this.spell ? String(this.spell.rank).padStart(2, "0") : "??",
+				hide: !isGenericScrollOrWand(this.item),
+			},
+		};
 	}
 
 	private prepareSummaryContext(context: Record<string, unknown>, maxTotalStarting: UnsignedCoinsPF2e) {
