@@ -7,7 +7,7 @@
 		"verified": "13"
 	},
 	"url": "https://github.com/Unoblueboy/PF2E-Heroic-Crafting",
-	"manifest": "https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/latest/download/system.json",
+	"manifest": "https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/latest/download/module.json",
 	"esmodules": ["scripts/heroicCrafting.mjs"],
 	"styles": ["styles/style.css"],
 	"languages": [

@@ -47,14 +47,15 @@
                     <div class="project-item-quantity">
                         {{project.batchSize}}
                     </div>
-                    <div class="project-item-buttons heroic-button-group">
+                    <div class="project-item-buttons heroic-button-group"
+                         data-tooltip-direction="UP">
                         <a data-tooltip="Complete the project and automatically create the item"
                            data-project-action="create"><i class="fa-solid fa-fw fa-plus"></i></a>
-                        <a data-tooltip="edit details about this project"
+                        <a data-tooltip="Edit details about this project"
                            data-project-action="edit"><i class="fa-solid fa-fw fa-edit"></i></a>
                         <button data-project-action="craft"><i class="fa-fw fa-solid fa-hammer"
                                inert></i>Craft</button>
-                        <a data-tooltip="delete this project"
+                        <a data-tooltip="Delete this project"
                            data-project-action="delete"><i class="fa-solid fa-fw fa-trash"></i></a>
                     </div>
                     <div class="project-item-summary heroic-item-summary"

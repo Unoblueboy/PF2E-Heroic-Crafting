@@ -1,6 +1,5 @@
 name: Release
-on:
-    workflow_dispatch
+on: workflow_dispatch
 
 jobs:
     build:
@@ -16,8 +15,8 @@ jobs:
               id: bump-and-tag
               uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
               env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
-                PRERELEASE: false
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
+                  PRERELEASE: false
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4
@@ -25,7 +24,7 @@ jobs:
                   node-version: ${{ matrix.node-version }}
 
             - name: Build
-              run: | 
+              run: |
                   npm install
                   npm run build
 
@@ -34,19 +33,19 @@ jobs:
               uses: amochkin/action-json@v1
               id: write_version
               with:
-                mode: write
-                file: ./build/module.json
-                property: version
-                value: ${{ steps.bump-and-tag.outputs.new_tag }}
+                  mode: write
+                  file: ./build/module.json
+                  property: version
+                  value: ${{ steps.bump-and-tag.outputs.new_tag }}
 
             - name: Write download link to module.json
               uses: amochkin/action-json@v1
               id: write_download_link
               with:
-                mode: write
-                file: ./build/module.json
-                property: url
-                value: https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/download/${{ steps.bump-and-tag.outputs.new_tag }}/pf2e-heroic-crafting.zip
+                  mode: write
+                  file: ./build/module.json
+                  property: url
+                  value: https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/download/${{ steps.bump-and-tag.outputs.new_tag }}/pf2e-heroic-crafting.zip
 
             - name: Zip Files
               working-directory: ./build
@@ -60,7 +59,6 @@ jobs:
                   allowUpdates: false
                   draft: false
                   prerelease: false
-                  body: ${{ steps.generate_change_log.outputs.changelog }}
                   token: ${{ secrets.GITHUB_TOKEN }}
                   artifacts: "./build/module.json,./build/pf2e-heroic-crafting.zip"
                   tag: ${{ steps.bump-and-tag.outputs.new_tag }}
