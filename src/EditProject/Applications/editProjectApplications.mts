@@ -83,7 +83,6 @@ export class EditProjectApplication extends HandlebarsApplicationMixin(Applicati
 			batchSize: _formData.object["batch-size"] as number,
 			value,
 		};
-		console.log(_formData);
 	}
 
 	static async getNewDetails(options: { actor: CharacterPF2eHeroicCrafting; project: AProject }) {

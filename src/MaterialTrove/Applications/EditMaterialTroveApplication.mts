@@ -134,8 +134,6 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 	}
 
 	private static negateCurValue(this: EditMaterialTroveApplication) {
-		console.log("Heroic Crafting |", "negateCurValue");
-
 		if (this.tabGroups.primary == EditMaterialTroveApplicationTab.ADD_SUB) {
 			const curValue = this.formData.curValue[this.tabGroups.primary];
 			this.formData.curValue[this.tabGroups.primary] = SignedCoinsPF2e.negate(curValue);
@@ -147,7 +145,6 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 
 	static async EditMaterialTrove(options: Omit<EditMaterialTroveApplicationOptions, "callback">) {
 		return new Promise<EditMaterialTroveApplicationResult | undefined>((resolve) => {
-			console.log(options);
 			const app = new EditMaterialTroveApplication({ ...options, callback: resolve });
 			app.render(true);
 		});
@@ -216,7 +213,7 @@ export class EditMaterialTroveApplication extends HandlebarsApplicationMixin(App
 				const boundedDifference = SignedCoinsPF2e.boundCoins(
 					this.formData.curValue["add-sub"],
 					SignedCoinsPF2e.negate(this.materialTrove.value),
-					SignedCoinsPF2e.INFINITY
+					this.formData.updateActorCoins ? this.actor.inventory.coins : SignedCoinsPF2e.INFINITY
 				);
 				this.formData.curValue[tab] = boundedDifference;
 				break;

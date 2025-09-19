@@ -69,7 +69,6 @@ export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId
 			style: CONST.CHAT_MESSAGE_STYLES.EMOTE,
 			speaker: ChatMessage.getSpeaker(actor),
 			flavor: flavor,
-			content: `${actor.name}`,
 		});
 		return;
 	}
@@ -82,9 +81,6 @@ export async function craftProject(actor: CharacterPF2eHeroicCrafting, projectId
 	) {
 		if (message instanceof CONFIG.ChatMessage.documentClass) {
 			if (!project || !craftDetails) return; // this should never happen
-
-			const projectProgress = craftDetails.progress;
-			console.log("Heroic Crafting |", projectProgress);
 
 			await foundry.applications.handlebars.loadTemplates([
 				"modules/pf2e-heroic-crafting/templates/chat/craftProject/card-content.hbs",

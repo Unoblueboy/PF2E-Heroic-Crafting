@@ -129,13 +129,7 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 			},
 			{ type: "button", icon: "fa-solid fa-xmark", label: "Cancel", action: "close" },
 		];
-		console.log(
-			this.item ?? {
-				img: "systems/pf2e/icons/actions/craft/unknown-item.webp",
-				name: "Drag item here...",
-				level: "??",
-			}
-		);
+
 		return {
 			...data,
 			buttons,

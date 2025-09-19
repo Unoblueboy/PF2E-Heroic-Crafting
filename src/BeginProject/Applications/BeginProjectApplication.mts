@@ -10,6 +10,7 @@ import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
 import {
 	BEGIN_A_PROJECT_ROLL_OPTION,
 	CRAFTING_MATERIAL_SLUG,
+	FORMULA_PRICE,
 	MATERIAL_TROVE_SLUG,
 	SALVAGE_MATERIAL_SLUG,
 } from "../../Helper/constants.mjs";
@@ -181,7 +182,6 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		options: Partial<ApplicationConfiguration> & BeginProjectApplicationOptions
 	): ApplicationConfiguration {
 		const result = super._initializeApplicationOptions(options);
-		console.log("Heroic Crafting |", options);
 		result.uniqueId = "begin-project-" + options.actor.uuid.replace(".", "-");
 		return result;
 	}
@@ -356,19 +356,35 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	private prepareDragDropContext(context: Record<string, unknown>) {
-		context.details = {
-			item: {
-				img: this.item ? this.item.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
-				name: this.item ? this.item.name : "Drag item here...",
-				level: this.item ? String(this.item.level).padStart(2, "0") : "??",
-			},
-			spell: {
-				img: this.spell ? this.spell.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
-				name: this.spell ? this.spell.name : "Drag Spell here...",
-				rank: this.spell ? String(this.spell.rank).padStart(2, "0") : "??",
-				hide: this.formData.isFormula || !isGenericScrollOrWand(this.item),
-			},
-		};
+		if (this.formData.isFormula) {
+			context.details = {
+				item: {
+					img: "icons/sundries/documents/blueprint-magical.webp",
+					name: this.item ? `Formula: ${this.item.name}` : "Drag item here...",
+					level: this.item ? String(this.item.level).padStart(2, "0") : "??",
+				},
+				spell: {
+					img: "systems/pf2e/icons/actions/craft/unknown-item.webp",
+					name: "Drag Spell here...",
+					rank: "??",
+					hide: true,
+				},
+			};
+		} else {
+			context.details = {
+				item: {
+					img: this.item ? this.item.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
+					name: this.item ? this.item.name : "Drag item here...",
+					level: this.item ? String(this.item.level).padStart(2, "0") : "??",
+				},
+				spell: {
+					img: this.spell ? this.spell.img : "systems/pf2e/icons/actions/craft/unknown-item.webp",
+					name: this.spell ? this.spell.name : "Drag Spell here...",
+					rank: this.spell ? String(this.spell.rank).padStart(2, "0") : "??",
+					hide: !isGenericScrollOrWand(this.item),
+				},
+			};
+		}
 	}
 
 	private prepareSummaryContext(context: Record<string, unknown>, maxTotalStarting: UnsignedCoinsPF2e) {
@@ -508,6 +524,9 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 	private getMaxStartingValue(): UnsignedCoinsPF2e {
 		if (!this.item) return new UnsignedCoinsPF2e();
+		if (this.formData.isFormula) {
+			return UnsignedCoinsPF2e.multiplyCoins(0.5, FORMULA_PRICE.get(this.item.level) ?? {});
+		}
 		const maxStartingValue = UnsignedCoinsPF2e.multiplyCoins(this.formData.batchSize / 2, this.item.price.value);
 		return maxStartingValue;
 	}

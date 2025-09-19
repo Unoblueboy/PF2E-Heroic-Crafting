@@ -101,7 +101,6 @@ type HeroicCraftingMenuTabGroup<T> = {
 	initial: T;
 };
 
-// TODO: Add an option in the crafting tab to create a project automatically
 export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) {
 	actor: CharacterPF2eHeroicCrafting;
 	constructor(options: HeroCraftingMenuOptions) {
@@ -406,7 +405,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		await super._onRender(context, options);
 		new foundry.applications.ux.DragDrop.implementation({
 			dragSelector: "[data-is-formula], [data-is-item]",
-			dropSelector: ".tab.formulas",
+			dropSelector: ".tab.formulas, .tab.begin-project",
 			callbacks: {
 				dragstart: (event: DragEvent) => {
 					this.onDragStart(event);
@@ -450,7 +449,12 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 		const data = game.pf2e.TextEditor.getDragEventData(event);
 		consoleDebug(CONFIG.debug.applications, "HeroCraftingMenu onDrop", data);
 
-		if (this.tabGroups.primary !== HeroCraftingMenuTab.FORMULAS) return;
+		if (
+			![HeroCraftingMenuTab.FORMULAS, HeroCraftingMenuTab.BEGIN].includes(
+				this.tabGroups.primary as HeroCraftingMenuTab
+			)
+		)
+			return;
 
 		const item = await (async () => {
 			try {

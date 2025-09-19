@@ -114,7 +114,7 @@ export class ModifyProgressRuleElement extends game.pf2e.RuleElement<ModifyProgr
 		options = foundry.utils.mergeObject(options ?? {}, {
 			injectables: { heroiccrafting: heroicCraftingInjectables },
 		});
-		if (CONFIG.debug.ruleElement) console.debug("HEROIC CRAFTING | DEBUG | ModifyProgressRuleElement", options);
+		consoleDebug(CONFIG.debug.ruleElement, "ModifyProgressRuleElement", options);
 		return super.resolveInjectedProperties(source, options);
 	}
 

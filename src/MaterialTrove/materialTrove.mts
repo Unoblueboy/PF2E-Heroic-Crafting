@@ -7,6 +7,7 @@ import { ProjectCraftDuration } from "../CraftProject/types.mjs";
 import { MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, CRAFTING_MATERIAL_UUID } from "../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
+import { consoleDebug } from "../Helper/log.mjs";
 import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { ModifyConstantRuleElementHelper } from "../RuleElement/Helpers/ModifyConstantHelper.mjs";
@@ -156,8 +157,9 @@ export class MaterialTrove {
 
 	async updateCraftingMaterials(value?: UnsignedCoins, actorLevel: number = this.actor.level) {
 		value ??= this.value;
-		console.debug(
-			`HEROIC CRAFTING | DEBUG | updateCraftingMaterials {pp: ${value.pp}, gp: ${value.gp}, sp: ${value.sp}, cp: ${value.cp}}`
+		consoleDebug(
+			CONFIG.debug.hooks,
+			`updateCraftingMaterials {pp: ${value.pp}, gp: ${value.gp}, sp: ${value.sp}, cp: ${value.cp}}`
 		);
 		const coinValue = new UnsignedCoinsPF2e(value);
 
@@ -185,7 +187,6 @@ export class MaterialTrove {
 			})
 		);
 
-		console.log("Heroic Crafting | operations by bulk", operationsByBulk);
 		const operations = operationsByBulk.reduce<{
 			create: TreasureSource[];
 			update: EmbeddedDocumentUpdateData[];
@@ -330,7 +331,7 @@ export class MaterialTrove {
 	}
 
 	private static initialiseHooks() {
-		console.debug("Heroic Crafting | Initialising Material Trove hooks");
+		consoleDebug(CONFIG.debug.hooks, "Initialising Material Trove hooks");
 		Hooks.on("preCreateItem", MaterialTrove.onPreCreateItem);
 		Hooks.on("createItem", MaterialTrove.onCreateItem);
 		Hooks.on("preUpdateItem", MaterialTrove.onPreUpdateItem);
@@ -342,8 +343,8 @@ export class MaterialTrove {
 	}
 
 	private static onPreCreateItem(...args: unknown[]) {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreCreateItem`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", ...args);
+		consoleDebug(CONFIG.debug.hooks, `onPreCreateItem`);
+		consoleDebug(CONFIG.debug.hooks, ...args);
 
 		const item = args[0] as PhysicalItemPF2e;
 		const preCreateData = args[1] as { system?: { slug?: string } };
@@ -363,8 +364,8 @@ export class MaterialTrove {
 	}
 
 	private static onPreCreateMaterialTrove(actor: ActorPF2e, item: PhysicalItemPF2e) {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreCreateMaterialTrove`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", actor);
+		consoleDebug(CONFIG.debug.hooks, `onPreCreateMaterialTrove`);
+		consoleDebug(CONFIG.debug.hooks, actor);
 
 		if (actor.type !== "character") {
 			ui.notifications.error(`A ${actor.type} can not have a Material Trove`);
@@ -383,8 +384,8 @@ export class MaterialTrove {
 	}
 
 	private static onPreCreateGenericCraftingMaterial(actor: ActorPF2e, item: PhysicalItemPF2e) {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreCreateGenericCraftingMaterial`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", actor, item);
+		consoleDebug(CONFIG.debug.hooks, `onPreCreateGenericCraftingMaterial`);
+		consoleDebug(CONFIG.debug.hooks, actor, item);
 
 		const materialTrove = MaterialTrove.troves.get(actor.uuid);
 		if (!materialTrove) return;
@@ -410,9 +411,8 @@ export class MaterialTrove {
 		item: PhysicalItemPF2e,
 		materialTrove: MaterialTrove
 	) {
-		if (CONFIG.debug.hooks)
-			console.debug(`HEROIC CRAFTING | DEBUG | onPreCreateNegligibleBulkGenericCraftingMaterial`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove);
+		consoleDebug(CONFIG.debug.hooks, `onPreCreateNegligibleBulkGenericCraftingMaterial`);
+		consoleDebug(CONFIG.debug.hooks, item, materialTrove);
 
 		const craftingMaterials = materialTrove.getGroupedCraftingMaterials();
 		const addedValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
@@ -432,8 +432,8 @@ export class MaterialTrove {
 	}
 
 	private static onPreCreateLightBulkGenericCraftingMaterial(item: PhysicalItemPF2e, materialTrove: MaterialTrove) {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreCreateLightBulkGenericCraftingMaterial`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove);
+		consoleDebug(CONFIG.debug.hooks, `onPreCreateLightBulkGenericCraftingMaterial`);
+		consoleDebug(CONFIG.debug.hooks, item, materialTrove);
 		const craftingMaterials = materialTrove.getGroupedCraftingMaterials();
 		const addedValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
 
@@ -450,9 +450,8 @@ export class MaterialTrove {
 	}
 
 	private static onPreCreateDefaultBulkGenericCraftingMaterial(item: PhysicalItemPF2e, materialTrove: MaterialTrove) {
-		if (CONFIG.debug.hooks)
-			console.debug(`HEROIC CRAFTING | DEBUG | onPreCreateDefaultBulkGenericCraftingMaterial`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove);
+		consoleDebug(CONFIG.debug.hooks, `onPreCreateDefaultBulkGenericCraftingMaterial`);
+		consoleDebug(CONFIG.debug.hooks, item, materialTrove);
 
 		const addedValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
 		materialTrove.add(addedValue);
@@ -460,8 +459,8 @@ export class MaterialTrove {
 	}
 
 	private static onCreateItem(...args: unknown[]) {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onCreateItem`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", ...args);
+		consoleDebug(CONFIG.debug.hooks, `onCreateItem`);
+		consoleDebug(CONFIG.debug.hooks, ...args);
 
 		const item = args[0] as PhysicalItemPF2e;
 
@@ -483,8 +482,8 @@ export class MaterialTrove {
 	}
 
 	private static onPreUpdateItem(...args: unknown[]) {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreUpdateItem`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", ...args);
+		consoleDebug(CONFIG.debug.hooks, `onPreUpdateItem`);
+		consoleDebug(CONFIG.debug.hooks, ...args);
 
 		const item = args[0] as PhysicalItemPF2e;
 		const preUpdateData = args[1] as { system?: { slug?: string | null; containerId?: string | null } };
@@ -502,8 +501,8 @@ export class MaterialTrove {
 		item: PhysicalItemPF2e,
 		preUpdateData: { system?: { slug?: string | null; containerId?: string | null } }
 	) {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreUpdateItemGenericCraftingMaterial`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", actor, item, preUpdateData);
+		consoleDebug(CONFIG.debug.hooks, `onPreUpdateItemGenericCraftingMaterial`);
+		consoleDebug(CONFIG.debug.hooks, actor, item, preUpdateData);
 
 		const fromContainerID = item.system.containerId;
 		const toContainerID = preUpdateData.system?.containerId;
@@ -528,9 +527,8 @@ export class MaterialTrove {
 		item: PhysicalItemPF2e,
 		materialTrove: MaterialTrove
 	) {
-		if (CONFIG.debug.hooks)
-			console.debug(`HEROIC CRAFTING | DEBUG | onPreUpdateItemGenericCraftingMaterialIntoMaterialTrove`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove);
+		consoleDebug(CONFIG.debug.hooks, `onPreUpdateItemGenericCraftingMaterialIntoMaterialTrove`);
+		consoleDebug(CONFIG.debug.hooks, item, materialTrove);
 
 		const baseItemValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
 		const newValue = UnsignedCoinsPF2e.addCoins(materialTrove.value, baseItemValue);
@@ -543,9 +541,8 @@ export class MaterialTrove {
 		item: PhysicalItemPF2e,
 		materialTrove: MaterialTrove
 	) {
-		if (CONFIG.debug.hooks)
-			console.debug(`HEROIC CRAFTING | DEBUG | onPreUpdateItemGenericCraftingMaterialOutOfMaterialTrove`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove);
+		consoleDebug(CONFIG.debug.hooks, `onPreUpdateItemGenericCraftingMaterialOutOfMaterialTrove`);
+		consoleDebug(CONFIG.debug.hooks, item, materialTrove);
 
 		const baseItemValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
 		materialTrove.value = UnsignedCoinsPF2e.subtractCoins(materialTrove.value, baseItemValue);
@@ -556,9 +553,8 @@ export class MaterialTrove {
 		materialTrove: MaterialTrove,
 		preUpdateData: { system?: object }
 	) {
-		if (CONFIG.debug.hooks)
-			console.debug(`HEROIC CRAFTING | DEBUG | onPreUpdateItemGenericCraftingMaterialInPlace`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", item, materialTrove, preUpdateData);
+		consoleDebug(CONFIG.debug.hooks, `onPreUpdateItemGenericCraftingMaterialInPlace`);
+		consoleDebug(CONFIG.debug.hooks, item, materialTrove, preUpdateData);
 		const baseItemValue = UnsignedCoinsPF2e.multiplyCoins(item.system.quantity, item.system.price.value);
 		const newItemSystemData = foundry.utils.mergeObject(item.system, preUpdateData.system, {
 			inplace: false,
@@ -583,8 +579,8 @@ export class MaterialTrove {
 	}
 
 	private static onUpdateItem(...args: unknown[]) {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onUpdateItem`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", ...args);
+		consoleDebug(CONFIG.debug.hooks, `onUpdateItem`);
+		consoleDebug(CONFIG.debug.hooks, ...args);
 
 		const item = args[0] as PhysicalItemPF2e;
 
@@ -600,8 +596,8 @@ export class MaterialTrove {
 	}
 
 	private static onPreDeleteItem(...args: unknown[]) {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreDeleteItem`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", ...args);
+		consoleDebug(CONFIG.debug.hooks, `onPreDeleteItem`);
+		consoleDebug(CONFIG.debug.hooks, ...args);
 
 		const item = args[0] as PhysicalItemPF2e;
 
@@ -618,15 +614,15 @@ export class MaterialTrove {
 	}
 
 	private static onPreDeleteMaterialTrove(actor: ActorPF2e): void {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreDeleteMaterialTrove`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", actor);
+		consoleDebug(CONFIG.debug.hooks, `onPreDeleteMaterialTrove`);
+		consoleDebug(CONFIG.debug.hooks, actor);
 
 		MaterialTrove.troves.delete(actor.uuid);
 	}
 
 	private static onPreDeleteGenericCraftingMaterial(actor: ActorPF2e, item: PhysicalItemPF2e): void {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreDeleteGenericCraftingMaterial`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", actor, item);
+		consoleDebug(CONFIG.debug.hooks, `onPreDeleteGenericCraftingMaterial`);
+		consoleDebug(CONFIG.debug.hooks, actor, item);
 
 		const materialTrove = MaterialTrove.troves.get(actor.uuid);
 		if (!materialTrove) return;
@@ -638,8 +634,8 @@ export class MaterialTrove {
 	}
 
 	private static onDeleteItem(...args: unknown[]) {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onDeleteItem`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", ...args);
+		consoleDebug(CONFIG.debug.hooks, `onDeleteItem`);
+		consoleDebug(CONFIG.debug.hooks, ...args);
 
 		const item = args[0] as PhysicalItemPF2e;
 
@@ -655,8 +651,8 @@ export class MaterialTrove {
 	}
 
 	private static onPreUpdateActor(...args: unknown[]) {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onPreUpdateActor`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", ...args);
+		consoleDebug(CONFIG.debug.hooks, `onPreUpdateActor`);
+		consoleDebug(CONFIG.debug.hooks, ...args);
 
 		const actor = args[0] as ActorPF2e;
 		const preUpdateData = args[1] as { system?: { details?: { level?: { value?: number } } } };
@@ -672,8 +668,8 @@ export class MaterialTrove {
 	}
 
 	private static onUpdateActor(...args: unknown[]) {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onUpdateActor`);
-		if (CONFIG.debug.hooks) console.debug("HEROIC CRAFTING | DEBUG |", ...args);
+		consoleDebug(CONFIG.debug.hooks, `onUpdateActor`);
+		consoleDebug(CONFIG.debug.hooks, ...args);
 
 		const actor = args[0] as ActorPF2e;
 
@@ -684,7 +680,7 @@ export class MaterialTrove {
 	}
 
 	static onReady() {
-		if (CONFIG.debug.hooks) console.debug(`HEROIC CRAFTING | DEBUG | onReady`);
+		consoleDebug(CONFIG.debug.hooks, `onReady`);
 
 		game.actors.forEach((actor) => {
 			if (actor.type !== "character") return;

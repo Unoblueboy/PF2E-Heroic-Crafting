@@ -1,5 +1,6 @@
 import { PhysicalItemPF2e } from "../../types/src/module/item/physical";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import { consoleDebug } from "../Helper/log.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { Projects } from "../Projects/projects.mjs";
 import { BeginProjectApplication } from "./Applications/BeginProjectApplication.mjs";
@@ -36,7 +37,7 @@ export async function beginProject(
 	if (details?.type !== BeginProjectDetailsType.FULL) {
 		return false;
 	}
-	console.debug("Heroic Crafting | Begin Project Details", details);
+	consoleDebug(CONFIG.debug.applications, "Begin Project Details", details);
 
 	const { itemDetails, startingValue } = details;
 

@@ -179,7 +179,7 @@ export class ModifyConstantRuleElement extends game.pf2e.RuleElement<ModifyConst
 		options = foundry.utils.mergeObject(options ?? {}, {
 			injectables: { heroiccrafting: heroicCraftingInjectables },
 		});
-		if (CONFIG.debug.ruleElement) console.debug("HEROIC CRAFTING | DEBUG | ModifyConstantRuleElement", options);
+		consoleDebug(CONFIG.debug.ruleElement, "ModifyConstantRuleElement", options);
 		return super.resolveInjectedProperties(source, options);
 	}
 
