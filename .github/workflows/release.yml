@@ -33,8 +33,8 @@ jobs:
 
             - name: push tag
               run: |
-                  git tag ${{ steps.semver.outputs.next }}
-                  git push origin ${{ steps.semver.outputs.next }}
+                  git tag ${{ steps.semver.outputs.nextStrict }}
+                  git push origin ${{ steps.semver.outputs.nextStrict }}
 
             - name: Use Node.js 20.x
               uses: actions/setup-node@v4
@@ -62,7 +62,7 @@ jobs:
                   mode: write
                   file: ./build/module.json
                   property: url
-                  value: https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/download/${{ steps.semver.outputs.next }}/pf2e-heroic-crafting.zip
+                  value: https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/download/${{ steps.semver.outputs.nextStrict }}/pf2e-heroic-crafting.zip
 
             - name: Zip Files
               working-directory: ./build
@@ -72,12 +72,11 @@ jobs:
               id: create_version_release
               uses: ncipollo/release-action@v1
               with:
-                  name: ${{ steps.semver.outputs.next }}
+                  name: ${{ steps.semver.outputs.nextStrict }}
                   allowUpdates: false
                   draft: false
                   prerelease: false
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  # body: ${{ steps.generate_changes.output.changes }}
                   body: ${{ steps.get_change_log.outputs.clean_changelog }}
                   artifacts: "./build/module.json,./build/pf2e-heroic-crafting.zip"
-                  tag: ${{ steps.semver.outputs.next }}
+                  tag: ${{ steps.semver.outputs.nextStrict }}
