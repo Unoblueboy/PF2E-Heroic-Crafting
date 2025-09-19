@@ -27,7 +27,6 @@ jobs:
               with:
                   token: ${{ github.token }}
                   fallbackTag: 0.0.0
-                  prefix: v
 
             - name: Echo Outputs
               run: echo ${{ steps.semver.outputs }}
