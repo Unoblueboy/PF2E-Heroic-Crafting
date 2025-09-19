@@ -9,6 +9,15 @@ jobs:
             contents: write
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Bump version and push tag
+              id: bump-and-tag
+              uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
+                PRERELEASE: true
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4
@@ -20,12 +29,6 @@ jobs:
                   npm install
                   npm run build
 
-            - name: Get Version
-              id: semver-tag
-              uses: gandarez/semver-action@master
-              with:
-                  branching_model: "git-flow"
-
             # TODO: Update Manifest
 
             - name: Zip Files
@@ -36,10 +39,10 @@ jobs:
               id: create_version_release
               uses: ncipollo/release-action@v1
               with:
-                  name: ${{ env.systemVersion }}
+                  name: ${{ steps.bump-and-tag.new-tag }}
                   allowUpdates: false
                   draft: false
                   prerelease: false
                   token: ${{ secrets.GITHUB_TOKEN }}
                   artifacts: "./build/module.json,./build/pf2e-heroic-crafting.zip"
-                  tag: ${{ env.systemVersion }}
+                  tag: ${{ steps.bump-and-tag.new-tag }}
