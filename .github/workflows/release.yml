@@ -52,14 +52,6 @@ jobs:
               working-directory: ./build
               run: zip -r ./pf2e-heroic-crafting.zip ./*
 
-            - name: "✏️ Generate release changelog"
-              id: generate_change_log
-              uses: janheinrichmerker/action-github-changelog-generator@v2.3
-              with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
-                  sinceTag: ${{ steps.bump-and-tag.outputs.old_tag }}
-                  dueTag: ${{ steps.bump-and-tag.outputs.new_tag }}
-
             - name: Create Version Release
               id: create_version_release
               uses: ncipollo/release-action@v1
