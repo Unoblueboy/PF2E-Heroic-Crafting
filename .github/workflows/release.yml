@@ -39,10 +39,10 @@ jobs:
               id: create_version_release
               uses: ncipollo/release-action@v1
               with:
-                  name: ${{ steps.bump-and-tag.new_tag }}
+                  name: ${{ steps.bump-and-tag.outputs.new_tag }}
                   allowUpdates: false
                   draft: false
                   prerelease: false
                   token: ${{ secrets.GITHUB_TOKEN }}
                   artifacts: "./build/module.json,./build/pf2e-heroic-crafting.zip"
-                  tag: ${{ steps.bump-and-tag.new_tag }}
+                  tag: ${{ steps.bump-and-tag.outputs.new_tag }}
