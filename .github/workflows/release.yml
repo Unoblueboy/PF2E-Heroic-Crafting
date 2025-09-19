@@ -15,11 +15,11 @@ jobs:
               id: get_change_log
               uses: TriPSs/conventional-changelog-action@v5
               with:
-                github-token: ${{ secrets.github_token }}
-                skip-tag: true
-                skip-commit: true
-                skip-bump: true
-                output-file: false
+                  github-token: ${{ secrets.github_token }}
+                  skip-tag: true
+                  skip-commit: true
+                  skip-bump: true
+                  output-file: false
 
             - name: Get Next Version
               id: semver
@@ -46,7 +46,6 @@ jobs:
                   npm install
                   npm run build
 
-            # TODO: Update Manifest
             - name: Write version to module.json
               uses: amochkin/action-json@v1
               id: write_version
@@ -68,21 +67,6 @@ jobs:
             - name: Zip Files
               working-directory: ./build
               run: zip -r ./pf2e-heroic-crafting.zip ./*
-
-
-            # - name: generate changes
-            #   id: generate_changes
-            #   uses: requarks/changelog-action@v1
-            #   with:
-            #       token: ${{ github.token }}
-            #       fromTag: ${{ steps.semver.outputs.current }}
-            #       toTag: ${{ steps.semver.outputs.next }}
-            #       writeToFile: false
-
-            # - name: Echo Changes
-            #   run: echo ${{steps.generate_changes.output.changes}}
-
-           
 
             - name: Create Version Release
               id: create_version_release
