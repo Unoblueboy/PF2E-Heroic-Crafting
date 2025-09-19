@@ -18,6 +18,9 @@ jobs:
                   token: ${{ github.token }}
                   fallbackTag: 0.0.0
 
+            - name: Echo Outputs
+              run: echo ${{ steps.semver.outputs }}
+
             - name: push tag
               run: |
                   git tag ${{ steps.semver.outputs.next }}
@@ -52,20 +55,22 @@ jobs:
                   property: url
                   value: https://github.com/Unoblueboy/PF2E-Heroic-Crafting/releases/download/${{ steps.semver.outputs.nextStrict }}/pf2e-heroic-crafting.zip
 
-            - name: generate changes
-              id: generate_changes
-              uses: requarks/changelog-action@v1
-              with:
-                  token: ${{ github.token }}
-                  tag: ${{ steps.semver.outputs.next }}
-                  writeToFile: false
-
             - name: Zip Files
               working-directory: ./build
               run: zip -r ./pf2e-heroic-crafting.zip ./*
 
-            - name: Echo Changes
-              run: echo ${{steps.generate_changes.output.changes}}
+
+            # - name: generate changes
+            #   id: generate_changes
+            #   uses: requarks/changelog-action@v1
+            #   with:
+            #       token: ${{ github.token }}
+            #       fromTag: ${{ steps.semver.outputs.current }}
+            #       toTag: ${{ steps.semver.outputs.next }}
+            #       writeToFile: false
+
+            # - name: Echo Changes
+            #   run: echo ${{steps.generate_changes.output.changes}}
 
             - name: Create Version Release
               id: create_version_release
@@ -76,6 +81,6 @@ jobs:
                   draft: false
                   prerelease: false
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  body: ${{ steps.generate_changes.output.changes }}
+                  # body: ${{ steps.generate_changes.output.changes }}
                   artifacts: "./build/module.json,./build/pf2e-heroic-crafting.zip"
                   tag: ${{ steps.semver.outputs.next }}
