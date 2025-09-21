@@ -17,7 +17,8 @@ export async function forageCraftingResourcesChatButtonListener(
 async function addResourcesToTrove(event: Event, message: ChatMessagePF2e): Promise<void> {
 	const actor = message.actor as CharacterPF2eHeroicCrafting;
 
-	const button = event.target as HTMLButtonElement;
+	const button = event.target;
+	if (!(button instanceof HTMLButtonElement)) return;
 	const div = event.currentTarget as HTMLDivElement;
 	const data = { ...button.dataset, ...div.dataset };
 
