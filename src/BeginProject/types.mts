@@ -19,7 +19,7 @@ export type EmbeddedSpell = {
 	heightenedLevel?: number;
 };
 
-export type BeginProjectUpdateDetailsOptions = { itemDropped?: boolean };
+export type BeginProjectUpdateDetailsOptions = { doFullUpdate?: boolean };
 export enum BeginProjectDetailsType {
 	FULL,
 	PARTIAL,

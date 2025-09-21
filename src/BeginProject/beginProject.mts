@@ -26,6 +26,10 @@ export async function beginProject(
 				itemSettings: {
 					lockItem: true,
 					item: item,
+					formula: {
+						defaultValue: false,
+						include: false,
+					},
 				},
 			});
 			break;

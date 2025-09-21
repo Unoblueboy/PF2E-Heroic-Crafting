@@ -84,12 +84,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 		};
 
 		if (this.item) {
-			const batchSize = ModifyConstantRuleElementHelper.getConstant(
-				this.actor,
-				"batchSize",
-				{ item: this.item },
-				this.getRollOptions()
-			);
+			const batchSize = this.getBatchSize();
 			this.batchSizeMax = batchSize;
 			this.formData.batchSize = batchSize;
 			this.formData.dc = calculateDC(this.item.level, this.item.rarity);
@@ -216,7 +211,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 		const updateDetailsOptions: BeginProjectUpdateDetailsOptions = {};
 		if (this.item && options.isFirstRender) {
-			updateDetailsOptions.itemDropped = true;
+			updateDetailsOptions.doFullUpdate = true;
 		}
 		this.updateDetails(updateDetailsOptions);
 	}
@@ -234,7 +229,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			}
 			case "isFormula": {
 				this.formData.isFormula = target.checked;
-				this.updateDetails();
+				this.updateDetails({ doFullUpdate: true });
 
 				break;
 			}
@@ -416,7 +411,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 			const item = await this.getItem(data);
 			if (item && (!this.item || (this.item && !this.lockItem))) {
 				this.item = item;
-				options.itemDropped = true;
+				options.doFullUpdate = true;
 			}
 		} else if (classes.contains("spell-drop")) {
 			const spell = await this.getSpell(data);
@@ -503,7 +498,7 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 	}
 
 	private updateDetails(options: BeginProjectUpdateDetailsOptions = {}) {
-		if (options.itemDropped) {
+		if (options.doFullUpdate) {
 			this.updateDc();
 			this.resetBatchSizeInput();
 			this.ResetStartingValue();
@@ -520,14 +515,21 @@ export class BeginProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 	private resetBatchSizeInput() {
 		if (!this.item) return;
-		const batchSize = ModifyConstantRuleElementHelper.getConstant(
-			this.actor,
-			"batchSize",
-			{ item: this.item },
-			this.getRollOptions()
-		);
+		const batchSize = this.getBatchSize();
 		this.formData.batchSize = batchSize;
 		this.batchSizeMax = batchSize;
+	}
+
+	private getBatchSize() {
+		if (!this.item) return 1;
+		return this.formData.isFormula
+			? 1
+			: ModifyConstantRuleElementHelper.getConstant(
+					this.actor,
+					"batchSize",
+					{ item: this.item },
+					this.getRollOptions()
+			  );
 	}
 
 	private getMaxStartingValue(): UnsignedCoinsPF2e {
