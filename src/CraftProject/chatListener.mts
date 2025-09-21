@@ -113,7 +113,7 @@ async function doEfficientCrafting(
 	const totalSpent = UnsignedCoinsPF2e.sumCoins(
 		materialSpent.currency ?? {},
 		materialSpent.trove ?? {},
-		...(materialSpent.treasure?.map((x) => x.value) ?? [])
+		...(materialSpent.materials?.map((x) => x.value) ?? [])
 	);
 	const materialBack = totalSpent.multiply(0.5);
 

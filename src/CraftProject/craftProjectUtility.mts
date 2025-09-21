@@ -1,22 +1,27 @@
 import { PhysicalItemPF2e } from "../../types/src/module/item";
 import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
-import {
-	ProjectCraftDetails,
-	ProjectCraftMaterialSpent,
-	TreasureMaterialSpent,
-	TreasurePostUseOperation,
-} from "./types.mjs";
+import { BasicMaterials, ProjectCraftDetails, TreasureMaterialSpent, TreasurePostUseOperation } from "./types.mjs";
+
+type a = BasicMaterials & {
+	materials?: {
+		value: UnsignedCoins;
+		quantity?: number;
+	}[];
+};
 
 export class CraftProjectUtility {
-	static getTotalMaterialSpent(materialsSpent?: ProjectCraftMaterialSpent): UnsignedCoinsPF2e {
+	static getTotalMaterialSpent(materialsSpent?: a): UnsignedCoinsPF2e {
 		if (!materialsSpent) return new UnsignedCoinsPF2e(); // should never happen
 
 		return UnsignedCoinsPF2e.sumCoins(
 			materialsSpent.trove ?? {},
 			materialsSpent.currency ?? {},
-			...(materialsSpent.treasure ?? []).map((treasure) => treasure.value)
+			...(materialsSpent.materials ?? []).map((treasure) =>
+				UnsignedCoinsPF2e.multiplyCoins(treasure.quantity ?? 1, treasure.value)
+			)
 		);
 	}
 
@@ -31,7 +36,7 @@ export class CraftProjectUtility {
 		if (materialsSpent.currency) {
 			await actor.inventory.removeCoins(materialsSpent.currency);
 		}
-		for (const material of materialsSpent.treasure ?? []) {
+		for (const material of materialsSpent.materials ?? []) {
 			const item = await foundry.utils.fromUuid<PhysicalItemPF2e>(material.uuid);
 			if (!item) continue;
 			await CraftProjectUtility.updateSpentTreasure(item, material);
@@ -103,7 +108,7 @@ export class CraftProjectUtility {
 			});
 		}
 
-		for (const treasureSpent of craftDetails.materialsSpent.treasure ?? []) {
+		for (const treasureSpent of craftDetails.materialsSpent.materials ?? []) {
 			const treasure = await foundry.utils.fromUuid<PhysicalItemPF2e>(treasureSpent.uuid);
 			if (!treasure) continue;
 

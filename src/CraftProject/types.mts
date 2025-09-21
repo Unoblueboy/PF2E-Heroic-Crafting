@@ -1,11 +1,12 @@
 import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
 import { UnsignedCoins, SignedCoins } from "../Helper/currencyTypes.mjs";
 
-export type ProjectCraftMaterialSpent = {
+export type BasicMaterials = {
 	trove?: UnsignedCoins;
 	currency?: UnsignedCoins;
-	treasure?: TreasureMaterialSpent[];
 };
+
+export type ProjectCraftMaterialSpent = BasicMaterials & { materials?: TreasureMaterialSpent[] };
 
 export type ProjectCraftProgress = {
 	[x in DegreeOfSuccessString]: SignedCoins;

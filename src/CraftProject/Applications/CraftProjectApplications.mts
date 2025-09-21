@@ -225,7 +225,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			materialsSpent.currency = this.formData.materialList.currency;
 		if (UnsignedCoinsPF2e.getCopperValue(this.formData.materialList.trove) > 0)
 			materialsSpent.trove = this.formData.materialList.trove;
-		if (treasureMaterials.length > 0) materialsSpent.treasure = treasureMaterials;
+		if (treasureMaterials.length > 0) materialsSpent.materials = treasureMaterials;
 
 		const progress = await this.getProjectProgress();
 
@@ -384,7 +384,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		);
 
 		const preMaterialContribution = UnsignedCoinsPF2e.subtractCoins(
-			CraftProjectUtility.getTotalMaterialSpent(this.formData.materialList),
+			this.getTotalMaterialSpent(),
 			this.formData.materialList[basicMaterial]
 		);
 
@@ -400,8 +400,17 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 		}
 	}
 
+	private getTotalMaterialSpent(): UnsignedCoinsPF2e {
+		const materialList = {
+			currency: this.formData.materialList.currency,
+			trove: this.formData.materialList.trove,
+			materials: Object.values(this.formData.materialList.materials),
+		};
+		return CraftProjectUtility.getTotalMaterialSpent(materialList);
+	}
+
 	private getTotalMaterialCost(totalMaterialsSpent?: UnsignedCoinsPF2e): UnsignedCoinsPF2e {
-		totalMaterialsSpent ??= CraftProjectUtility.getTotalMaterialSpent(this.formData.materialList);
+		totalMaterialsSpent ??= this.getTotalMaterialSpent();
 
 		return this.rushCost ? UnsignedCoinsPF2e.multiplyCoins(0.5, totalMaterialsSpent) : totalMaterialsSpent;
 	}
@@ -438,17 +447,17 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 
 		const item = (await foundry.utils.fromUuid(materialUuid)) as PhysicalItemPF2e;
 		const treasureCoinsTotal = UnsignedCoinsPF2e.multiplyCoins(
-			materialFromData.quantity ?? 1,
+			materialFromData.quantity ?? 0,
 			materialFromData.value
 		);
 
 		const preTreasureContribution = UnsignedCoinsPF2e.subtractCoins(
-			CraftProjectUtility.getTotalMaterialSpent(this.formData.materialList),
+			this.getTotalMaterialSpent(),
 			treasureCoinsTotal
 		);
 		const remainingBudget = UnsignedCoinsPF2e.subtractCoins(scaledSpendingLimit, preTreasureContribution);
 		const maxSpendTotal = UnsignedCoinsPF2e.minCoins(
-			item.price.value.scale(materialFromData.quantity ?? 1),
+			item.price.value.scale(materialFromData.quantity ?? 0),
 			remainingBudget
 		);
 
@@ -691,7 +700,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			}),
 			totalMaterial: {
 				cost: this.getTotalMaterialCost(),
-				spent: CraftProjectUtility.getTotalMaterialSpent(this.formData.materialList),
+				spent: this.getTotalMaterialSpent(),
 				max: UnsignedCoinsPF2e.multiplyCoins(this.project.batchSize, await this.getSpendingLimit()),
 			},
 			rushCost: this.rushCost,
@@ -709,7 +718,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 					icon: "fa-solid fa-hammer",
 					cssClass: "craft-project-button",
 					label: "Craft Project",
-					disabled: CraftProjectUtility.getTotalMaterialSpent(this.formData.materialList).copperValue === 0,
+					disabled: this.getTotalMaterialSpent().copperValue === 0,
 				},
 				{
 					type: "button",
