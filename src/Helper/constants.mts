@@ -1,6 +1,5 @@
 import type { UnsignedCoins } from "./currencyTypes.mjs";
-
-import { UnsignedCoinsPF2e } from "./unsignedCoins.mjs";
+import type { UnsignedCoinsPF2e } from "./unsignedCoins.mjs";
 
 export const MATERIAL_TROVE_UUID =
 	`Compendium.pf2e-heroic-crafting.heroic-crafting-items.Item.wtpSAjQwSyPOglzU` as const;

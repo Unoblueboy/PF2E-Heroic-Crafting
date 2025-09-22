@@ -7,8 +7,7 @@ import type { HandlebarsRenderOptions } from "foundry-pf2e/foundry/client/applic
 import type FormDataExtended from "foundry-pf2e/foundry/client/applications/ux/form-data-extended.mjs";
 import type { ProjectItemDetails } from "../../BeginProject/types.mjs";
 import type { CharacterPF2eHeroicCrafting } from "../../character.mjs";
-
-import { AProject } from "../../Projects/projects.mjs";
+import type { AProject } from "../../Projects/projects.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 

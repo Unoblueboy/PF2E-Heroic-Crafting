@@ -9,7 +9,9 @@ import type {
 } from "foundry-pf2e/foundry/client/applications/_module.mjs";
 import type { HandlebarsRenderOptions } from "foundry-pf2e/foundry/client/applications/api/handlebars-application.mjs";
 import type FormDataExtended from "foundry-pf2e/foundry/client/applications/ux/form-data-extended.mjs";
+import type { AProject } from "../../Projects/projects.mjs";
 
+import { Projects } from "../../Projects/projects.mjs";
 import {
 	CRAFT_A_PROJECT_ROLL_OPTION,
 	CRAFT_ROLL_OPTION,
@@ -27,7 +29,6 @@ import { consoleDebug } from "../../Helper/log.mjs";
 import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../../MaterialTrove/materialTrove.mjs";
-import { AProject, Projects } from "../../Projects/projects.mjs";
 import { ModifyConstantRuleElementHelper } from "../../RuleElement/Helpers/ModifyConstantHelper.mjs";
 import { ModifyProgressRuleElementHelper } from "../../RuleElement/Helpers/ModifyProgressHelper.mjs";
 import { CraftProjectUtility } from "../craftProjectUtility.mjs";

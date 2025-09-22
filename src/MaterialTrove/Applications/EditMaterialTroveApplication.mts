@@ -8,11 +8,11 @@ import type {
 } from "foundry-pf2e/foundry/client/applications/_module.mjs";
 import type { HandlebarsRenderOptions } from "foundry-pf2e/foundry/client/applications/api/handlebars-application.mjs";
 import type FormDataExtended from "foundry-pf2e/foundry/client/applications/ux/form-data-extended.mjs";
+import type { MaterialTrove } from "../materialTrove.mjs";
 
 import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
 import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
-import { MaterialTrove } from "../materialTrove.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 

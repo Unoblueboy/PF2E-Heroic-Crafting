@@ -8,12 +8,10 @@ import type {
 	ModifyConstantRushCostSynthetic,
 	ModifyConstantSynthetic,
 } from "../types.js";
-
 import type { PhysicalItemPF2e } from "foundry-pf2e";
+import type { ProjectCraftDuration } from "../../CraftProject/types.mjs";
 
-import { ProjectCraftDuration } from "../../CraftProject/types.mjs";
 import { HEROIC_CRAFTING_SPENDING_LIMIT } from "../../Helper/constants.mjs";
-
 import { getMaxBatchSize } from "../../Helper/item.mjs";
 import { consoleDebug } from "../../Helper/log.mjs";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";

@@ -21,6 +21,8 @@ export default defineConfig([
 					ignoreRestSiblings: true,
 				},
 			],
+			"@typescript-eslint/no-import-type-side-effects": "error",
+			"@typescript-eslint/consistent-type-imports": "error",
 		},
 	},
 ]);
