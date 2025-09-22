@@ -1,19 +1,22 @@
-import { PhysicalItemPF2e } from "../../../types/src/module/item";
-import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
-import { ProjectCraftDuration } from "../../CraftProject/types.mjs";
-import { HEROIC_CRAFTING_SPENDING_LIMIT } from "../../Helper/constants.mjs";
-import { UnsignedCoins } from "../../Helper/currencyTypes.mjs";
-import { Either } from "../../Helper/generics.mjs";
-import { getMaxBatchSize } from "../../Helper/item.mjs";
-import { consoleDebug } from "../../Helper/log.mjs";
-import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
-import { ModifyConstantElementConstant } from "../modifyConstantElement.mjs";
-import {
+import type { CharacterPF2eHeroicCrafting } from "../../character.mjs";
+import type { UnsignedCoins } from "../../Helper/currencyTypes.mjs";
+import type { Either } from "../../Helper/generics.mjs";
+import type { ModifyConstantElementConstant } from "../modifyConstantElement.mjs";
+import type {
 	ModifyConstantBatchSizeSynthetic,
 	ModifyConstantSpendingLimitSynthetic,
 	ModifyConstantRushCostSynthetic,
 	ModifyConstantSynthetic,
-} from "../types";
+} from "../types.js";
+
+import type { PhysicalItemPF2e } from "foundry-pf2e";
+
+import { ProjectCraftDuration } from "../../CraftProject/types.mjs";
+import { HEROIC_CRAFTING_SPENDING_LIMIT } from "../../Helper/constants.mjs";
+
+import { getMaxBatchSize } from "../../Helper/item.mjs";
+import { consoleDebug } from "../../Helper/log.mjs";
+import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 
 type BatchSizeRetrievalData = Either<
 	{

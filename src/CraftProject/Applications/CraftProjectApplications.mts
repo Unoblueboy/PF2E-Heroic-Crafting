@@ -1,12 +1,15 @@
-import { FeatPF2e, PhysicalItemPF2e } from "../../../types/src/module/item";
-import {
-	ApplicationClosingOptions,
+import type { CharacterPF2eHeroicCrafting } from "../../character.mjs";
+import type { DENOMINATION, UnsignedCoins } from "../../Helper/currencyTypes.mjs";
+import type { ProjectCraftDetails, ProjectCraftMaterialSpent, TreasureMaterialSpent } from "../types.mjs";
+import type { PhysicalItemPF2e, FeatPF2e } from "foundry-pf2e";
+import type {
 	ApplicationConfiguration,
 	ApplicationRenderOptions,
-} from "../../../types/types/foundry/client/applications/_module.mjs";
-import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
-import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
-import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
+	ApplicationClosingOptions,
+} from "foundry-pf2e/foundry/client/applications/_module.mjs";
+import type { HandlebarsRenderOptions } from "foundry-pf2e/foundry/client/applications/api/handlebars-application.mjs";
+import type FormDataExtended from "foundry-pf2e/foundry/client/applications/ux/form-data-extended.mjs";
+
 import {
 	CRAFT_A_PROJECT_ROLL_OPTION,
 	CRAFT_ROLL_OPTION,
@@ -18,7 +21,6 @@ import {
 	SPECIALTY_CRAFTING_SLUG,
 	SPECIALTY_ROLL_OPTION,
 } from "../../Helper/constants.mjs";
-import { DENOMINATION, UnsignedCoins } from "../../Helper/currencyTypes.mjs";
 import { fractionToPercent } from "../../Helper/generics.mjs";
 import { hasFeat } from "../../Helper/item.mjs";
 import { consoleDebug } from "../../Helper/log.mjs";
@@ -29,13 +31,7 @@ import { AProject, Projects } from "../../Projects/projects.mjs";
 import { ModifyConstantRuleElementHelper } from "../../RuleElement/Helpers/ModifyConstantHelper.mjs";
 import { ModifyProgressRuleElementHelper } from "../../RuleElement/Helpers/ModifyProgressHelper.mjs";
 import { CraftProjectUtility } from "../craftProjectUtility.mjs";
-import {
-	ProjectCraftDetails,
-	ProjectCraftDuration,
-	ProjectCraftMaterialSpent,
-	TreasureMaterialSpent,
-	TreasurePostUseOperation,
-} from "../types.mjs";
+import { ProjectCraftDuration, TreasurePostUseOperation } from "../types.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 

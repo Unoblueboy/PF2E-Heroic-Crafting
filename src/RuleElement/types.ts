@@ -1,6 +1,5 @@
-import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
-import { Predicate } from "../../types/src/module/system/predication";
-import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
+import type { Predicate, DegreeOfSuccessString } from "foundry-pf2e";
+import type { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 
 // MODIFY PROGRESS TYPES
 type ModifyProgressMultDivSynthetic = {

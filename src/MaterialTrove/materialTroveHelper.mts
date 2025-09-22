@@ -1,6 +1,7 @@
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";
+
 import { EditMaterialTroveApplication } from "./Applications/EditMaterialTroveApplication.mjs";
-import { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";
 import { MaterialTrove, useActorCoins } from "./materialTrove.mjs";
 
 export async function editMaterialTrove(actor: CharacterPF2eHeroicCrafting) {

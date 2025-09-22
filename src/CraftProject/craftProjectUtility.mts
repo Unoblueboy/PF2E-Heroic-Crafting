@@ -1,9 +1,11 @@
-import { PhysicalItemPF2e } from "../../types/src/module/item";
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
-import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { UnsignedCoins } from "../Helper/currencyTypes.mjs";
+import type { BasicMaterials, ProjectCraftDetails, TreasureMaterialSpent } from "./types.mjs";
+import type { PhysicalItemPF2e } from "foundry-pf2e";
+
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
-import { BasicMaterials, ProjectCraftDetails, TreasureMaterialSpent, TreasurePostUseOperation } from "./types.mjs";
+import { TreasurePostUseOperation } from "./types.mjs";
 
 type a = BasicMaterials & {
 	materials?: {

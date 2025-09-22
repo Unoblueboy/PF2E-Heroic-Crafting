@@ -1,5 +1,6 @@
-import { ChatMessagePF2e } from "../../types/src/module/chat-message";
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { ChatMessagePF2e } from "foundry-pf2e";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 

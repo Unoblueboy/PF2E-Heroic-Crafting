@@ -1,5 +1,6 @@
-import { ChatMessagePF2e } from "../types/src/module/chat-message";
-import { ConsumablePF2e } from "../types/src/module/item";
+import type { SignedCoins, UnsignedCoins } from "./Helper/currencyTypes.mjs";
+import type { ConsumablePF2e, ChatMessagePF2e } from "foundry-pf2e";
+
 import { forageCraftingResources, forageSocketListener } from "./Forage/forager.mjs";
 import { HeroCraftingMenu } from "./Menu/HeroicCraftingMenu.mjs";
 import { beginProject } from "./BeginProject/beginProject.mjs";
@@ -13,7 +14,6 @@ import { craftProjectChatButtonListener } from "./CraftProject/chatListener.mjs"
 import { forageCraftingResourcesChatButtonListener } from "./Forage/chatListener.mjs";
 import { initRuleElements } from "./RuleElement/initRuleElements.mjs";
 import { MaterialTrove } from "./MaterialTrove/materialTrove.mjs";
-import { SignedCoins, UnsignedCoins } from "./Helper/currencyTypes.mjs";
 import { UnsignedCoinsPF2e } from "./Helper/unsignedCoins.mjs";
 import { SignedCoinsPF2e } from "./Helper/signedCoins.mjs";
 
@@ -34,16 +34,18 @@ Handlebars.registerHelper("formatCoin", (coins: SignedCoins | UnsignedCoins, ign
 
 Hooks.once("init", () => {
 	console.log("Heroic Crafting | Initializing game variables");
-	game.pf2eHeroicCrafting = {
-		salvage,
-		beginProject,
-		reverseEngineer,
-		craftProject,
-		openHeroCraftingMenu: HeroCraftingMenu.openHeroCraftingMenu,
-		forageCraftingResources,
-		editProject,
-		MaterialTrove,
-	};
+	Object.assign(game, {
+		pf2eHeroicCrafting: {
+			salvage,
+			beginProject,
+			reverseEngineer,
+			craftProject,
+			openHeroCraftingMenu: HeroCraftingMenu.openHeroCraftingMenu,
+			forageCraftingResources,
+			editProject,
+			MaterialTrove,
+		},
+	});
 
 	initRuleElements();
 

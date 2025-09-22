@@ -1,15 +1,16 @@
-import { CraftingFormula } from "../../types/src/module/actor/character/crafting";
-import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../types/src/module/item";
-import { ItemInstances } from "../../types/src/module/item/types";
-import {
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { UnsignedCoins } from "../Helper/currencyTypes.mjs";
+import type { ProjectContextData } from "../Projects/projects.mjs";
+import type { CraftingFormula, PhysicalItemPF2e, TreasurePF2e, ItemPF2e } from "foundry-pf2e";
+import type {
 	ApplicationConfiguration,
-	ApplicationRenderOptions,
 	ApplicationTab,
-} from "../../types/types/foundry/client/applications/_module.mjs";
-import { HandlebarsRenderOptions } from "../../types/types/foundry/client/applications/api/handlebars-application.mjs";
+	ApplicationRenderOptions,
+} from "foundry-pf2e/foundry/client/applications/_module.mjs";
+import type { HandlebarsRenderOptions } from "foundry-pf2e/foundry/client/applications/api/handlebars-application.mjs";
+
 import { beginProject } from "../BeginProject/beginProject.mjs";
 import { BeginProjectDetailsType } from "../BeginProject/types.mjs";
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { craftProject } from "../CraftProject/craftProject.mjs";
 import { editProject } from "../EditProject/editProject.mjs";
 import { forageCraftingResources } from "../Forage/forager.mjs";
@@ -20,21 +21,20 @@ import {
 	MATERIAL_TROVE_UUID,
 	SALVAGE_MATERIAL_SLUG,
 } from "../Helper/constants.mjs";
-import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 import { calculateDC } from "../Helper/dc.mjs";
 import { getHeroicItemRollOptions } from "../Helper/item.mjs";
 import { consoleDebug } from "../Helper/log.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { editMaterialTrove } from "../MaterialTrove/materialTroveHelper.mjs";
-import { ProjectContextData, Projects } from "../Projects/projects.mjs";
+import { Projects } from "../Projects/projects.mjs";
 import { reverseEngineer } from "../ReverseEngineer/reverseEngineer.mjs";
 import { ModifyConstantRuleElementHelper } from "../RuleElement/Helpers/ModifyConstantHelper.mjs";
 import { salvage } from "../Salvage/salvage.mjs";
 
 const { ApplicationV2, DialogV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-type ItemType = keyof ItemInstances<CharacterPF2eHeroicCrafting>;
+type ItemType = "armor" | "shield" | "consumable" | "backpack" | "book" | "equipment" | "treasure" | "weapon";
 
 enum HeroCraftingMenuTab {
 	BEGIN = "begin",
@@ -612,7 +612,7 @@ export class HeroCraftingMenu extends HandlebarsApplicationMixin(ApplicationV2) 
 			| ItemType[]
 		)[]) {
 			const allItems = Array.isArray(itemType)
-				? itemType.flatMap((it) => this.actor.itemTypes[it])
+				? itemType.flatMap<PhysicalItemPF2e<CharacterPF2eHeroicCrafting>>((it) => this.actor.itemTypes[it])
 				: this.actor.itemTypes[itemType];
 			const items = allItems.filter(
 				(item: PhysicalItemPF2e<CharacterPF2eHeroicCrafting>) =>

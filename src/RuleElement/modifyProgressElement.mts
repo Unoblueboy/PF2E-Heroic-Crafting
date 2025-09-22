@@ -1,20 +1,23 @@
-import { ResolvableValueField, RuleElementSchema } from "../../types/src/module/rules/rule-element";
-import { RollOptionRuleElement } from "../../types/src/module/rules/rule-element/roll-option/rule-element";
-import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
-import { StringField } from "../../types/types/foundry/common/data/fields.mjs";
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
-import {
-	HEROIC_CRAFTING_GATHERED_INCOME,
-	HEROIC_CRAFTING_SPENDING_LIMIT,
+import type {
+	RuleElementSchema,
+	DegreeOfSuccessString,
+	RollOptionRuleElement,
+	ResolvableValueField,
+} from "foundry-pf2e";
+import type { StringField } from "foundry-pf2e/foundry/common/data/fields.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { ModifyProgressSynthetic } from "./types.js";
+import type { UnsignedCoins } from "../Helper/currencyTypes.mjs";
+import type {
 	HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD,
 	HEROIC_CRAFTING_SPENDING_LIMIT_UNSIGNEDCOINSPF2E_RECORD,
 } from "../Helper/constants.mjs";
+
+import { HEROIC_CRAFTING_GATHERED_INCOME, HEROIC_CRAFTING_SPENDING_LIMIT } from "../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
-import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 import { objectToString } from "../Helper/generics.mjs";
 import { consoleDebug } from "../Helper/log.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
-import { ModifyProgressSynthetic } from "./types";
 
 type ModifyProgressSchema = RuleElementSchema & {
 	outcome: StringField;
@@ -160,7 +163,7 @@ export class ModifyProgressRuleElement extends game.pf2e.RuleElement<ModifyProgr
 				) {
 					change = UnsignedCoinsPF2e.fromString(change);
 				}
-				if (!CoinsPF2eUtility.isCoin(change)) {
+				if (!CoinsPF2eUtility.isUnsignedCoin(change)) {
 					const changeString = objectToString(change);
 					this.failValidation(`${this.value} (${changeString}) could not resolve to Coins`);
 					return;

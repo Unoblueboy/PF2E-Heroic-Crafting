@@ -1,4 +1,5 @@
-import { Coins } from "../../types/src/module/item/physical";
+import type { UnsignedCoins } from "./currencyTypes.mjs";
+
 import { UnsignedCoinsPF2e } from "./unsignedCoins.mjs";
 
 export const MATERIAL_TROVE_UUID =
@@ -29,9 +30,9 @@ export const SAVVY_TEARDOWN_ROLL_OPTION = "action:savvy-teardown" as const;
 export const SPECIALTY_ROLL_OPTION = "specialty" as const;
 
 export type HEROIC_CRAFTING_SPENDING_LIMIT_COINS_RECORD = {
-	hour: Coins;
-	day: Coins;
-	week: Coins;
+	hour: UnsignedCoins;
+	day: UnsignedCoins;
+	week: UnsignedCoins;
 };
 
 export type HEROIC_CRAFTING_SPENDING_LIMIT_UNSIGNEDCOINSPF2E_RECORD = {
@@ -206,7 +207,7 @@ export const HEROIC_CRAFTING_SPENDING_LIMIT: Map<number, HEROIC_CRAFTING_SPENDIN
 	],
 ]);
 
-export const HEROIC_CRAFTING_GATHERED_INCOME: Map<number, Coins> = new Map<number, Coins>([
+export const HEROIC_CRAFTING_GATHERED_INCOME: Map<number, UnsignedCoins> = new Map<number, UnsignedCoins>([
 	[0, { sp: 1 }],
 	[1, { sp: 4 }],
 	[2, { sp: 6 }],
@@ -260,7 +261,7 @@ export const LEVEL_BASED_DC = new Map<number, number>([
 	[25, 50],
 ]);
 
-export const FORMULA_PRICE: Map<number, Coins> = new Map<number, Coins>([
+export const FORMULA_PRICE: Map<number, UnsignedCoins> = new Map<number, UnsignedCoins>([
 	[0, { sp: 5 }],
 	[1, { gp: 1 }],
 	[2, { gp: 2 }],

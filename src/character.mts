@@ -1,6 +1,5 @@
-import { CharacterPF2e } from "../types/src/module/actor";
-import { RuleElementSynthetics } from "../types/src/module/rules";
-import { ModifyProgressSynthetic, ModifyConstantSynthetic } from "./RuleElement/types";
+import type { CharacterPF2e, RuleElementSynthetics } from "foundry-pf2e";
+import type { ModifyProgressSynthetic, ModifyConstantSynthetic } from "./RuleElement/types.js";
 
 interface PF2eHeroicCraftingRuleElementSynthetics {
 	modifyProgress?: ModifyProgressSynthetic[];

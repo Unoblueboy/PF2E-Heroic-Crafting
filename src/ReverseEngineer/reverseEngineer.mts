@@ -1,7 +1,8 @@
-import { PhysicalItemPF2e } from "../../types/src/module/item";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { PhysicalItemPF2e } from "foundry-pf2e";
+
 import { BeginProjectApplication } from "../BeginProject/Applications/BeginProjectApplication.mjs";
 import { beginProject } from "../BeginProject/beginProject.mjs";
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { createSalvage } from "../Salvage/salvage.mjs";
 import { ReverseEngineerApplication } from "./Applications/ReverseEngineerApplication.mjs";
 

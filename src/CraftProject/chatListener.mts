@@ -1,6 +1,7 @@
-import { ChatMessagePF2e } from "../../types/src/module/chat-message/document";
-import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { ProjectCraftDetails } from "./types.mjs";
+import type { ChatMessagePF2e, DegreeOfSuccessString } from "foundry-pf2e";
+
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 import { fractionToPercent } from "../Helper/generics.mjs";
 import { hasFeat } from "../Helper/item.mjs";
@@ -9,7 +10,6 @@ import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { AProject, Projects } from "../Projects/projects.mjs";
 import { CraftProjectUtility } from "./craftProjectUtility.mjs";
-import { ProjectCraftDetails } from "./types.mjs";
 
 export async function craftProjectChatButtonListener(message: ChatMessagePF2e, html: HTMLElement, _data: unknown) {
 	const craftProjectResults = html.querySelector("[data-craft-project-results]");

@@ -1,17 +1,18 @@
-import {
-	ApplicationClosingOptions,
+import type { CharacterPF2eHeroicCrafting } from "../../character.mjs";
+import type { UnsignedCoins, SignedCoins } from "../../Helper/currencyTypes.mjs";
+import type { EditMaterialTroveApplicationResult } from "./types.mjs";
+import type {
 	ApplicationConfiguration,
+	ApplicationClosingOptions,
 	ApplicationRenderOptions,
-} from "../../../types/types/foundry/client/applications/_module.mjs";
-import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/_module.mjs";
-import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
-import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
+} from "foundry-pf2e/foundry/client/applications/_module.mjs";
+import type { HandlebarsRenderOptions } from "foundry-pf2e/foundry/client/applications/api/handlebars-application.mjs";
+import type FormDataExtended from "foundry-pf2e/foundry/client/applications/ux/form-data-extended.mjs";
+
 import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
-import { UnsignedCoins, SignedCoins } from "../../Helper/currencyTypes.mjs";
 import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 import { MaterialTrove } from "../materialTrove.mjs";
-import { EditMaterialTroveApplicationResult } from "./types.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 

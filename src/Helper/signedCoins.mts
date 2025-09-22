@@ -1,4 +1,6 @@
-import { DENOMINATIONS, SignedCoins } from "./currencyTypes.mjs";
+import type { SignedCoins } from "./currencyTypes.mjs";
+
+import { DENOMINATIONS } from "./currencyTypes.mjs";
 
 export class SignedCoinsPF2e implements SignedCoins {
 	declare cp: number;

@@ -1,12 +1,13 @@
-import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../../types/src/module/item";
-import {
-	ApplicationClosingOptions,
+import type { PhysicalItemPF2e, ItemPF2e, TreasurePF2e } from "foundry-pf2e";
+import type {
 	ApplicationConfiguration,
 	ApplicationRenderOptions,
-} from "../../../types/types/foundry/client/applications/_module.mjs";
-import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
-import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
-import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
+	ApplicationClosingOptions,
+} from "foundry-pf2e/foundry/client/applications/_module.mjs";
+import type { HandlebarsRenderOptions } from "foundry-pf2e/foundry/client/applications/api/handlebars-application.mjs";
+import type FormDataExtended from "foundry-pf2e/foundry/client/applications/ux/form-data-extended.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../../character.mjs";
+
 import { CRAFTING_MATERIAL_SLUG, MATERIAL_TROVE_SLUG, SALVAGE_MATERIAL_SLUG } from "../../Helper/constants.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -152,7 +153,7 @@ export class ReverseEngineerApplication extends HandlebarsApplicationMixin(Appli
 	}
 
 	private async onDrop(event: DragEvent) {
-		const data = game.pf2e.TextEditor.getDragEventData(event);
+		const data = game.pf2e.TextEditor.getDragEventData(event) as Record<string, JSONValue>;
 
 		const item = await this.getItem(data);
 		if (!item) return;

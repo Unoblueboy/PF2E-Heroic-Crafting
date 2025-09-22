@@ -1,11 +1,12 @@
-import { DegreeOfSuccessString } from "../../../types/src/module/system/degree-of-success";
-import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../../character.mjs";
+import type { SignedCoins } from "../../Helper/currencyTypes.mjs";
+import type { ModifyProgressSynthetic } from "../types.js";
+import type { DegreeOfSuccessString } from "foundry-pf2e";
+
 import { DEGREE_OF_SUCCESS_STRINGS } from "../../Helper/constants.mjs";
-import { SignedCoins } from "../../Helper/currencyTypes.mjs";
 import { consoleDebug } from "../../Helper/log.mjs";
 import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
-import { ModifyProgressSynthetic } from "../types";
 
 type ProjectProgress = {
 	[x in DegreeOfSuccessString]: SignedCoins;

@@ -1,5 +1,5 @@
-import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
-import { UnsignedCoins, SignedCoins } from "../Helper/currencyTypes.mjs";
+import type { DegreeOfSuccessString } from "foundry-pf2e";
+import type { UnsignedCoins, SignedCoins } from "../Helper/currencyTypes.mjs";
 
 export type BasicMaterials = {
 	trove?: UnsignedCoins;

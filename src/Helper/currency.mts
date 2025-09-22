@@ -1,11 +1,15 @@
-import { Coins } from "../../types/src/module/item/physical";
-import { UnsignedCoins, SignedCoins } from "./currencyTypes.mjs";
+import type { UnsignedCoins, SignedCoins } from "./currencyTypes.mjs";
+
 import { SignedCoinsPF2e } from "./signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "./unsignedCoins.mjs";
 
 export class CoinsPF2eUtility {
-	static isCoin(coin: unknown): coin is Coins {
+	static isCoin(coin: unknown): coin is UnsignedCoins | SignedCoins {
 		return typeof coin === "object" && coin !== null;
+	}
+
+	static isUnsignedCoin(coin: unknown): coin is UnsignedCoins {
+		return typeof coin === "object" && coin !== null && !Object.hasOwn(coin, "isNegative");
 	}
 
 	static toSignedCoins(coins: UnsignedCoins | SignedCoins) {

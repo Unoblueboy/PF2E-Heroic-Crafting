@@ -1,9 +1,7 @@
-import { ChatMessagePF2e } from "../../types/src/module/chat-message";
-import { PhysicalItemPF2e } from "../../types/src/module/item";
-import { CheckRoll } from "../../types/src/module/system/check";
-import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
-import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { PhysicalItemPF2e, CheckRoll, DegreeOfSuccessString, ChatMessagePF2e } from "foundry-pf2e";
+import type { Rolled } from "foundry-pf2e/foundry/client/dice/roll.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { Projects } from "../Projects/projects.mjs";
 import { CraftProjectApplication } from "./Applications/CraftProjectApplications.mjs";

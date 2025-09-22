@@ -1,4 +1,5 @@
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+
 import { Projects } from "../Projects/projects.mjs";
 import { EditProjectApplication } from "./Applications/editProjectApplications.mjs";
 

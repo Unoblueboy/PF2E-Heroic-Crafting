@@ -1,4 +1,5 @@
-import { ConsumablePF2e } from "../../types/src/module/item";
+import type { ConsumablePF2e } from "foundry-pf2e";
+
 import { hasFeat } from "../Helper/item.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { createSalvage } from "../Salvage/salvage.mjs";

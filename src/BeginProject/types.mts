@@ -1,6 +1,6 @@
-import { PhysicalItemPF2e } from "../../types/src/module/item/physical";
-import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
-import { Either } from "../Helper/generics.mjs";
+import type { PhysicalItemPF2e } from "foundry-pf2e";
+import type { UnsignedCoins } from "../Helper/currencyTypes.mjs";
+import type { Either } from "../Helper/generics.mjs";
 
 export interface ProjectItemDetails {
 	dc: number;

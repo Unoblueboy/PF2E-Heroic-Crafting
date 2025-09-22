@@ -1,4 +1,4 @@
-import { Coins } from "../../types/src/module/item/physical";
+import type { Coins } from "foundry-pf2e";
 
 export const DENOMINATIONS = ["pp", "gp", "sp", "cp"] as const;
 export type DENOMINATION = (typeof DENOMINATIONS)[number];

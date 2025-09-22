@@ -1,5 +1,5 @@
-import { ActorPF2e } from "../../types/src/module/actor";
-import { ConsumablePF2e, FeatPF2e, PhysicalItemPF2e, WeaponPF2e } from "../../types/src/module/item";
+import type { PhysicalItemPF2e, ConsumablePF2e, WeaponPF2e, ActorPF2e, FeatPF2e } from "foundry-pf2e";
+
 import { HEROIC_CRAFTING_ROLL_OPTION_PREFIX } from "./constants.mjs";
 
 export function getHeroicItemRollOptions(item: PhysicalItemPF2e | undefined): Set<string> {

@@ -1,10 +1,12 @@
-import { PhysicalItemPF2e } from "../../types/src/module/item/physical";
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { BeginProjectDetails, BeginProjectStartingValues } from "./types.mjs";
+import type { PhysicalItemPF2e } from "foundry-pf2e";
+
 import { consoleDebug } from "../Helper/log.mjs";
 import { MaterialTrove } from "../MaterialTrove/materialTrove.mjs";
 import { Projects } from "../Projects/projects.mjs";
 import { BeginProjectApplication } from "./Applications/BeginProjectApplication.mjs";
-import { BeginProjectDetails, BeginProjectDetailsType, BeginProjectStartingValues } from "./types.mjs";
+import { BeginProjectDetailsType } from "./types.mjs";
 
 export async function beginProject(
 	actor?: CharacterPF2eHeroicCrafting,

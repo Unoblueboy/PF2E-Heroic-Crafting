@@ -1,17 +1,15 @@
-import { ActorPF2e } from "../../types/src/module/actor";
-import { ContainerPF2e, TreasurePF2e } from "../../types/src/module/item";
-import { PhysicalItemPF2e } from "../../types/src/module/item/physical";
-import { TreasureSource } from "../../types/src/module/item/treasure/data";
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { UnsignedCoins } from "../Helper/currencyTypes.mjs";
+import type { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";
+import type { ContainerPF2e, TreasurePF2e, ActorPF2e, TreasureSource, PhysicalItemPF2e } from "foundry-pf2e";
+
 import { ProjectCraftDuration } from "../CraftProject/types.mjs";
 import { MATERIAL_TROVE_SLUG, CRAFTING_MATERIAL_SLUG, CRAFTING_MATERIAL_UUID } from "../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
-import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 import { consoleDebug } from "../Helper/log.mjs";
 import { SignedCoinsPF2e } from "../Helper/signedCoins.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { ModifyConstantRuleElementHelper } from "../RuleElement/Helpers/ModifyConstantHelper.mjs";
-import { EditMaterialTroveApplicationResult } from "./Applications/types.mjs";
 
 export async function useActorCoins(
 	result: EditMaterialTroveApplicationResult,

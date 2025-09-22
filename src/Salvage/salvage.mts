@@ -1,16 +1,20 @@
-import { ChatMessagePF2e } from "../../types/src/module/chat-message";
-import { PhysicalItemPF2e, TreasurePF2e } from "../../types/src/module/item";
-import { CheckRoll } from "../../types/src/module/system/check";
-import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
-import { StatisticRollParameters } from "../../types/src/module/system/statistic";
-import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
+import type { SalvageApplicationResult } from "./Applications/types.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { UnsignedCoins } from "../Helper/currencyTypes.mjs";
+import type {
+	PhysicalItemPF2e,
+	StatisticRollParameters,
+	CheckRoll,
+	DegreeOfSuccessString,
+	ChatMessagePF2e,
+	TreasurePF2e,
+} from "foundry-pf2e";
+import type { Rolled } from "foundry-pf2e/foundry/client/dice/roll.mjs";
+
 import { SALVAGE_MATERIAL_UUID } from "../Helper/constants.mjs";
 import { SalvageApplication } from "./Applications/SalvageApplication.mjs";
-import { SalvageApplicationResult } from "./Applications/types.mjs";
 import { calculateDC } from "../Helper/dc.mjs";
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
-import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 
 export async function salvage(actor: CharacterPF2eHeroicCrafting, item?: PhysicalItemPF2e, lockItem = false) {
 	const salvageDetails = await SalvageApplication.GetSalvageDetails({ actor: actor, item: item, lockItem: lockItem });

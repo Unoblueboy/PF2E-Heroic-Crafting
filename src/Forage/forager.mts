@@ -1,15 +1,15 @@
-import { ChatMessagePF2e } from "../../types/src/module/chat-message";
-import { CheckRoll } from "../../types/src/module/system/check";
-import { DegreeOfSuccessString } from "../../types/src/module/system/degree-of-success";
-import { Rolled } from "../../types/types/foundry/client/dice/_module.mjs";
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { CheckRoll, DegreeOfSuccessString, ChatMessagePF2e } from "foundry-pf2e";
+import type { Rolled } from "foundry-pf2e/foundry/client/dice/roll.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { GetDCMessage, RollCheckMessage, SocketMessage } from "./types.mjs";
+
 import { FORAGE_ROLL_OPTION, HEROIC_CRAFTING_GATHERED_INCOME } from "../Helper/constants.mjs";
 import { CoinsPF2eUtility } from "../Helper/currency.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
 import { ModifyProgressRuleElementHelper } from "../RuleElement/Helpers/ModifyProgressHelper.mjs";
 import { ForageDcDialog } from "./Applications/ForageDcDialog.mjs";
 import { ForageLocationLevelDialog } from "./Applications/ForageLocationLevelDialog.mjs";
-import { ForageCraftingResourcesRequest, GetDCMessage, RollCheckMessage, SocketMessage } from "./types.mjs";
+import { ForageCraftingResourcesRequest } from "./types.mjs";
 
 export async function forageCraftingResources(actor: CharacterPF2eHeroicCrafting) {
 	if (!actor) return;

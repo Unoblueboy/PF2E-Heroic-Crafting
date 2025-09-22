@@ -1,4 +1,5 @@
-import { Rarity } from "../../types/src/module/data";
+import type { Rarity } from "foundry-pf2e";
+
 import { LEVEL_BASED_DC } from "./constants.mjs";
 
 export function calculateDC(level: number, rarity: Rarity = "common"): number {

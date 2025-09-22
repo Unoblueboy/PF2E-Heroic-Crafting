@@ -1,13 +1,16 @@
-import { ItemPF2e, PhysicalItemPF2e, TreasurePF2e } from "../../../types/src/module/item";
-import {
-	ApplicationClosingOptions,
+import type { DENOMINATION, UnsignedCoins } from "../../Helper/currencyTypes.mjs";
+import type { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../../character.mjs";
+import type { PhysicalItemPF2e, DegreeOfSuccessString, ItemPF2e, TreasurePF2e } from "foundry-pf2e";
+import type {
 	ApplicationConfiguration,
 	ApplicationRenderOptions,
-} from "../../../types/types/foundry/client/applications/_module.mjs";
-import { HandlebarsRenderOptions } from "../../../types/types/foundry/client/applications/api/handlebars-application.mjs";
-import { FormDataExtended } from "../../../types/types/foundry/client/applications/ux/_module.mjs";
+	ApplicationClosingOptions,
+} from "foundry-pf2e/foundry/client/applications/_module.mjs";
+import type { HandlebarsRenderOptions } from "foundry-pf2e/foundry/client/applications/api/handlebars-application.mjs";
+import type FormDataExtended from "foundry-pf2e/foundry/client/applications/ux/form-data-extended.mjs";
+
 import { CoinsPF2eUtility } from "../../Helper/currency.mjs";
-import { DENOMINATION, UnsignedCoins } from "../../Helper/currencyTypes.mjs";
 import {
 	CRAFTING_MATERIAL_SLUG,
 	DEGREE_OF_SUCCESS_STRINGS,
@@ -18,9 +21,6 @@ import {
 	SAVVY_TEARDOWN_ROLL_OPTION,
 	SAVVY_TEARDOWN_SLUG,
 } from "../../Helper/constants.mjs";
-import { SalvageApplicationOptions, SalvageApplicationResult } from "./types.mjs";
-import { CharacterPF2eHeroicCrafting } from "../../character.mjs";
-import { DegreeOfSuccessString } from "../../../types/src/module/system/degree-of-success";
 import { UnsignedCoinsPF2e } from "../../Helper/unsignedCoins.mjs";
 import { SignedCoinsPF2e } from "../../Helper/signedCoins.mjs";
 import { ModifyProgressRuleElementHelper } from "../../RuleElement/Helpers/ModifyProgressHelper.mjs";
@@ -276,7 +276,7 @@ export class SalvageApplication extends HandlebarsApplicationMixin(ApplicationV2
 	 * @protected
 	 */
 	private async onDrop(event: DragEvent) {
-		const data = game.pf2e.TextEditor.getDragEventData(event);
+		const data = game.pf2e.TextEditor.getDragEventData(event) as Record<string, JSONValue>;
 
 		const item = await this.getItem(data);
 		if (!item) return;

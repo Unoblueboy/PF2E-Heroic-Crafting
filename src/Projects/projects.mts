@@ -1,11 +1,10 @@
-import { Rarity } from "../../types/src/module/data";
-import { SpellPF2e } from "../../types/src/module/item";
-import { PhysicalItemPF2e } from "../../types/src/module/item/physical";
-import { ItemUUID } from "../../types/types/foundry/common/documents/_module.mjs";
-import { itemDataUuid, ProjectItemDetails } from "../BeginProject/types.mjs";
-import { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { itemDataUuid, ProjectItemDetails } from "../BeginProject/types.mjs";
+import type { CharacterPF2eHeroicCrafting } from "../character.mjs";
+import type { UnsignedCoins } from "../Helper/currencyTypes.mjs";
+import type { PhysicalItemPF2e, SpellPF2e, Rarity } from "foundry-pf2e";
+import type { ItemUUID } from "foundry-pf2e/foundry/common/documents/_module.mjs";
+
 import { FORMULA_PRICE, MODULE_ID, RARITIES } from "../Helper/constants.mjs";
-import { UnsignedCoins } from "../Helper/currencyTypes.mjs";
 import { fractionToPercent } from "../Helper/generics.mjs";
 import { getHeroicItemRollOptions } from "../Helper/item.mjs";
 import { UnsignedCoinsPF2e } from "../Helper/unsignedCoins.mjs";
