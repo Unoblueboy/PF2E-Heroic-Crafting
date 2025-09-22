@@ -858,7 +858,6 @@ section.heroic-crafting-menu {
 			grid-template-areas: "name dc price _ button";
 			grid-template-rows: 1fr;
 			grid-template-columns: 1fr 1.5rem 4.5rem 7rem max-content;
-			height: var(--img-thumbnail-size);
 			min-height: var(--img-thumbnail-size);
 			box-sizing: content-box;
 		}
