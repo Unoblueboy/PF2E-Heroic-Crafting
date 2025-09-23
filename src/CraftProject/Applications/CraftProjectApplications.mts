@@ -16,6 +16,7 @@ import {
 	CRAFT_A_PROJECT_ROLL_OPTION,
 	CRAFT_ROLL_OPTION,
 	CRAFTING_MATERIAL_SLUG,
+	HEROIC_CRAFTING_ROLL_OPTION_PREFIX,
 	MATERIAL_TROVE_SLUG,
 	MIDNIGHT_CRAFTING_SLUG,
 	SALVAGE_MATERIAL_SLUG,
@@ -570,7 +571,7 @@ export class CraftProjectApplication extends HandlebarsApplicationMixin(Applicat
 			...(await this.project.getRollOptions()),
 			CRAFT_ROLL_OPTION,
 			CRAFT_A_PROJECT_ROLL_OPTION,
-			`heroic:crafting:duration:${this.formData.craftDuration}`,
+			`${HEROIC_CRAFTING_ROLL_OPTION_PREFIX}:duration:${this.formData.craftDuration}`,
 		]);
 
 		if (this.formData.craftingOptions.midnightCrafting) {
