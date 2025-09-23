@@ -165,3 +165,5 @@ dist
 /build
 
 *.code-workspace
+
+project-words.txt
