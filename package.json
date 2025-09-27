@@ -9,7 +9,11 @@
 		"build-dev": "node ./node-scripts/build.mjs dev & npx tsc",
 		"watch": "npx concurrently --kill-others \"node ./node-scripts/watch.mjs\" \"npx tsc --watch --preserveWatchOutput\""
 	},
-	"author": "",
+	"authors": [
+		{
+			"name": "unoblueboy"
+		}
+	],
 	"license": "MIT",
 	"devDependencies": {
 		"@eslint/js": "^9.31.0",
