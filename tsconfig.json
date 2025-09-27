@@ -10,7 +10,6 @@
 		"strict": true /* Enable all strict type-checking options. */,
 		"skipLibCheck": true /* Skip type checking all .d.ts files. */,
 		"sourceMap": true,
-		"isolatedModules": true,
 		"types": ["foundry-pf2e", "foundry-pf2e/lib-wrapper"]
 	}
 }
