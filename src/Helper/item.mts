@@ -1,4 +1,4 @@
-import type { PhysicalItemPF2e, ConsumablePF2e, WeaponPF2e, ActorPF2e, FeatPF2e } from "foundry-pf2e";
+import type { PhysicalItemPF2e, ConsumablePF2e, ActorPF2e, FeatPF2e } from "foundry-pf2e";
 
 import { HEROIC_CRAFTING_ROLL_OPTION_PREFIX } from "./constants.mjs";
 
@@ -38,17 +38,10 @@ export function getGenericScrollOrWandRank(item: ConsumablePF2e) {
 
 export function getMaxBatchSize(item: PhysicalItemPF2e | undefined): number {
 	if (!item) return 1;
-	const isAmmo = item.isOfType("consumable") && (item as ConsumablePF2e).isAmmo;
-	const isMundaneAmmo = isAmmo && !item.isMagical;
-	const isConsumable =
-		(item.isOfType("consumable") && (item as ConsumablePF2e).category !== "wand") ||
-		(item.isOfType("weapon") && (item as WeaponPF2e).baseType === "alchemical-bomb");
 
-	const magicalAmmo = isConsumable && !isAmmo ? 4 : 1;
-	const batchSize = Math.max(
-		item.system.price.per,
-		isMundaneAmmo ? Math.clamp(item.system.price.per, 1, 10) : magicalAmmo
-	);
+	const isConsumable = item.system.traits.value.includes("consumable");
+	const batchSize = Math.max(item.system.price.per, isConsumable ? 4 : 1);
+
 	return batchSize;
 }
 
